@@ -8,23 +8,29 @@ import { useParams } from "react-router-dom";
 function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
   const { id } = useParams();
   const [filterUser, setFilterUser] = useState("Customer");
-  const [toWhom, setToWhom] = useState({});
   const userDetails = useSelector((state) => state.users);
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
 
   const [formData, setFormData] = useState({
-    companyRef: "",
-    projectRef: "",
-    bookRef: "",
     amount: 0,
-    categoryType: "",
+    bookRef: "",
+    category: "",
+    companyRef: "",
     date: Timestamp.fromDate(new Date()),
-    paymentMode: "Cash",
+    paymentMode: "",
+    projectRef: "",
     remarks: "",
     toWhom: {
       userType: "Customer",
+      address: "",
+      city: "",
+      zipcode: "",
+      gstNumber: 0,
+      name: "",
+      phoneNumber: "",
+      userRef: "",
     },
     transactionType: isModalOpen.type,
   });
@@ -65,63 +71,55 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
 
   function onHandleSelectUser(e) {
     const { value } = e.target;
-    let userData = {};
-
+    let data = {};
+    let userRef = {};
     if (formData.toWhom.userType === "Vendor") {
-      const data = userDataSet.vendors.find((ele) => ele.id === value);
-
-      const vendorRef = doc(db, "vendors", value);
-      userData = {
-        vendor: {
-          address: data?.address,
-          gstNumber: data?.businessDetails?.gst_number || 0,
-          name: data?.name,
-          phoneNumber: data?.phone || 0,
-          vendorRef,
-        },
-      };
+      data = userDataSet.vendors.find((ele) => ele.id === value);
+      userRef = doc(db, "vendors", value);
     } else if (formData.toWhom.userType === "Customer") {
-      const data = userDataSet.customers.find((ele) => ele.id === value);
-      const custRef = doc(db, "customers", value);
-      userData = {
-        customer: {
-          address: data?.address,
-          gstNumber: data?.businessDetails?.gst_number || 0,
-          name: data.name,
-          phoneNumber: data?.phone || 0,
-          custRef,
-        },
-      };
+      data = userDataSet.customers.find((ele) => ele.id === value);
+      userRef = doc(db, "customers", value);
     } else if (formData.toWhom.userType === "Staff") {
-      const data = userDataSet.staff.find((ele) => ele.id === value);
-      const staffRef = doc(db, "staff", value);
-      userData = {
-        customer: {
-          address: data?.address,
-          gstNumber: data?.businessDetails?.gst_number || 0,
-          name: data.name,
-          phoneNumber: data?.phone || 0,
-          staffRef,
-        },
-      };
+      data = userDataSet.staff.find((ele) => ele.id === value);
+      userRef = doc(db, "staff", value);
     }
-    setToWhom(userData);
+    const userData = {
+      address: data?.address.address || "",
+      city: data?.address.city || "",
+      zipcode: data?.address.zipcode || "",
+      gstNumber: data?.businessDetails?.gst_number || 0,
+      name: data.name,
+      phoneNumber: data?.phone || 0,
+      userRef,
+    };
+    setFormData((val) => ({
+      ...val,
+      toWhom: { ...formData.toWhom, ...userData },
+    }));
   }
+
   function ResetForm() {
     setFormData({
-      companyRef: "",
-      ProjectRef: "",
       amount: 0,
-      categoryType: "",
+      bookRef: "",
+      category: "",
+      companyRef: "",
       date: Timestamp.fromDate(new Date()),
       paymentMode: "",
+      projectRef: "",
       remarks: "",
       toWhom: {
         userType: "Customer",
+        address: "",
+        city: "",
+        zipcode: "",
+        gstNumber: 0,
+        name: "",
+        phoneNumber: "",
+        userRef: "",
       },
       transactionType: isModalOpen.type,
     });
-    setToWhom({});
   }
 
   async function onSubmit() {
@@ -133,7 +131,6 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
         companyRef,
         bookRef,
         transactionType: isModalOpen.type,
-        toWhom: { ...formData.toWhom, ...toWhom },
       };
       await addDoc(collection(db, "companies", companyId, "expenses"), payload);
       alert("successfully Created " + isModalOpen.type);
@@ -255,9 +252,12 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
             <div>
               <select
                 className="w-full p-2 border-2 rounded-lg focus:outline-none"
+                value={formData.toWhom.userRef.id || ""}
                 onChange={onHandleSelectUser}
               >
-                <option disabled>select {formData.toWhom.userType}</option>
+                <option disabled value="">
+                  select {formData.toWhom.userType}
+                </option>
                 {formData.toWhom.userType === "Customer" &&
                   userDataSet.customers.map((ele) => (
                     <option value={ele.id} key={ele.id}>
@@ -288,7 +288,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
                 onChange={(e) =>
                   setFormData((val) => ({
                     ...val,
-                    categoryType: e.target.value,
+                    category: e.target.value,
                   }))
                 }
               >
@@ -330,6 +330,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
             <div>Mode</div>
             <select
               className="border p-2 rounded w-full"
+              value={formData.paymentMode || ""}
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
@@ -337,6 +338,9 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
                 }))
               }
             >
+              <option value="" disabled>
+                Select Payment Mode
+              </option>
               <option value="Cash">Cash</option>
               <option value="Emi">Emi</option>
               <option value="Cheque">Cheque</option>

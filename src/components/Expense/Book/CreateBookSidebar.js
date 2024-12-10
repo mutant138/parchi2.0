@@ -9,33 +9,28 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
-
+  const [confirmAccount, setConfirmAccount] = useState("");
   const [formData, setFormData] = useState({
-    bankAccountDetails: {
-      bank_account: "",
-      bank_ifsc_code: "",
-      bank_name: "",
-      branch_name: "",
-      confirm_bank_account: "",
-    },
-    createdAt: "",
+    accountNo: "",
+    IfscCode: "",
+    bankName: "",
+    branch: "",
     name: "",
     openingBalance: 0,
     upi: "",
+    createdAt: "",
   });
+
   function resetForm() {
     setFormData({
-      bankAccountDetails: {
-        bank_account: "",
-        bank_ifsc_code: "",
-        bank_name: "",
-        branch_name: "",
-        confirm_bank_account: "",
-      },
-      createdAt: "",
+      accountNo: "",
+      IfscCode: "",
+      bankName: "",
+      branch: "",
       name: "",
       openingBalance: 0,
       upi: "",
+      createdAt: "",
     });
   }
   async function onCreateAccount() {
@@ -69,7 +64,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between">
-          <h2 className="font-bold text-xl mb-4"> Select Products</h2>
+          <h2 className="font-bold text-xl mb-4"> Create Account/Book </h2>
           <button className="text-2xl mb-4" onClick={onClose}>
             <IoMdClose size={24} />
           </button>
@@ -112,10 +107,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
-                  bankAccountDetails: {
-                    ...formData.bankAccountDetails,
-                    bank_name: e.target.value,
-                  },
+                  bankName: e.target.value,
                 }))
               }
             />
@@ -130,30 +122,26 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
-                  bankAccountDetails: {
-                    ...formData.bankAccountDetails,
-                    bank_account: e.target.value,
-                  },
+                  accountNo: e.target.value,
                 }))
               }
             />
           </div>
           <div>
-            <label className="block font-semibold">Confirm Bank Account</label>
+            <label className="block font-semibold">
+              Confirm Bank Account{" "}
+              {confirmAccount !== formData.accountNo && (
+                <span className="text-red-500 text-xs">
+                  (AccountNo. Not Match)
+                </span>
+              )}
+            </label>
             <input
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="Confirm Bank Account"
               required
-              onChange={(e) =>
-                setFormData((val) => ({
-                  ...val,
-                  bankAccountDetails: {
-                    ...formData.bankAccountDetails,
-                    confirm_bank_account: e.target.value,
-                  },
-                }))
-              }
+              onChange={(e) => setConfirmAccount(e.target.value)}
             />
           </div>
           <div>
@@ -166,10 +154,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
-                  bankAccountDetails: {
-                    ...formData.bankAccountDetails,
-                    bank_ifsc_code: e.target.value,
-                  },
+                  IfscCode: e.target.value,
                 }))
               }
             />
@@ -184,10 +169,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
-                  bankAccountDetails: {
-                    ...formData.bankAccountDetails,
-                    branch_name: e.target.value,
-                  },
+                  branch: e.target.value,
                 }))
               }
             />

@@ -112,16 +112,7 @@ function Expense() {
     const userTypeLower = toWhom.userType.toLowerCase();
     const filterUserLower = filterUser.toLowerCase();
 
-    const userName =
-      userTypeLower === "customer"
-        ? toWhom.customer.name
-        : userTypeLower === "vendor"
-        ? toWhom.vendor.name
-        : userTypeLower === "staff"
-        ? toWhom.staff.name
-        : "";
-
-    const matchesSearch = userName
+    const matchesSearch = toWhom.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesStatus =
@@ -333,14 +324,7 @@ function Expense() {
                       </div>
                     )}
                     <div>
-                      <div>
-                        {expense.toWhom.userType.toLowerCase() === "customer" &&
-                          expense.toWhom?.customer?.name}
-                        {expense.toWhom.userType.toLowerCase() === "staff" &&
-                          expense.toWhom?.staff?.name}
-                        {expense.toWhom.userType.toLowerCase() === "vendor" &&
-                          expense.toWhom?.vendor?.name}
-                      </div>
+                      <div>{expense.toWhom?.name}</div>
                       <div>Created at: {DateFormate(expense.date)}</div>
                     </div>
                   </div>

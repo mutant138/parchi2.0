@@ -115,8 +115,8 @@ const ProductList = () => {
           <table className="min-w-full text-center text-gray-800 font-semibold ">
             <thead className="border-b">
               <tr>
-                <th className="px-4 py-2">Product Image</th>
-                <th className="px-4 py-2">Product Name</th>
+                <th className="px-4 py-2">Image</th>
+                <th className="px-4 py-2"> Name</th>
                 <th className="px-4 py-2">Description</th>
                 <th className="px-4 py-2">Unit Price</th>
                 <th className="px-4 py-2">Discount</th>
@@ -124,10 +124,10 @@ const ProductList = () => {
                 <th className="px-4 py-2">Purchase Price</th>
                 <th className="px-4 py-2">Including Tax</th>
                 <th className="px-4 py-2">Quantity</th>
-                <th className="px-4 py-2">Net Amount</th>
+                {/* <th className="px-4 py-2">Net Amount</th> */}
                 {/* <th className="px-4 py-2">SGST</th>
                 <th className="px-4 py-2">CGST</th> */}
-                <th className="px-4 py-2">Total Amount</th>
+                {/* <th className="px-4 py-2">Total Amount</th> */}
                 <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
@@ -165,10 +165,10 @@ const ProductList = () => {
                       {product.includingTax ? "Yes" : "No"}
                     </td>
                     <td className="px-4 py-3">{product.stock}</td>
-                    <td className="px-4 py-3">₹{product.netAmount}</td>
+                    {/* <td className="px-4 py-3">₹{product.netAmount}</td> */}
                     {/* <td className="px-4 py-3">₹{product.sgstAmount}</td>
                     <td className="px-4 py-3">₹{product.cgstAmount}</td> */}
-                    <td className="px-4 py-3">₹{product.totalAmount}</td>
+                    {/* <td className="px-4 py-3">₹{product.totalAmount}</td> */}
                     <td className="px-4 py-3">
                       <div className="flex justify-center items-center  space-x-4">
                         <div className="relative group">

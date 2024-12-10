@@ -10,6 +10,7 @@ import {
   getDocs,
   query,
   setDoc,
+  Timestamp,
   where,
 } from "firebase/firestore";
 import { useDispatch } from "react-redux";
@@ -95,6 +96,7 @@ const LandingPage = () => {
       try {
         const authResult = await confirmationResult.confirm(otp);
         const authUser = authResult.user;
+        console.log("🚀 ~ handleOtpSubmit ~ authUser:", authUser);
         const token = await authUser.getIdToken();
 
         let userDocRef = doc(db, "users", authUser.uid);
@@ -108,6 +110,7 @@ const LandingPage = () => {
             email: "",
             phone: "+919876543210",
             photoURL: "",
+            createdAt: Timestamp.fromDate(new Date()),
           };
           await setDoc(userDocRef, user);
 
@@ -115,6 +118,10 @@ const LandingPage = () => {
             userRef: userDocRef,
             userType: "Admin",
             name: "Your Company",
+            address: "",
+            city: "",
+            zip_code: "",
+            image: "",
           };
           const companyDocRef = await addDoc(
             collection(db, "companies"),
@@ -124,6 +131,10 @@ const LandingPage = () => {
             companyId: companyDocRef.id,
             userType: "Admin",
             name: "Your Company",
+            address: "",
+            city: "",
+            zip_code: "",
+            image: "",
           });
         } else {
           user = userDoc.data();
