@@ -20,14 +20,14 @@ const ProductList = () => {
   const userDetails = useSelector((state) => state.users);
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
-  const companyReference = doc(db, "companies", companyDetails.companyId);
+  const companyRef = doc(db, "companies", companyDetails.companyId);
 
   const fetchProducts = async () => {
     try {
       const productRef = collection(db, "products");
       const productQuery = query(
         productRef,
-        where("companyReference", "==", companyReference)
+        where("companyRef", "==", companyRef)
       );
 
       const querySnapshot = await getDocs(productQuery);

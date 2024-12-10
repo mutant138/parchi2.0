@@ -24,14 +24,14 @@ let initialState = {
 
 //   const projectRef = collection(db, "projects");
 
-//   const q = query(projectRef, where("companyReferance", "==", companyRef));
+//   const q = query(projectRef, where("companyRef", "==", companyRef));
 //   const querySnapshot = await getDocs(q);
 //   const projectsData = querySnapshot.docs.map((doc) => {
-//     const { projectMembers, companyReferance, createdAt, ...rest } = doc.data();
+//     const { projectMembers, companyRef, createdAt, ...rest } = doc.data();
 //     return {
 //       ...rest,
 //       projectId: doc.id,
-//       companyReferance: companyReferance.id,
+//       companyRef: companyRef.id,
 //       createdAt: DateFormate(createdAt),
 //       startDate: DateFormate(rest.startDate),
 //       dueDate: DateFormate(rest.dueDate),

@@ -401,21 +401,21 @@ function EditService() {
     });
   }
 
-  // function onSelectBook(e) {
-  //   const { value } = e.target;
-  //   const data = books.find((ele) => ele.id === value);
-  //   const bookRef = doc(
-  //     db,
-  //     "companies",
-  //     companyDetails.companyId,
-  //     "books",
-  //     value
-  //   );
-  //   setFormData((val) => ({
-  //     ...val,
-  //     book: { id: value, name: data.name, bookRef },
-  //   }));
-  // }
+  function onSelectBook(e) {
+    const { value } = e.target;
+    const data = books.find((ele) => ele.id === value);
+    const bookRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "books",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      book: { id: value, name: data.name, bookRef },
+    }));
+  }
   useEffect(() => {
     let discountAmount = formData.extraDiscount.amount || 0;
     if (formData.extraDiscount.type === "percentage") {
@@ -659,7 +659,7 @@ function EditService() {
                     </div>
                   )}
                 </div>
-                {/* <div className="w-full ">
+                <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
                     defaultValue=""
@@ -676,7 +676,7 @@ function EditService() {
                         </option>
                       ))}
                   </select>
-                </div> */}
+                </div>
                 <div className="w-full ">
                   <div>Sign</div>
                   <select

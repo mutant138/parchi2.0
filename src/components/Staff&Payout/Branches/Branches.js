@@ -40,7 +40,7 @@ const Branches = () => {
 
       const branchesRef = collection(db, "branches");
 
-      const q = query(branchesRef, where("companyReferance", "==", companyRef));
+      const q = query(branchesRef, where("companyRef", "==", companyRef));
 
       const querySnapshot = await getDocs(q);
 
@@ -205,7 +205,7 @@ const AddBranchModal = ({ isOpen, onClose, onAddBranch, companyId }) => {
       const companyRef = await doc(db, "companies", companyId);
       const payload = {
         ...formData,
-        companyReferance: companyRef,
+        companyRef: companyRef,
         createdAt: Timestamp.fromDate(new Date()),
       };
       const branchRef = await addDoc(collection(db, "branches"), payload);

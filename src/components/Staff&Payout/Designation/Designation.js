@@ -38,10 +38,7 @@ const Designation = () => {
 
       const designationRef = collection(db, "designations");
 
-      const q = query(
-        designationRef,
-        where("companyReferance", "==", companyRef)
-      );
+      const q = query(designationRef, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const designationData = querySnapshot.docs.map((doc) => ({
@@ -210,7 +207,7 @@ const AddDesignationModal = ({ onClose, onAddDesignation }) => {
 
       const payload = {
         ...newDesignation,
-        companyReferance: companyRef,
+        companyRef: companyRef,
         createdAt: Timestamp.fromDate(new Date()),
       };
       const docRef = await addDoc(collection(db, "designations"), payload);

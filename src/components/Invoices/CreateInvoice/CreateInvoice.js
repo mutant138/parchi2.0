@@ -79,12 +79,9 @@ const CreateInvoice = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const companyReference = doc(db, "companies", companyDetails.companyId);
+        const companyRef = doc(db, "companies", companyDetails.companyId);
         const productRef = collection(db, "products");
-        const q = query(
-          productRef,
-          where("companyReference", "==", companyReference)
-        );
+        const q = query(productRef, where("companyRef", "==", companyRef));
         const querySnapshot = await getDocs(q);
 
         const productsData = querySnapshot.docs.map((doc) => {
@@ -516,21 +513,22 @@ const CreateInvoice = () => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
-  // function onSelectBook(e) {
-  //   const { value } = e.target;
-  //   const data = books.find((ele) => ele.id === value);
-  //   const bookRef = doc(
-  //     db,
-  //     "companies",
-  //     companyDetails.companyId,
-  //     "books",
-  //     value
-  //   );
-  //   setFormData((val) => ({
-  //     ...val,
-  //     book: { id: value, name: data.name, bookRef },
-  //   }));
-  // }
+
+  function onSelectBook(e) {
+    const { value } = e.target;
+    const data = books.find((ele) => ele.id === value);
+    const bookRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "books",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      book: { id: value, name: data.name, bookRef },
+    }));
+  }
 
   return (
     <div
@@ -766,7 +764,7 @@ const CreateInvoice = () => {
                     </option>
                   </select>
                 </div>
-                {/* <div className="w-full ">
+                <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
                     defaultValue=""
@@ -783,7 +781,7 @@ const CreateInvoice = () => {
                         </option>
                       ))}
                   </select>
-                </div> */}
+                </div>
                 <div className="w-full ">
                   <div>Sign</div>
                   <select

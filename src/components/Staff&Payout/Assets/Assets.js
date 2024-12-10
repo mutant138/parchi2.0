@@ -40,7 +40,7 @@ const Assets = () => {
 
       const assetRef = collection(db, "assets");
 
-      const q = query(assetRef, where("companyReferance", "==", companyRef));
+      const q = query(assetRef, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const assetData = querySnapshot.docs.map((doc) => ({
@@ -257,7 +257,7 @@ const AddAssetModal = ({ onClose, onAddasset, isOpen, companyId }) => {
 
       const payload = {
         ...newAsset,
-        companyReferance: companyRef,
+        companyRef: companyRef,
         createdAt: Timestamp.fromDate(new Date()),
       };
 

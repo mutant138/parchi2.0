@@ -29,7 +29,7 @@ function CreateProject() {
       const companyRef = await doc(db, "companies", companyDetails.companyId);
       const payload = {
         ...projectForm,
-        companyReferance: companyRef,
+        companyRef: companyRef,
         createdAt: Timestamp.fromDate(new Date()),
       };
       await addDoc(collection(db, "projects"), payload);

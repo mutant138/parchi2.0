@@ -15,7 +15,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
 
   const [formData, setFormData] = useState({
-    companyReference: "",
+    companyRef: "",
     projectReference: "",
     bookReference: "",
     amount: 0,
@@ -109,7 +109,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
   }
   function ResetForm() {
     setFormData({
-      companyReference: "",
+      companyRef: "",
       ProjectReference: "",
       amount: 0,
       categoryType: "",
@@ -126,11 +126,11 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
 
   async function onSubmit() {
     try {
-      const companyReference = doc(db, "companies", companyId);
+      const companyRef = doc(db, "companies", companyId);
       const bookReference = doc(db, "companies", companyId, "books", id);
       const payload = {
         ...formData,
-        companyReference,
+        companyRef,
         bookReference,
         transactionType: isModalOpen.type,
         toWhom: { ...formData.toWhom, ...toWhom },

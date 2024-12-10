@@ -101,14 +101,11 @@ const LandingPage = () => {
         const user = userDoc.data();
 
         const companiesRef = collection(db, "companies");
-        const q = query(
-          companiesRef,
-          where("createdBy.userRef", "==", userDocRef)
-        );
+        const q = query(companiesRef, where("userRef", "==", userDocRef));
 
         const company = await getDocs(q);
         const companiesData = company.docs.map((doc) => {
-          const { createdBy, ...rest } = doc.data();
+          const { userRef, ...rest } = doc.data();
           return {
             companyId: doc.id,
             ...rest,
@@ -128,7 +125,7 @@ const LandingPage = () => {
 
         dispatch(setUserLogin(payload));
         alert("OTP verified successfully!");
-        navigate("/invoiceList")
+        navigate("/invoiceList");
         closeModal();
       } catch (error) {
         alert("Invalid OTP. Please try again.");
@@ -161,7 +158,6 @@ const LandingPage = () => {
       <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-4 bg-white shadow-md z-10">
         <div className="text-2xl font-bold text-blue-500">Sunya</div>
         <div className="space-x-4">
-          
           {/* <button
             className="bg-blue-500 text-white rounded-full px-4 py-1"
             onClick={openModal}

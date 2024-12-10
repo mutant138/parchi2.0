@@ -22,7 +22,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
   const [formData, setFormData] = useState({
     barcode: "",
     category: "",
-    companyReference: "",
+    companyRef: "",
     createdAt: "",
     description: "",
     discount: 0,
@@ -87,7 +87,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
     setFormData({
       barcode: "",
       category: "",
-      companyReference: "",
+      companyRef: "",
       createdAt: "",
       description: "",
       discount: 0,
@@ -145,7 +145,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
         const payload = {
           ...formData,
           image: productImageUrl,
-          // companyReference: doc(
+          // companyRef: doc(
           //   db,
           //   "companies",
           //   userDetails.companies[userDetails.selectedCompanyIndex].companyId
@@ -156,12 +156,12 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
         await updateDoc(productDocRef, payload); // Update product
         alert("Product successfully updated.");
       } else {
-        let productDocRef 
-        let productImageUrl =""
-        if(productImage?.name){
-        productImageUrl = await handleFileChange(productImage);
+        let productDocRef;
+        let productImageUrl = "";
+        if (productImage?.name) {
+          productImageUrl = await handleFileChange(productImage);
         }
-        const companyReference = doc(
+        const companyRef = doc(
           db,
           "companies",
           userDetails.companies[userDetails.selectedCompanyIndex].companyId
@@ -170,18 +170,18 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
 
         const payload = {
           ...formData,
-          image: productImageUrl ,
+          image: productImageUrl,
           createdAt: Timestamp.fromDate(new Date()),
-          companyReference,
+          companyRef,
           userReference,
         };
-        if(formData.barcode){
+        if (formData.barcode) {
           productDocRef = doc(db, "products", formData.barcode);
-          await setDoc(productDocRef, payload); 
-        }else{
+          await setDoc(productDocRef, payload);
+        } else {
           productDocRef = collection(db, "products");
-          await addDoc(productDocRef, payload); 
-        }   
+          await addDoc(productDocRef, payload);
+        }
         alert("Product successfully created.");
       }
       onProductAdded();

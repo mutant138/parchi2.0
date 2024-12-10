@@ -64,7 +64,7 @@ const Navbar = () => {
               </span> */}
             </Link>
 
-            {/* <div
+            <div
               className="flex items-center space-x-4 group relative cursor-pointer"
               onClick={() => setIsCompanyOpen(!isCompanyOpen)}
             >
@@ -83,7 +83,7 @@ const Navbar = () => {
               <div className="absolute z-10 left-0 top-10 w-max px-2 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
                 Change Company
               </div>
-            </div> */}
+            </div>
           </div>
 
           {/* <div className="flex-1 flex items-center justify-center">

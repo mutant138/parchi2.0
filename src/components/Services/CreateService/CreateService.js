@@ -594,7 +594,7 @@ function CreateService() {
                     </div>
                   )}
                 </div>
-                {/* <div className="w-full ">
+                <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
                     defaultValue=""
@@ -611,7 +611,7 @@ function CreateService() {
                         </option>
                       ))}
                   </select>
-                </div> */}
+                </div>
                 <div className="w-full ">
                   <div>Sign</div>
                   <select

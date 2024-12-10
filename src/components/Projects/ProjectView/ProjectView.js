@@ -94,7 +94,7 @@ function ProjectView() {
     console.log("data", data);
     const payload = {
       ...data,
-      companyReferance: data.companyReferance.id,
+      companyRef: data.companyRef.id,
       createdAt: DateFormate(data.createdAt),
       startDate: DateFormate(data.startDate, "yyyy-mm-dd"),
       dueDate: DateFormate(data.dueDate, "yyyy-mm-dd"),

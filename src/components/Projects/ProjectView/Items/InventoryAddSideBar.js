@@ -29,12 +29,9 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
     const fetchInventoryItems = async () => {
       setLoadingItems(true);
       try {
-        const companyReference = doc(db, "companies", companyId);
+        const companyRef = doc(db, "companies", companyId);
         const inventoryRef = collection(db, "products");
-        const q = query(
-          inventoryRef,
-          where("companyReference", "==", companyReference)
-        );
+        const q = query(inventoryRef, where("companyRef", "==", companyRef));
         const querySnapshot = await getDocs(q);
 
         const inventoryItems = querySnapshot.docs.map((doc) => ({
