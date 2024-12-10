@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../../firebase";
 import { setUserLogin } from "../../store/UserSlice";
 import {
+  addDoc,
   collection,
   doc,
   getDoc,
   getDocs,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { useDispatch } from "react-redux";
@@ -95,25 +97,51 @@ const LandingPage = () => {
         const authUser = authResult.user;
         const token = await authUser.getIdToken();
 
-        const userDocRef = doc(db, "users", authUser.uid);
+        let userDocRef = doc(db, "users", authUser.uid);
         const userDoc = await getDoc(userDocRef);
-        const user = userDoc.data();
-
-        const companiesRef = collection(db, "companies");
-        const q = query(companiesRef, where("userRef", "==", userDocRef));
-
-        const company = await getDocs(q);
-        const companiesData = company.docs.map((doc) => {
-          const { userRef, ...rest } = doc.data();
-          return {
-            companyId: doc.id,
-            ...rest,
+        let user = {};
+        let companiesData = [];
+        if (!userDoc.exists()) {
+          user = {
+            uid: authUser.uid,
+            displayName: "",
+            email: "",
+            phone: "+919876543210",
+            photoURL: "",
           };
-        });
+          await setDoc(userDocRef, user);
+
+          const companyPayload = {
+            userRef: userDocRef,
+            userType: "Admin",
+            name: "Your Company",
+          };
+          const companyDocRef = await addDoc(
+            collection(db, "companies"),
+            companyPayload
+          );
+          companiesData.push({
+            companyId: companyDocRef.id,
+            userType: "Admin",
+            name: "Your Company",
+          });
+        } else {
+          user = userDoc.data();
+          const companiesRef = collection(db, "companies");
+          const q = query(companiesRef, where("userRef", "==", userDocRef));
+          const company = await getDocs(q);
+          companiesData = company.docs.map((doc) => {
+            const { userRef, ...rest } = doc.data();
+            return {
+              companyId: doc.id,
+              ...rest,
+            };
+          });
+        }
 
         const payload = {
           userId: user.uid,
-          name: user.name || "",
+          name: user.displayName || "",
           email: user.email || "",
           phone: user.phone_number || "",
           companies: companiesData || [],
