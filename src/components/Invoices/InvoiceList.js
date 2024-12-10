@@ -251,7 +251,7 @@ const InvoiceList = () => {
                           </select>
                         </td>
                         <td className="py-3">
-                          {invoice.paymentMode || "Online"}
+                          {invoice.mode || "Online"}
                         </td>
                         <td className="py-3">{invoice.invoiceNo}</td>
 

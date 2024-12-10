@@ -88,7 +88,7 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
       }
 
       const amount = formData.pricing.sellingPrice.amount - fieldValue;
-      const sellingPriceTaxAmount =
+      let sellingPriceTaxAmount =
         amount * (formData.pricing.sellingPrice.taxSlab / 100);
       const companyRef = doc(
         db,
