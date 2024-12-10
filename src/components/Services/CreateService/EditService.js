@@ -60,7 +60,6 @@ function EditService() {
     totalAmount: 0,
     subTotalAmount: 0,
   });
-  console.log("Mounting pahase", totalAmounts.totalAmount);
   const [preServicesList, setPreServicesList] = useState([]);
 
   const [servicesList, setServicesList] = useState([]);
@@ -160,12 +159,12 @@ function EditService() {
           let sgstAmount = 0;
           let cgstAmount = 0;
 
-          if (!data.pricing.sellingPrice?.includingTax) {
-            sgst = taxRate / 2;
-            cgst = taxRate / 2;
-            sgstAmount = netAmount * (sgst / 100);
-            cgstAmount = netAmount * (cgst / 100);
-          }
+          // if (!data.pricing.sellingPrice?.includingTax) {
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
+          // }
           return {
             id: doc.id,
             serviceName: data.serviceName || "N/A",
@@ -177,13 +176,12 @@ function EditService() {
             cgst,
             sgstAmount,
             cgstAmount,
-            taxAmount: data.tax.taxAmount,
+            taxAmount: data.pricing.sellingPrice?.taxAmount,
             taxSlab: data.pricing.sellingPrice?.taxSlab,
             isSelected: false,
           };
         });
         setServicesList(serviceData);
-        console.log("🚀 ~ fetchServices ~ serviceData:", serviceData);
       } catch (error) {
         console.error("Error fetching services:", error);
       }
@@ -310,7 +308,7 @@ function EditService() {
           memberships: arrayUnion(formData.membershipId),
         });
       }
-      alert("successfully Created Service");
+      alert("successfully Updated Service");
       navigate("/services");
     } catch (err) {
       console.error(err);
@@ -340,10 +338,18 @@ function EditService() {
   }, [SelectedServicesList]);
 
   function calculationService(data) {
-    const totalTaxableAmount = data.reduce(
-      (sum, product) => sum + product.totalAmount,
-      0
-    );
+    // const totalTaxableAmount = data.reduce(
+    //   (sum, product) => sum + product.totalAmount,
+    //   0
+    // );
+
+    const totalTaxableAmount = data.reduce((sum, product) => {
+      const cal = sum + (product.totalAmount - product.taxAmount);
+      if (!product.includingTax) {
+        return sum + product.totalAmount;
+      }
+      return cal;
+    }, 0);
 
     const totalSgstAmount_2_5 = data.reduce(
       (sum, product) => (product.sgst === 2.5 ? sum + product.sgstAmount : sum),
@@ -386,7 +392,6 @@ function EditService() {
       discountAmount = (+subTotalAmount * discountAmount) / 100;
     }
     const totalAmount = +subTotalAmount - discountAmount;
-    console.log("🚀 ~ calculationService ~ totalAmount:", totalAmount);
     // Set state with the new values
     setTotalAmounts({
       totalTaxableAmount,
@@ -456,7 +461,7 @@ function EditService() {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">Create Service</h1>
+        <h1 className="text-2xl font-bold">Edit Service</h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg ">
         <div className="flex gap-8 mb-6">
@@ -768,7 +773,6 @@ function EditService() {
                     />
                     <select
                       className="border p-2 rounded"
-                      defaultValue="percentage"
                       value={formData.extraDiscount?.type}
                       onChange={(e) => {
                         setFormData((val) => ({

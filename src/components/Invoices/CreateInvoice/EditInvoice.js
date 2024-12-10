@@ -233,13 +233,11 @@ const EditInvoice = () => {
           let sgstAmount = 0;
           let cgstAmount = 0;
 
-          if (!data.sellingPriceTaxType) {
-            sgst = taxRate / 2;
-            cgst = taxRate / 2;
-            taxAmount = netAmount * (taxRate / 100);
-            sgstAmount = netAmount * (sgst / 100);
-            cgstAmount = netAmount * (cgst / 100);
-          }
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
 
           return {
             id: doc.id,
@@ -318,10 +316,14 @@ const EditInvoice = () => {
     // Calculate totals based on updated quantities
   }
   function calculateProduct(products) {
-    const totalTaxableAmount = products.reduce(
-      (sum, product) => sum + product.netAmount * product.actionQty,
-      0
-    );
+    const totalTaxableAmount = products.reduce((sum, product) => {
+      const cal =
+        sum + (product.netAmount - product.taxAmount) * product.actionQty;
+      if (!product.isIncludedTax) {
+        return sum + product.netAmount * product.actionQty;
+      }
+      return cal;
+    }, 0);
 
     const totalSgstAmount_2_5 = products.reduce(
       (sum, product) =>

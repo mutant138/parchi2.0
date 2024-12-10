@@ -131,7 +131,6 @@ const AddMilestoneModal = ({ onClose, onAddMilestone, projectId }) => {
       alert("Milestone name is required");
       return;
     }
-    console.log("projectId", projectId);
     setIsLoading(true);
 
     try {

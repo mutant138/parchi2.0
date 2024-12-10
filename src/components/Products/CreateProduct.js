@@ -36,7 +36,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
     stock: 0,
     tax: 0,
     units: "",
-    userReference: "",
+    userRef: "",
     warehouse: "",
   });
 
@@ -75,7 +75,6 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
     fetchCategories();
     fetchWarehouses();
     if (onProductUpdated) {
-      console.log("🚀 ~ useEffect ~ onProductUpdated:", onProductUpdated);
       setFormData({
         ...onProductUpdated,
       });
@@ -101,7 +100,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
       stock: 0,
       tax: 0,
       units: "",
-      userReference: "",
+      userRef: "",
       warehouse: "",
     });
     setProductImage("");
@@ -137,7 +136,6 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
       // }
       if (onProductUpdated?.id) {
         const productDocRef = doc(db, "products", onProductUpdated.id);
-        console.log("🚀 ~ onCreateProduct ~ productImage:", productImage);
         const productImageUrl = productImage.name
           ? await handleFileChange(productImage)
           : formData.image;
@@ -150,7 +148,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           //   "companies",
           //   userDetails.companies[userDetails.selectedCompanyIndex].companyId
           // ),
-          // userReference: doc(db, "users", userDetails.userId),
+          // userRef: doc(db, "users", userDetails.userId),
         };
 
         await updateDoc(productDocRef, payload); // Update product
@@ -166,14 +164,14 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           "companies",
           userDetails.companies[userDetails.selectedCompanyIndex].companyId
         );
-        const userReference = doc(db, "users", userDetails.userId);
+        const userRef = doc(db, "users", userDetails.userId);
 
         const payload = {
           ...formData,
           image: productImageUrl,
           createdAt: Timestamp.fromDate(new Date()),
           companyRef,
-          userReference,
+          userRef,
         };
         if (formData.barcode) {
           productDocRef = doc(db, "products", formData.barcode);
@@ -273,7 +271,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
               <select
                 className="w-full  border border-gray-300 p-2 rounded-r-lg"
                 name="pricing.sellingPrice.includingTax"
-                value={formData.sellingPriceTaxType || ""}
+                value={formData.sellingPriceTaxType}
                 onChange={(e) =>
                   setFormData((val) => ({
                     ...val,
@@ -306,7 +304,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
               />
               <select
                 className="w-full  border border-gray-300 p-2 rounded-r-lg"
-                value={formData.purchasePriceTaxType || ""}
+                value={formData.purchasePriceTaxType}
                 onChange={(e) =>
                   setFormData((val) => ({
                     ...val,

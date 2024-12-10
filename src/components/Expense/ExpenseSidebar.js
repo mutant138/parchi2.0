@@ -16,8 +16,8 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
 
   const [formData, setFormData] = useState({
     companyRef: "",
-    projectReference: "",
-    bookReference: "",
+    projectRef: "",
+    bookRef: "",
     amount: 0,
     categoryType: "",
     date: Timestamp.fromDate(new Date()),
@@ -110,7 +110,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
   function ResetForm() {
     setFormData({
       companyRef: "",
-      ProjectReference: "",
+      ProjectRef: "",
       amount: 0,
       categoryType: "",
       date: Timestamp.fromDate(new Date()),
@@ -127,11 +127,11 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
   async function onSubmit() {
     try {
       const companyRef = doc(db, "companies", companyId);
-      const bookReference = doc(db, "companies", companyId, "books", id);
+      const bookRef = doc(db, "companies", companyId, "books", id);
       const payload = {
         ...formData,
         companyRef,
-        bookReference,
+        bookRef,
         transactionType: isModalOpen.type,
         toWhom: { ...formData.toWhom, ...toWhom },
       };

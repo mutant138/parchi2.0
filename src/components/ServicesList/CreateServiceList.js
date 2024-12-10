@@ -76,10 +76,9 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
   }, [service]);
 
   // Create or update the service
-  const onCreateProduct = async (e) => {
+  const onCreateService = async (e) => {
     e.preventDefault();
     try {
-      let sellingPriceTaxAmount = 0;
       let fieldValue = formData.pricing.discount.amount;
 
       if (formData.pricing.discount.type === "Percentage") {
@@ -89,15 +88,19 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
       }
 
       const amount = formData.pricing.sellingPrice.amount - fieldValue;
-      if (!formData.pricing.sellingPrice.includingTax) {
-        sellingPriceTaxAmount =
-          amount * (formData.pricing.sellingPrice.taxSlab / 100);
-      }
+      const sellingPriceTaxAmount =
+        amount * (formData.pricing.sellingPrice.taxSlab / 100);
       const companyRef = doc(
         db,
         "companies",
         userDetails.companies[userDetails.selectedCompanyIndex].companyId
       );
+
+      if (!formData.pricing.sellingPrice.includingTax) {
+        sellingPriceTaxAmount =
+          amount * (formData.pricing.sellingPrice.taxSlab / 100);
+      }
+
       const payload = {
         ...formData,
         pricing: {
@@ -114,8 +117,7 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
         },
         tax: {
           taxSlab: formData.pricing.gstTax,
-          taxAmount:
-            sellingPriceTaxAmount * formData.pricing.sellingPrice.amount,
+          taxAmount: sellingPriceTaxAmount,
         },
         companyRef,
       };
@@ -159,7 +161,7 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
           <IoMdClose />
         </button>
 
-        <form className="space-y-1.5" onSubmit={onCreateProduct}>
+        <form className="space-y-1.5" onSubmit={onCreateService}>
           <div>
             <label className="text-sm block font-semibold mt-2">
               Service Details
@@ -308,9 +310,16 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
             <div className="grid w-full mb-2 items-center gap-1.5">
               <label className="text-sm block font-semibold ">Barcode</label>
               <input
-                id="picture"
-                type="file"
-                className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
+                className="w-full border border-gray-300 p-2 rounded-l-lg"
+                type="text"
+                placeholder="Barcode"
+                value={formData.barcode}
+                onChange={(e) =>
+                  setFormData((val) => ({
+                    ...val,
+                    barcode: e.target.value,
+                  }))
+                }
               />
             </div>
           </div>

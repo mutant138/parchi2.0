@@ -75,7 +75,6 @@ const LandingPage = () => {
           `+91${phoneNumber}`,
           window.recaptchaVerifier
         );
-        console.log(phoneNumber);
         setConfirmationResult(authResult);
         setIsOtpStage(true);
         setCountdown(60);

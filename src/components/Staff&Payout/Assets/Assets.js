@@ -215,7 +215,6 @@ const AddAssetModal = ({ onClose, onAddasset, isOpen, companyId }) => {
     fetchStaffDetails();
   }, [companyDetails.companyId]);
 
-  console.log("staffDetails", staffData);
   const handleAddAsset = async (e) => {
     e.preventDefault();
 

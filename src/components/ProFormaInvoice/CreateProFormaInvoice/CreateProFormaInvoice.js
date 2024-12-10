@@ -209,7 +209,6 @@ const CreateProFormaInvoice = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("🚀 ~ fetchBooks ~ fetchBooks:", fetchBooks);
         setBooks(fetchBooks);
       } catch (error) {
         console.log("🚀 ~ fetchBooks ~ error:", error);

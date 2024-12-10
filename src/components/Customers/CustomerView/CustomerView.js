@@ -94,10 +94,6 @@ function CustomerView() {
             date: DateFormate(data.date),
           };
         });
-        console.log(
-          "🚀 ~ customersInvoices ~ customersInvoices:",
-          customersInvoices
-        );
 
         setCustomersServicesData(customersInvoices);
       } catch (error) {

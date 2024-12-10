@@ -2,7 +2,6 @@ import React, { forwardRef } from "react";
 
 const Template1 = forwardRef((props, ref) => {
   const { invoiceData } = props;
-  console.log("🚀 ~ Template1 ~ invoiceData:", invoiceData);
 
   if (!invoiceData) {
     return;

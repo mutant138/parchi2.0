@@ -12,7 +12,6 @@ const DesignationView = () => {
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
 
   const { id } = useParams();
-  console.log("🚀 ~ DesignationView ~  id:", id);
   const [staffData, setStaffData] = useState([]);
   const [loading, setLoading] = useState(false);
 

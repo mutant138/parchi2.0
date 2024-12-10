@@ -204,7 +204,6 @@ const CreateQuotation = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("🚀 ~ fetchBooks ~ fetchBooks:", fetchBooks);
         setBooks(fetchBooks);
       } catch (error) {
         console.log("🚀 ~ fetchBooks ~ error:", error);
@@ -433,7 +432,6 @@ const CreateQuotation = () => {
           name: selectedCustomerData.name,
         },
       };
-      console.log("🚀 ~ onCreateQuotation ~ payload:", payload);
 
       await addDoc(
         collection(db, "companies", companyDetails.companyId, "quotations"),

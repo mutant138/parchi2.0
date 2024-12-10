@@ -19,7 +19,6 @@ import { db } from "../../../../firebase";
 
 function StaffView() {
   const { id } = useParams();
-  console.log("🚀 ~ StaffView ~ id:", id);
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;

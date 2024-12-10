@@ -38,7 +38,6 @@ const Files = () => {
   useEffect(() => {
     fetchFiles();
   }, []);
-  console.log("files", files);
   const fetchData = async (collectionName, setData) => {
     setLoading(true);
     try {
@@ -122,7 +121,6 @@ const Files = () => {
       const selectedCustomer = customers.find(
         (customer) => customer.id === formData.customerOrVendorRef
       );
-      console.log("customer", selectedCustomer);
       if (selectedCustomer) {
         setFormData((prevData) => ({
           ...prevData,
@@ -138,7 +136,6 @@ const Files = () => {
           ...prevData,
           phoneNumber: selectedVendor.phone,
         }));
-        console.log("vendor", selectedVendor);
       }
     }
   };

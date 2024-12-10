@@ -52,7 +52,7 @@ function POSViewHome({ POS }) {
         return;
       }
 
-      // Reference to the POS document
+      // Ref to the POS document
       const POSDocRef = doc(db, "companies", companyId, "pos", POS.id);
 
       const confirmDelete = window.confirm(
@@ -79,7 +79,6 @@ function POSViewHome({ POS }) {
             inventoryItem.productRef.id
           );
 
-          console.log("Updating inventory for:", inventoryItem.productRef.id);
           return updateDoc(inventoryDocRef, {
             "stock.quantity": increment(inventoryItem.quantity),
           });

@@ -52,7 +52,7 @@ function QuotationView({ quotation }) {
         return;
       }
 
-      // Reference to the quotation document
+      // Ref to the quotation document
       const quotationDocRef = doc(
         db,
         "companies",
@@ -60,7 +60,6 @@ function QuotationView({ quotation }) {
         "quotations",
         quotation.id
       );
-      console.log("Deleting quotation:", quotation.id);
 
       const confirmDelete = window.confirm(
         "Are you sure you want to delete this quotation?"
@@ -86,7 +85,6 @@ function QuotationView({ quotation }) {
             inventoryItem.productRef.id
           );
 
-          console.log("Updating inventory for:", inventoryItem.productRef.id);
           return updateDoc(inventoryDocRef, {
             "stock.quantity": increment(inventoryItem.quantity),
           });

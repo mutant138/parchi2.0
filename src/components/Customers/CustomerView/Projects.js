@@ -1,7 +1,6 @@
 import React from "react";
 
 function Projects({ customersProjectsData }) {
-  console.log("🚀 ~ Projects ~ customersProjectsData:", customersProjectsData);
   return (
     <div className=" p-4 rounded-lg">
       {customersProjectsData.length > 0 ? (

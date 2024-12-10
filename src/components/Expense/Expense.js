@@ -42,8 +42,8 @@ function Expense() {
     setLoading(true);
     try {
       const expensesRef = collection(db, "companies", companyId, "expenses");
-      const bookReference = doc(db, "companies", companyId, "books", id);
-      const q = query(expensesRef, where("bookReference", "==", bookReference));
+      const bookRef = doc(db, "companies", companyId, "books", id);
+      const q = query(expensesRef, where("bookRef", "==", bookRef));
       const querySnapshot = await getDocs(q);
       const totalAmountData = {
         total: 0,
@@ -65,8 +65,6 @@ function Expense() {
         };
       });
       setTotalAmounts(totalAmountData);
-
-      console.log("🚀 ~ fetchExpenses ~ expensesData:", expensesData);
 
       setExpenses(expensesData);
     } catch (error) {
@@ -135,7 +133,6 @@ function Expense() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-      console.log(searchTerm);
     }, 500);
 
     return () => clearTimeout(handler);

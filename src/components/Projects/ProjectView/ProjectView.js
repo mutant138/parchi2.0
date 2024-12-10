@@ -91,7 +91,6 @@ function ProjectView() {
   async function fetchData() {
     const getData = await getDoc(doc(db, "projects", id));
     const data = getData.data();
-    console.log("data", data);
     const payload = {
       ...data,
       companyRef: data.companyRef.id,

@@ -14,6 +14,7 @@ import NewCustomerModal from "./NewCustomerModal/NewCustomerModal";
 import { FaSearch, FaRegEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { RiDeleteBin6Line } from "react-icons/ri";
+
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);

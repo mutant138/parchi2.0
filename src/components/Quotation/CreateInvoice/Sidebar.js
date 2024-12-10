@@ -16,7 +16,6 @@ function Sidebar({
   );
 
   useEffect(() => {
-    console.log(productList);
     setProducts(productList);
   }, [productList]);
 
@@ -63,7 +62,9 @@ function Sidebar({
               }
             >
               <div className="">
-                <div className="font-bold">{product.itemName} - Quantity: {product.quantity || "0"}</div>
+                <div className="font-bold">
+                  {product.itemName} - Quantity: {product.quantity || "0"}
+                </div>
                 {product.quantity !== 0 && (
                   <div className="border-2 rounded-lg flex justify-between w-20 text-lg mt-2">
                     <button

@@ -54,10 +54,7 @@ function ProForma({ proForma }) {
         return;
       }
 
-      console.log("Company ID:", companyId);
-      console.log("Items:", proForma.items);
-
-      // Reference to the proForma document
+      // Ref to the proForma document
       const proFormaDocRef = doc(
         db,
         "companies",
@@ -65,7 +62,6 @@ function ProForma({ proForma }) {
         "proFormaInvoice",
         proForma.id
       );
-      console.log("Deleting proForma:", proForma.id);
 
       const confirmDelete = window.confirm(
         "Are you sure you want to delete this proForma?"
@@ -91,7 +87,6 @@ function ProForma({ proForma }) {
             inventoryItem.productRef.id
           );
 
-          console.log("Updating inventory for:", inventoryItem.productRef.id);
           return updateDoc(inventoryDocRef, {
             "stock.quantity": increment(inventoryItem.quantity),
           });

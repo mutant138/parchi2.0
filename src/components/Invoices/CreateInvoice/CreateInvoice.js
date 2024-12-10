@@ -86,7 +86,6 @@ const CreateInvoice = () => {
 
         const productsData = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          console.log("🚀 ~ productsData ~ data:", data);
           let discount = +data.discount || 0;
 
           if (data.discountType) {
@@ -136,7 +135,6 @@ const CreateInvoice = () => {
           };
         });
         setProducts(productsData);
-        console.log("🚀 ~ fetchProducts ~ productsData:", productsData);
       } catch (error) {
         console.error("Error fetching invoices:", error);
       }
@@ -279,20 +277,17 @@ const CreateInvoice = () => {
     });
     setIsProductSelected(countOfSelect > 0);
     // Calculate totals based on updated quantities
-    console.log("products", updatedProducts);
     let totalTaxableAmount = 0;
 
     totalTaxableAmount = updatedProducts.reduce((sum, product) => {
       const cal =
         sum + (product.netAmount - product.taxAmount) * product.actionQty;
       if (!product.isIncludedTax) {
-        console.log("false");
         return sum + product.netAmount * product.actionQty;
       }
       return cal;
     }, 0);
 
-    console.log("totalTaxableAmount1", totalTaxableAmount);
     // } else {
     //   totalTaxableAmount = updatedProducts.reduce(
     //     (sum, product) =>
@@ -301,7 +296,6 @@ const CreateInvoice = () => {
     //   );
     //   console.log("totalTaxableAmount2", totalTaxableAmount);
     // }
-    console.log("totalTaxableAmount", totalTaxableAmount);
     const totalSgstAmount_2_5 = updatedProducts.reduce(
       (sum, product) =>
         product.sgst === 2.5

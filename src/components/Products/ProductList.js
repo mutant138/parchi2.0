@@ -64,7 +64,6 @@ const ProductList = () => {
         };
       });
       setProducts(productsData);
-      console.log(productsData);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -79,7 +78,6 @@ const ProductList = () => {
     try {
       await deleteDoc(doc(db, "products", productId));
       fetchProducts();
-      console.log("Product deleted successfully!");
     } catch (error) {
       console.error("Error deleting product:", error);
     }

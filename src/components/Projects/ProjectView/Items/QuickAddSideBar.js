@@ -41,7 +41,7 @@ function QuickAddSideBar({ isOpen, onClose, isMaterialAdd }) {
     try {
       const projectRef = doc(db, "projects", projectId);
       const amount = +formData.quantity * +formData.itemPricePerPiece;
-      const userReference = doc(db, "users", userDetails.userId);
+      const userRef = doc(db, "users", userDetails.userId);
       const companyRef = doc(db, "companies", companyId);
 
       const payloadInventory = {
@@ -56,7 +56,7 @@ function QuickAddSideBar({ isOpen, onClose, isMaterialAdd }) {
         tax: 0,
         description: formData.description,
         createdAt: Timestamp.fromDate(new Date()),
-        userReference,
+        userRef,
         companyRef,
       };
 

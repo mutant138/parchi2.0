@@ -14,7 +14,6 @@ function Invoice({ invoice }) {
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
-  console.log("🚀 ~ Invoice ~ invoice:", invoice);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
@@ -53,10 +52,7 @@ function Invoice({ invoice }) {
         return;
       }
 
-      console.log("Company ID:", companyId);
-      console.log("Items:", invoice.items);
-
-      // Reference to the invoice document
+      // Ref to the invoice document
       const invoiceDocRef = doc(
         db,
         "companies",
@@ -64,7 +60,6 @@ function Invoice({ invoice }) {
         "invoices",
         invoice.id
       );
-      console.log("Deleting invoice:", invoice.id);
 
       const confirmDelete = window.confirm(
         "Are you sure you want to delete this invoice?"
@@ -90,7 +85,6 @@ function Invoice({ invoice }) {
             inventoryItem.productRef.id
           );
 
-          console.log("Updating inventory for:", inventoryItem.productRef.id);
           return updateDoc(inventoryDocRef, {
             "stock.quantity": increment(inventoryItem.quantity),
           });

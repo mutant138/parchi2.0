@@ -89,12 +89,10 @@ function CreateService() {
           let sgstAmount = 0;
           let cgstAmount = 0;
 
-          if (!data.pricing.sellingPrice?.includingTax) {
-            sgst = taxRate / 2;
-            cgst = taxRate / 2;
-            sgstAmount = netAmount * (sgst / 100);
-            cgstAmount = netAmount * (cgst / 100);
-          }
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
           return {
             id: doc.id,
             serviceName: data.serviceName || "N/A",
@@ -106,13 +104,12 @@ function CreateService() {
             cgst,
             sgstAmount,
             cgstAmount,
-            taxAmount: data.tax.taxAmount,
+            taxAmount: data.pricing.sellingPrice?.taxAmount,
             taxSlab: data.pricing.sellingPrice?.taxSlab,
             isSelected: false,
           };
         });
         setServicesList(serviceData);
-        console.log("🚀 ~ fetchServices ~ serviceData:", serviceData);
       } catch (error) {
         console.error("Error fetching services:", error);
       }
@@ -166,14 +163,13 @@ function CreateService() {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("🚀 ~ fetchBooks ~ fetchBooks:", fetchBooks);
         setBooks(fetchBooks);
       } catch (error) {
         console.log("🚀 ~ fetchBooks ~ error:", error);
       }
     }
 
-    fetchBooks();
+    // fetchBooks();
     fetchServicesNumbers();
     customerDetails();
     fetchServices();
@@ -273,15 +269,26 @@ function CreateService() {
   function onSelectService(data) {
     setSelectedServicesList(data);
 
-    const totalTaxableAmount = data.reduce(
-      (sum, product) => sum + product.totalAmount,
-      0
-    );
+    // const totalTaxableAmount = data.reduce(
+    //   (sum, product) => sum + product.totalAmount,
+    //   0
+    // );
+
+    let totalTaxableAmount = 0;
+
+    totalTaxableAmount = data.reduce((sum, product) => {
+      const cal = sum + (product.totalAmount - product.taxAmount);
+      if (!product.includingTax) {
+        return sum + product.totalAmount;
+      }
+      return cal;
+    }, 0);
 
     const totalSgstAmount_2_5 = data.reduce(
       (sum, product) => (product.sgst === 2.5 ? sum + product.sgstAmount : sum),
       0
     );
+
     const totalCgstAmount_2_5 = data.reduce(
       (sum, product) => (product.cgst === 2.5 ? sum + product.cgstAmount : sum),
       0
@@ -291,6 +298,7 @@ function CreateService() {
       (sum, product) => (product.sgst === 6 ? sum + product.sgstAmount : sum),
       0
     );
+
     const totalCgstAmount_6 = data.reduce(
       (sum, product) => (product.cgst === 6 ? sum + product.cgstAmount : sum),
       0
@@ -300,6 +308,7 @@ function CreateService() {
       (sum, product) => (product.sgst === 9 ? sum + product.sgstAmount : sum),
       0
     );
+
     const totalCgstAmount_9 = data.reduce(
       (sum, product) => (product.cgst === 9 ? sum + product.cgstAmount : sum),
       0
@@ -561,7 +570,7 @@ function CreateService() {
                 <div className="w-full ">
                   <div>Membership Period</div>
                   <select
-                    value={membershipPeriod}
+                    defaultValue={membershipPeriod}
                     onChange={(e) => {
                       const value = e.target.value;
                       setMembershipPeriod(value);
@@ -594,7 +603,7 @@ function CreateService() {
                     </div>
                   )}
                 </div>
-                <div className="w-full ">
+                {/* <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
                     defaultValue=""
@@ -611,11 +620,10 @@ function CreateService() {
                         </option>
                       ))}
                   </select>
-                </div>
+                </div> */}
                 <div className="w-full ">
                   <div>Sign</div>
                   <select
-                    value=""
                     onChange={() => {}}
                     className="border p-2 rounded w-full"
                   >
@@ -725,6 +733,7 @@ function CreateService() {
                       </span>
                     </div>
                   )}
+
                   {totalAmounts.totalSgstAmount_2_5 > 0 && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>SGST(2.5%)</span>
@@ -765,7 +774,19 @@ function CreateService() {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
-
+                  {formData.extraDiscount.amount > 0 && (
+                    <div className="flex justify-between text-gray-700 mb-2">
+                      <span>Extra Discount Amount</span>
+                      <span>
+                        ₹{" "}
+                        {formData.extraDiscount.type === "percentage"
+                          ? (+totalAmounts.subTotalAmount *
+                              formData.extraDiscount.amount) /
+                            100
+                          : formData.extraDiscount.amount}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-xl mb-2">
                     <span>Total Amount</span>
                     <span>₹ {totalAmounts.totalAmount.toFixed(2)}</span>
