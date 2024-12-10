@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { GrMenu } from "react-icons/gr";
-// import { LiaMoneyBillWaveSolid } from "react-icons/lia";
-// import { GrUserManager } from "react-icons/gr";
-// import { CgMoreVerticalO } from "react-icons/cg";
+import { LiaMoneyBillWaveSolid } from "react-icons/lia";
+import { GrUserManager } from "react-icons/gr";
+import { CgMoreVerticalO } from "react-icons/cg";
 import { FaAngleUp } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
@@ -17,10 +17,10 @@ function SideBar() {
       // image: <LiaMoneyBillWaveSolid size={30} />,
       isExpend: true,
       items: [
-        // {
-        //   name: "Expense",
-        //   path: "/expense",
-        // },
+        {
+          name: "Expense",
+          path: "/expense",
+        },
         {
           name: "Invoice",
           path: "/invoiceList",
@@ -29,30 +29,30 @@ function SideBar() {
           name: "Services",
           path: "/services",
         },
-        // {
-        //   name: "Quotation",
-        //   path: "/quotation",
-        // },
-        // {
-        //   name: "Pro Forma Invoice",
-        //   path: "/pro-forma-invoice",
-        // },
-        // {
-        //   name: "PO",
-        //   path: "/po",
-        // },
-        // {
-        //   name: "Delivery Challan",
-        //   path: "",
-        // },
-        // {
-        //   name: "Credit Note",
-        //   path: "",
-        // },
-        // {
-        //   name: "POS",
-        //   path: "/pos",
-        // },
+        {
+          name: "Quotation",
+          path: "/quotation",
+        },
+        {
+          name: "Pro Forma Invoice",
+          path: "/pro-forma-invoice",
+        },
+        {
+          name: "PO",
+          path: "/po",
+        },
+        {
+          name: "Delivery Challan",
+          path: "",
+        },
+        {
+          name: "Credit Note",
+          path: "",
+        },
+        {
+          name: "POS",
+          path: "/pos",
+        },
       ],
     },
     manage: {
@@ -83,34 +83,34 @@ function SideBar() {
           name: "Vendors",
           path: "/vendor",
         },
-        // {
-        //   name: "Documents",
-        //   path: "",
-        // },
-        // {
-        //   name: "Reminder",
-        //   path: "/reminder",
-        // },
+        {
+          name: "Documents",
+          path: "",
+        },
+        {
+          name: "Reminder",
+          path: "/reminder",
+        },
       ],
     },
-    // more: {
-    //   // image: <CgMoreVerticalO size={30} />,
-    //   isExpend: true,
-    //   items: [
-    //     {
-    //       name: "Insights",
-    //       path: "",
-    //     },
-    //     {
-    //       name: "Report",
-    //       path: "",
-    //     },
-    //     {
-    //       name: "Business Card",
-    //       path: "",
-    //     },
-    //   ],
-    // },
+    more: {
+      // image: <CgMoreVerticalO size={30} />,
+      isExpend: true,
+      items: [
+        {
+          name: "Insights",
+          path: "",
+        },
+        {
+          name: "Report",
+          path: "",
+        },
+        {
+          name: "Business Card",
+          path: "",
+        },
+      ],
+    },
   });
 
   return (
@@ -248,7 +248,7 @@ function SideBar() {
           </div>
         </div>
 
-        {/* <div className="mt-3  border-b-2 mb-10">
+        <div className="mt-3  border-b-2 mb-10">
           <div
             className="flex items-center justify-between"
             onClick={() =>
@@ -296,7 +296,7 @@ function SideBar() {
                 </Link>
               ))}
           </div>
-        </div> */}
+        </div>
       </div>
     </div>
   );

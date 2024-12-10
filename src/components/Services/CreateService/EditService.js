@@ -208,27 +208,27 @@ function EditService() {
       }
     }
 
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     console.log("🚀 ~ fetchBooks ~ fetchBooks:", fetchBooks);
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    async function fetchBooks() {
+      try {
+        const bookRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "books"
+        );
+        const getBookData = await getDocs(bookRef);
+        const fetchBooks = getBookData.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log("🚀 ~ fetchBooks ~ fetchBooks:", fetchBooks);
+        setBooks(fetchBooks);
+      } catch (error) {
+        console.log("🚀 ~ fetchBooks ~ error:", error);
+      }
+    }
 
-    // fetchBooks();
+    fetchBooks();
     fetchServiceData();
     customerDetails();
     fetchServices();

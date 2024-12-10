@@ -173,7 +173,7 @@ function CreateService() {
       }
     }
 
-    // fetchBooks();
+    fetchBooks();
     fetchServicesNumbers();
     customerDetails();
     fetchServices();

@@ -95,7 +95,7 @@ const Home = () => {
               path="/invoiceList/:id/edit-invoice"
               element={<EditInvoice />}
             ></Route>
-            {/* <Route path="/quotation" element={<Quotation />}></Route>
+            <Route path="/quotation" element={<Quotation />}></Route>
             <Route
               path="/quotation/:id"
               element={<QuotationViewHome />}
@@ -115,10 +115,10 @@ const Home = () => {
             <Route
               path="/pro-forma-invoice/create-invoice"
               element={<CreateProFormaInvoice />}
-            ></Route> */}
-            {/* <Route path="/pos" element={<POS />}></Route>
+            ></Route>
+            <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
-            <Route path="/pos/create-pos" element={<CreatePOS />}></Route> */}
+            <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
             <Route path="/customer" element={<CustomerList />}></Route>
             <Route path="/customer/:id" element={<CustomerView />}></Route>
             <Route path="/vendor" element={<VendorList />}></Route>
@@ -176,11 +176,11 @@ const Home = () => {
               element={<EditService />}
             ></Route>
             <Route path="/chats" element={<Chats />}></Route>
-            {/* <Route path="/po" element={<PO />}></Route>
+            <Route path="/po" element={<PO />}></Route>
             <Route path="/create-po" element={<CreatePo />}></Route>
             <Route path="/reminder" element={<Reminder />}></Route>
             <Route path="/expense" element={<BookList />}></Route>
-            <Route path="/expense/:id" element={<Expense />}></Route> */}
+            <Route path="/expense/:id" element={<Expense />}></Route>
           </Routes>
           <Outlet />
         </div>
