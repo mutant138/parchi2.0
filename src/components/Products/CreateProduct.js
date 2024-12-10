@@ -28,7 +28,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
     discount: 0,
     discountType: true,
     image: "",
-    itemName: "",
+    name: "",
     purchasePrice: 0,
     purchasePriceTaxType: true,
     sellingPrice: 0,
@@ -39,6 +39,9 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
     userRef: "",
     warehouse: "",
   });
+
+  const companyDetails =
+    userDetails.companies[userDetails.selectedCompanyIndex];
 
   useEffect(() => {
     const fetchWarehouses = async () => {
@@ -92,7 +95,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
       discount: 0,
       discountType: false,
       image: "",
-      itemName: "",
+      name: "",
       purchasePrice: 0,
       purchasePriceTaxType: true,
       sellingPrice: 0,
@@ -106,18 +109,18 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
     setProductImage("");
   }
 
-  const handleFileChange = async (file) => {
-    if (file) {
-      try {
-        const storageRef = ref(storage, `productImages/${file.name}`);
-        await uploadBytes(storageRef, file);
-        const productImageUrl = await getDownloadURL(storageRef);
-        return productImageUrl;
-      } catch (error) {
-        console.error("Error uploading file:", error);
-      }
-    }
-  };
+  // const handleFileChange = async (file) => {
+  //   if (file) {
+  //     try {
+  //       const storageRef = ref(storage, `productImages/${file.name}`);
+  //       await uploadBytes(storageRef, file);
+  //       const productImageUrl = await getDownloadURL(storageRef);
+  //       return productImageUrl;
+  //     } catch (error) {
+  //       console.error("Error uploading file:", error);
+  //     }
+  //   }
+  // };
 
   async function onCreateProduct(e) {
     e.preventDefault();
@@ -134,15 +137,16 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
       //   alert("Please provide a valid barcode.");
       //   return;
       // }
+
       if (onProductUpdated?.id) {
-        const productDocRef = doc(db, "products", onProductUpdated.id);
-        const productImageUrl = productImage.name
-          ? await handleFileChange(productImage)
-          : formData.image;
+        const productDocRef = doc(db, "companies", companyDetails.companyId, "products", onProductUpdated.id);
+        // const productImageUrl = productImage.name
+        //   ? await handleFileChange(productImage)
+        //   : formData.image;
 
         const payload = {
           ...formData,
-          image: productImageUrl,
+          // image: productImageUrl,
           // companyRef: doc(
           //   db,
           //   "companies",
@@ -150,15 +154,15 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           // ),
           // userRef: doc(db, "users", userDetails.userId),
         };
-
+     console.log('payload', formData)
         await updateDoc(productDocRef, payload); // Update product
         alert("Product successfully updated.");
       } else {
         let productDocRef;
-        let productImageUrl = "";
-        if (productImage?.name) {
-          productImageUrl = await handleFileChange(productImage);
-        }
+        // let productImageUrl = "";
+        // if (productImage?.name) {
+        //   productImageUrl = await handleFileChange(productImage);
+        // }
         const companyRef = doc(
           db,
           "companies",
@@ -168,16 +172,22 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
 
         const payload = {
           ...formData,
-          image: productImageUrl,
+          // image: productImageUrl,
           createdAt: Timestamp.fromDate(new Date()),
           companyRef,
           userRef,
         };
         if (formData.barcode) {
-          productDocRef = doc(db, "products", formData.barcode);
+          productDocRef = doc(db,"companies", companyDetails.companyId, "products", formData.barcode);
           await setDoc(productDocRef, payload);
         } else {
-          productDocRef = collection(db, "products");
+          // productDocRef = collection(db, "products");
+          productDocRef = collection(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "products"
+          );
           await addDoc(productDocRef, payload);
         }
         alert("Product successfully created.");
@@ -240,13 +250,13 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
             </label>
             <input
               type="text"
-              name="itemName"
+              name="name"
               className="w-full border border-gray-300 p-2 rounded-md  focus:outline-none"
-              placeholder="ItemName"
-              value={formData.itemName || ""}
+              placeholder="name"
+              value={formData.name || ""}
               required
               onChange={(e) =>
-                setFormData((val) => ({ ...val, itemName: e.target.value }))
+                setFormData((val) => ({ ...val, name: e.target.value }))
               }
             />
           </div>

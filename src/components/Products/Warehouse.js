@@ -173,9 +173,9 @@ const AddWarehouseModal = ({ isOpen, onClose, onAddWarehouse, companyId }) => {
         setIsLoading(false);
         return;
       }
-      const storageRef = ref(storage, `warehouses/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const fileUrl = await getDownloadURL(storageRef);
+      // const storageRef = ref(storage, `warehouses/${Date.now()}_${file.name}`);
+      // await uploadBytes(storageRef, file);
+      // const fileUrl = await getDownloadURL(storageRef);
 
       const warehouseData = {
         name,
@@ -184,7 +184,7 @@ const AddWarehouseModal = ({ isOpen, onClose, onAddWarehouse, companyId }) => {
           city: location.city,
         },
         phone,
-        fileUrl,
+        // fileUrl,
         createdAt: Timestamp.fromDate(new Date()),
         updatedAt: Timestamp.fromDate(new Date()),
       };

@@ -158,14 +158,14 @@ const Profile = ({ staffData, refresh }) => {
                   <label className="text-sm text-gray-500">Email</label>
                   <input
                     type="email"
-                    value={UpdatedData.email || (isEdit ? "" : "N/A")}
+                    value={UpdatedData.emailId || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        email: e.target.value,
+                        emailId: e.target.value,
                       }))
                     }
                     readOnly={!isEdit}
@@ -182,7 +182,7 @@ const Profile = ({ staffData, refresh }) => {
                   <input
                     type="text"
                     value={
-                      UpdatedData.address?.address || (isEdit ? "" : "N/A")
+                      UpdatedData.address || (isEdit ? "" : "N/A")
                     }
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
@@ -190,10 +190,10 @@ const Profile = ({ staffData, refresh }) => {
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        address: {
-                          ...UpdatedData.address,
+                        // address: {
+                        //   ...UpdatedData.address,
                           address: e.target.value,
-                        },
+                        // },
                       }))
                     }
                     readOnly={!isEdit}
@@ -203,17 +203,17 @@ const Profile = ({ staffData, refresh }) => {
                   <label className="text-sm text-gray-500">City</label>
                   <input
                     type="text"
-                    value={UpdatedData.address?.city || (isEdit ? "" : "N/A")}
+                    value={UpdatedData.city || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        address: {
-                          ...UpdatedData.address,
+                        // address: {
+                        //   ...UpdatedData.address,
                           city: e.target.value,
-                        },
+                        // },
                       }))
                     }
                     readOnly={!isEdit}
@@ -224,7 +224,7 @@ const Profile = ({ staffData, refresh }) => {
                   <input
                     type="text"
                     value={
-                      UpdatedData.address?.zip_code || (isEdit ? "" : "N/A")
+                      UpdatedData.zip_code || (isEdit ? "" : "N/A")
                     }
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
@@ -232,10 +232,10 @@ const Profile = ({ staffData, refresh }) => {
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        address: {
-                          ...UpdatedData.address,
+                        // address: {
+                        //   ...UpdatedData.address,
                           zip_code: e.target.value,
-                        },
+                        // },
                       }))
                     }
                     readOnly={!isEdit}

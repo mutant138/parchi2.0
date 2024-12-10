@@ -24,13 +24,13 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const productRef = collection(db, "products");
-      const productQuery = query(
-        productRef,
-        where("companyRef", "==", companyRef)
-      );
+      const productRef = collection(db, "companies", companyDetails.companyId ,"products");
+      // const productQuery = query(
+      //   productRef,
+      //   where("companyRef", "==", companyRef)
+      // );
 
-      const querySnapshot = await getDocs(productQuery);
+      const querySnapshot = await getDocs(productRef);
       const productsData = querySnapshot.docs.map((doc) => {
         const data = doc.data();
         const netAmount = +data.sellingPrice - (+data.discount || 0);
@@ -42,7 +42,7 @@ const ProductList = () => {
 
         return {
           id: doc.id,
-          itemName: data.itemName || "N/A",
+          name: data.name || "N/A",
           image: data.image || null,
           description: data.description || "No description available",
           unitPrice: data.sellingPrice ?? 0,
@@ -91,7 +91,7 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
-
+   console.log('products',products)
   return (
     <div className="bg-white p-4 overflow-y-auto" style={{ height: "80vh" }}>
       <div className="flex justify-between mb-4">
@@ -149,13 +149,13 @@ const ProductList = () => {
                         ) : (
                           <>
                             <span className="bg-red-400 text-white rounded-full h-12 w-12 pb-2 flex justify-center items-center font-semibold text-center text-xl">
-                              {product.itemName.charAt(0)}
+                              {product.name.charAt(0)}
                             </span>
                           </>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3">{product.itemName}</td>
+                    <td className="px-4 py-3">{product.name}</td>
                     <td className="px-4 py-3">{product.description}</td>
                     <td className="px-4 py-3">₹{product.unitPrice}</td>
                     <td className="px-4 py-3">₹{product.discount}</td>

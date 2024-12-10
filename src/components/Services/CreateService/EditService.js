@@ -142,6 +142,7 @@ function EditService() {
         console.log("🚀 ~ fetchInvoiceData ~ error:", error);
       }
     }
+  
     const fetchServices = async () => {
       try {
         const companyRef = doc(db, "companies", companyDetails.companyId);
@@ -285,7 +286,7 @@ function EditService() {
 
       const payload = {
         ...formData,
-        date: Timestamp.fromDate(new Date(serviceDate)),
+        date:serviceDate,
         subTotal: +totalAmounts.subTotalAmount,
         total: +totalAmounts.totalAmount,
         customerDetails: {
@@ -296,11 +297,12 @@ function EditService() {
           name: selectedCustomerData.name,
         },
         servicesList: serviceListPayload,
-        membershipStartDate: Timestamp.fromDate(membershipStartDate),
+        membershipStartDate:membershipStartDate,
         membershipEndDate,
+        typeOfEndMembership:membershipPeriod
       };
-      await addDoc(
-        collection(db, "companies", companyDetails.companyId, "services"),
+      await updateDoc(
+        doc(db, "companies", companyDetails.companyId, "services",id),
         payload
       );
       if (formData.membershipId) {
@@ -432,10 +434,14 @@ function EditService() {
 
   useEffect(() => {
     function setMembershipDate() {
-      if (!membershipStartDate) {
+      
+      if (!membershipStartDate?.seconds || !membershipPeriod) {
         return;
       }
-      const inputDate = new Date(membershipStartDate);
+      const milliseconds =
+        membershipStartDate.seconds * 1000 +
+        membershipStartDate.nanoseconds / 1000000;
+      const inputDate = new Date(milliseconds);
       let endDate = new Date();
       if (membershipPeriod === "free") {
         endDate = new Date(inputDate.setDate(inputDate.getDate() + 15));
