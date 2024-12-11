@@ -84,9 +84,9 @@ function Sidebar({
                 )}
               </div>
               <div className="text-end">
-                <div className="font-bold">₹ {product.unitPrice}</div>
+                <div className="font-bold">₹ {product.sellingPrice}</div>
                 <div className="text-sm">Discount : ₹ {product.discount}</div>
-                <div className="text-sm"> Tax: {product.gstTax} %</div>
+                <div className="text-sm"> Tax: {product.tax} %</div>
               </div>
             </div>
           ))}

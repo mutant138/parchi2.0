@@ -94,7 +94,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
       createdAt: "",
       description: "",
       discount: 0,
-      discountType: false,
+      discountType: true,
       image: "",
       name: "",
       purchasePrice: 0,
@@ -150,9 +150,9 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
         // const productImageUrl = productImage.name
         //   ? await handleFileChange(productImage)
         //   : formData.image;
-
+        const { id, includingTax, unitPrice, taxAmount, ...rest } = formData;
         const payload = {
-          ...formData,
+          ...rest,
           // image: productImageUrl,
           // companyRef: doc(
           //   db,
@@ -161,7 +161,6 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           // ),
           // userRef: doc(db, "users", userDetails.userId),
         };
-        console.log("payload", formData);
         await updateDoc(productDocRef, payload); // Update product
         alert("Product successfully updated.");
       } else {
@@ -362,12 +361,12 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
                 onChange={(e) =>
                   setFormData((val) => ({
                     ...val,
-                    discountType: e.target.value,
+                    discountType: e.target.value === "true" ? true : false,
                   }))
                 }
               >
-                <option value="Percentage">%</option>
-                <option value="Fixed">Fixed</option>
+                <option value="true">%</option>
+                <option value="false">Fixed</option>
               </select>
             </div>
           </div>

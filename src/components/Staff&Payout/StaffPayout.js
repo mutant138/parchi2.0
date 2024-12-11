@@ -26,70 +26,70 @@ function StaffPayout() {
         navigate("staff");
       },
     },
-    // {
-    //   icon: <RiUserFollowLine />,
-    //   name: "Attendance",
-    //   totalLabelName: "Total Projects",
-    //   onClick: () => {
-    //     navigate("attendance");
-    //   },
-    // },
-    // {
-    //   icon: <MdAddCard />,
-    //   name: "Payouts",
-    //   totalLabelName: "Total Staff",
-    //   onClick: () => {},
-    // },
-    // {
-    //   icon: <GrDocumentUser />,
-    //   name: "Designations",
-    //   totalLabelName: "Total Projects",
-    //   onClick: () => {
-    //     navigate("designations");
-    //   },
-    // },
-    // {
-    //   icon: <TbGitBranch />,
-    //   name: "Branch",
-    //   totalLabelName: "Total Staff",
-    //   onClick: () => {
-    //     navigate("branches");
-    //   },
-    // },
-    // {
-    //   icon: <IoMdTime />,
-    //   name: "Week off",
-    //   totalLabelName: "Total Projects",
-    //   onClick: () => {},
-    // },
-    // {
-    //   icon: <RiShieldUserLine />,
-    //   name: "Roles",
-    //   totalLabelName: "Total Staff",
-    //   onClick: () => {
-    //     navigate("roles");
-    //   },
-    // },
-    // {
-    //   icon: <FiCoffee />,
-    //   name: "Breaks",
-    //   totalLabelName: "Total Projects",
-    //   onClick: () => {},
-    // },
-    // {
-    //   icon: <MdDateRange />,
-    //   name: "Holidays",
-    //   totalLabelName: "Total Staff",
-    //   onClick: () => {},
-    // },
-    // {
-    //   icon: <HiOutlineClipboardList />,
-    //   name: "Assets",
-    //   totalLabelName: "Total Projects",
-    //   onClick: () => {
-    //     navigate("assets");
-    //   },
-    // },
+    {
+      icon: <RiUserFollowLine />,
+      name: "Attendance",
+      totalLabelName: "Total Projects",
+      onClick: () => {
+        navigate("attendance");
+      },
+    },
+    {
+      icon: <MdAddCard />,
+      name: "Payouts",
+      totalLabelName: "Total Staff",
+      onClick: () => {},
+    },
+    {
+      icon: <GrDocumentUser />,
+      name: "Designations",
+      totalLabelName: "Total Projects",
+      onClick: () => {
+        navigate("designations");
+      },
+    },
+    {
+      icon: <TbGitBranch />,
+      name: "Branch",
+      totalLabelName: "Total Staff",
+      onClick: () => {
+        navigate("branches");
+      },
+    },
+    {
+      icon: <IoMdTime />,
+      name: "Week off",
+      totalLabelName: "Total Projects",
+      onClick: () => {},
+    },
+    {
+      icon: <RiShieldUserLine />,
+      name: "Roles",
+      totalLabelName: "Total Staff",
+      onClick: () => {
+        navigate("roles");
+      },
+    },
+    {
+      icon: <FiCoffee />,
+      name: "Breaks",
+      totalLabelName: "Total Projects",
+      onClick: () => {},
+    },
+    {
+      icon: <MdDateRange />,
+      name: "Holidays",
+      totalLabelName: "Total Staff",
+      onClick: () => {},
+    },
+    {
+      icon: <HiOutlineClipboardList />,
+      name: "Assets",
+      totalLabelName: "Total Projects",
+      onClick: () => {
+        navigate("assets");
+      },
+    },
   ];
 
   return (

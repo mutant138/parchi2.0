@@ -8,22 +8,16 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../../firebase";
+import { db, storage } from "../../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { FaUserEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import {
   setCustomerDetails,
   updateCustomerDetails,
-} from "../../../store/CustomerSlice";
+} from "../../store/CustomerSlice";
 
-const NewCustomerModal = ({
-  isOpen,
-  onClose,
-  onCustomerAdded,
-  customerData,
-  isEdit,
-}) => {
+const CreateCustomer = ({ isOpen, onClose, customerData, isEdit }) => {
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
@@ -49,15 +43,11 @@ const NewCustomerModal = ({
     phone: "",
     email: "",
     profileImage: "",
-    address: {
-      address: "",
-      city: "",
-      zip_code: "",
-    },
-    businessDetails: {
-      gst_number: "",
-      pan_number: "",
-    },
+    gstNumber: "",
+    panNumber: "",
+    address: "",
+    city: "",
+    zipCode: "",
   });
 
   useEffect(() => {
@@ -67,15 +57,11 @@ const NewCustomerModal = ({
         phone: customerData.phone || "",
         email: customerData.email || "",
         profileImage: customerData.profileImage || "",
-        address: customerData.address || {
-          address: "",
-          city: "",
-          zip_code: "",
-        },
-        businessDetails: customerData.businessDetails || {
-          gst_number: "",
-          pan_number: "",
-        },
+        gstNumber: customerData?.gstNumber || "",
+        panNumber: customerData?.panNumber || "",
+        address: customerData?.address || "",
+        city: customerData?.city || "",
+        zipCode: customerData?.zipCode || "",
       });
       setIsEditing(false);
     } else {
@@ -84,8 +70,11 @@ const NewCustomerModal = ({
         phone: "",
         email: "",
         profileImage: "",
-        address: { address: "", city: "", zip_code: "" },
-        businessDetails: { gst_number: "", pan_number: "" },
+        gstNumber: "",
+        panNumber: "",
+        address: "",
+        city: "",
+        zipCode: "",
       });
       setIsEditing(true);
     }
@@ -100,18 +89,7 @@ const NewCustomerModal = ({
       }
     }
 
-    if (name.includes(".")) {
-      const [group, key] = name.split(".");
-      setFormData((prevState) => ({
-        ...prevState,
-        [group]: {
-          ...prevState[group],
-          [key]: value,
-        },
-      }));
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFileChange = async (e) => {
@@ -142,10 +120,11 @@ const NewCustomerModal = ({
         const customerDocRef = doc(db, "customers", customerData.id);
         await updateDoc(customerDocRef, formData);
       } else {
+        const companyRef = doc(db, "companies", companyId);
         const newCustomer = await addDoc(collection(db, "customers"), {
           ...formData,
-          companyId: companyId,
-          createdAt: serverTimestamp(),
+          companyRef: companyRef,
+          createdAt: Timestamp.fromDate(new Date()),
         });
         const payload = {
           id: newCustomer.id,
@@ -356,8 +335,8 @@ const NewCustomerModal = ({
             <label className="block font-semibold">Address</label>
             <input
               type="text"
-              name="address.address"
-              value={formData.address.address}
+              name="address"
+              value={formData.address}
               onChange={handleChange}
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="Street Address"
@@ -366,16 +345,16 @@ const NewCustomerModal = ({
           <div className="flex space-x-2">
             <input
               type="text"
-              name="address.zip_code"
-              value={formData.address.zip_code}
+              name="zipCode"
+              value={formData.zipCode}
               onChange={handleChange}
               placeholder="Pin Code"
               className="w-1/2 border border-gray-300 p-2 rounded-md"
             />
             <input
               type="text"
-              name="address.city"
-              value={formData.address.city}
+              name="city"
+              value={formData.city}
               onChange={handleChange}
               placeholder="City"
               className="w-1/2 border border-gray-300 p-2 rounded-md"
@@ -386,8 +365,8 @@ const NewCustomerModal = ({
             <label className="block font-semibold">GST Number</label>
             <input
               type="text"
-              name="businessDetails.gst_number"
-              value={formData.businessDetails.gst_number}
+              name="gstNumber"
+              value={formData.gstNumber}
               onChange={handleChange}
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="GST Number"
@@ -397,8 +376,8 @@ const NewCustomerModal = ({
             <label className="block font-semibold">PAN Number</label>
             <input
               type="text"
-              name="businessDetails.pan_number"
-              value={formData.businessDetails.pan_number}
+              name="panNumber"
+              value={formData.panNumber}
               onChange={handleChange}
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="PAN Number"
@@ -417,4 +396,4 @@ const NewCustomerModal = ({
   );
 };
 
-export default NewCustomerModal;
+export default CreateCustomer;

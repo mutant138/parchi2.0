@@ -10,7 +10,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useDispatch, useSelector } from "react-redux";
-import NewCustomerModal from "./NewCustomerModal/NewCustomerModal";
 import { FaSearch, FaRegEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -18,6 +17,7 @@ import {
   deleteCustomerDetails,
   setAllCustomersDetails,
 } from "../../store/CustomerSlice";
+import CreateCustomer from "./CreateCustomer";
 
 const CustomerList = () => {
   const [loading, setLoading] = useState(false);
@@ -228,13 +228,12 @@ const CustomerList = () => {
           </tbody>
         </table>
       </div>
-      <NewCustomerModal
+      <CreateCustomer
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedCustomer(null);
         }}
-        onCustomerAdded={fetchCustomers}
         customerData={selectedCustomer}
       />
     </div>

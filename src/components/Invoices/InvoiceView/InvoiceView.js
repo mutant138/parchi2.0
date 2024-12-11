@@ -25,6 +25,7 @@ function InvoiceView() {
         id: resData.id,
         ...resData.data(),
       };
+      console.log("🚀 ~ fetchInvoices ~ invoicesData:", invoicesData);
       setInvoice(invoicesData);
     } catch (error) {
       console.error("Error fetching invoices:", error);

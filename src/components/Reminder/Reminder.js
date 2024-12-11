@@ -160,7 +160,6 @@ function Reminder() {
       </nav>
 
       <div className="flex justify-between items-center mb-4">
-        <p className="text-lg font-bold">Progress: {Math.round(progress)}%</p>
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
@@ -233,7 +232,9 @@ function Reminder() {
                     <input
                       type="checkbox"
                       checked={!item.incomplete}
-                      onChange={() => onUpdateReminder(item.id, !item.incomplete)}
+                      onChange={() =>
+                        onUpdateReminder(item.id, !item.incomplete)
+                      }
                     />
                     <div>
                       <p

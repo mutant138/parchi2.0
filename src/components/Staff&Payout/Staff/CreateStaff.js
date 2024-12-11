@@ -19,7 +19,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
     idNo: "",
     isdailywages: false,
     name: "",
-    pan: "",
+    panNumber: "",
     paymentdetails: 0,
     phone: "",
   });
@@ -190,7 +190,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
               className="w-full border border-gray-300 p-2 rounded-md  focus:outline-none"
               placeholder="PAN"
               onChange={(e) =>
-                setFormData((val) => ({ ...val, pan: e.target.value }))
+                setFormData((val) => ({ ...val, panNumber: e.target.value }))
               }
             />
           </div>

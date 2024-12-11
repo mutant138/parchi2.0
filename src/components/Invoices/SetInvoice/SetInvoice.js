@@ -144,6 +144,7 @@ const SetInvoice = () => {
       if (!invoiceId) {
         return;
       }
+      console.log("🚀 ~ fetchInvoiceData ~ invoiceId:", invoiceId);
       try {
         const docRef = doc(
           db,
@@ -153,12 +154,13 @@ const SetInvoice = () => {
           invoiceId
         );
         const getData = (await getDoc(docRef)).data();
-        setInvoiceDate(getData.date);
+        console.log("🚀 ~ fetchInvoiceData ~ getData:", getData);
+        setInvoiceDate(getData.invoiceDate);
         const customerData = (
-          await getDoc(getData.customerDetails.custRef)
+          await getDoc(getData.customerDetails.customerRef)
         ).data();
         handleSelectCustomer({
-          customerId: getData.customerDetails.custRef.id,
+          id: getData.customerDetails.customerRef.id,
           ...customerData,
         });
         setFormData(getData);
@@ -174,10 +176,8 @@ const SetInvoice = () => {
 
       try {
         const customersRef = collection(db, "customers");
-        const q = query(
-          customersRef,
-          where("companyId", "==", companyDetails.companyId)
-        );
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(customersRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
         const customersData = company.docs.map((doc) => {
           const { createdAt, companyRef, ...data } = doc.data();
@@ -457,10 +457,10 @@ const SetInvoice = () => {
 
   async function onSetInvoice() {
     try {
-      if (!selectedCustomerData.customerId) {
+      if (!selectedCustomerData.id) {
         return;
       }
-      const customerRef = doc(db, "customers", selectedCustomerData.customerId);
+      const customerRef = doc(db, "customers", selectedCustomerData.id);
       const companyRef = doc(db, "companies", companyDetails.companyId);
       let subTotal = 0;
       const items = [];
@@ -639,7 +639,7 @@ const SetInvoice = () => {
                   onChange={handleInputChange}
                   onFocus={() => setIsDropdownVisible(true)}
                   onBlur={() => {
-                    if (!selectedCustomerData.customerId) {
+                    if (!selectedCustomerData.id) {
                       setSelectedCustomerData({ name: "" });
                     }
                     setIsDropdownVisible(false);
@@ -650,7 +650,7 @@ const SetInvoice = () => {
                   <div className="absolute z-20 bg-white border border-gray-300 rounded-lg shadow-md max-h-60 overflow-y-auto w-full">
                     {suggestions.map((item) => (
                       <div
-                        key={item.customerId}
+                        key={item.id}
                         onMouseDown={() => handleSelectCustomer(item)}
                         className="flex flex-col px-4 py-3 text-gray-800 hover:bg-blue-50 cursor-pointer transition-all duration-150 ease-in-out"
                       >

@@ -228,7 +228,7 @@ function Invoice({ invoice }) {
                     </div>
                   </div>
                 </div>
-                <Template1 ref={invoiceRef} invoiceData={invoice} />
+                {/* <Template1 ref={invoiceRef} invoiceData={invoice} /> */}
               </div>
             </div>
           </div>
