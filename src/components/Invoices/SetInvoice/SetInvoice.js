@@ -572,7 +572,9 @@ const SetInvoice = () => {
         });
       }
 
-      alert("Successfully Updated the Invoice");
+      alert(
+        "Successfully " + (invoiceId ? "Updated" : "Created") + " the Invoice"
+      );
       navigate("/invoiceList");
     } catch (err) {
       console.error(err);

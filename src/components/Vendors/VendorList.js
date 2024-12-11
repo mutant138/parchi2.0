@@ -222,7 +222,7 @@ const VendorList = () => {
           setIsModalOpen(false);
           setSelectedVendor(null);
         }}
-        onVedorAdded={fetchVendors}
+        onVendorAdded={fetchVendors}
         vendorData={selectedVendor}
       />
     </div>

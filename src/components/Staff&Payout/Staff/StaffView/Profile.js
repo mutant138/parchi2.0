@@ -24,7 +24,8 @@ const Profile = ({ staffData, refresh }) => {
   async function onUpdateProfile() {
     try {
       const staffsRef = doc(db, "staff", staffData.id);
-      await updateDoc(staffsRef, UpdatedData);
+      const { id, ...rest } = UpdatedData;
+      await updateDoc(staffsRef, rest);
       refresh();
       alert("Profile updated successfully");
       setIsEdit(false);
@@ -181,9 +182,7 @@ const Profile = ({ staffData, refresh }) => {
                   <label className="text-sm text-gray-500">Street</label>
                   <input
                     type="text"
-                    value={
-                      UpdatedData.address || (isEdit ? "" : "N/A")
-                    }
+                    value={UpdatedData.address || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
@@ -192,7 +191,7 @@ const Profile = ({ staffData, refresh }) => {
                         ...val,
                         // address: {
                         //   ...UpdatedData.address,
-                          address: e.target.value,
+                        address: e.target.value,
                         // },
                       }))
                     }
@@ -212,7 +211,7 @@ const Profile = ({ staffData, refresh }) => {
                         ...val,
                         // address: {
                         //   ...UpdatedData.address,
-                          city: e.target.value,
+                        city: e.target.value,
                         // },
                       }))
                     }
@@ -223,9 +222,7 @@ const Profile = ({ staffData, refresh }) => {
                   <label className="text-sm text-gray-500">Pincode</label>
                   <input
                     type="text"
-                    value={
-                      UpdatedData.zip_code || (isEdit ? "" : "N/A")
-                    }
+                    value={UpdatedData.zip_code || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
@@ -234,7 +231,7 @@ const Profile = ({ staffData, refresh }) => {
                         ...val,
                         // address: {
                         //   ...UpdatedData.address,
-                          zip_code: e.target.value,
+                        zip_code: e.target.value,
                         // },
                       }))
                     }
