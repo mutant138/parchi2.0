@@ -22,7 +22,6 @@ const SetInvoice = () => {
 
   const userDetails = useSelector((state) => state.users);
   const customersDetails = useSelector((state) => state.customers).data;
-  console.log("🚀 ~ SetInvoice ~ customersDetails:", customersDetails);
   const dispatch = useDispatch();
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
@@ -86,15 +85,16 @@ const SetInvoice = () => {
   useEffect(() => {
     function addActionQty() {
       if (
-        formData?.items?.length === 0 ||
+        formData?.products?.length === 0 ||
         products.length === 0 ||
         !invoiceId
       ) {
         return;
       }
+      console.log("🚀 ~ addActionQty ~ products:", products);
       setIsProductSelected(true);
       let productData = products;
-      for (let ele of formData.items) {
+      for (let ele of formData.products) {
         productData = products.map((pro) => {
           if (pro.id === ele.productRef.id) {
             pro.actionQty = ele.quantity;
@@ -111,7 +111,7 @@ const SetInvoice = () => {
     if (invoiceId) {
       fetchInvoiceNumbers();
     }
-  }, [formData.items]);
+  }, [formData.products]);
 
   const fetchInvoiceNumbers = async () => {
     try {
@@ -313,6 +313,7 @@ const SetInvoice = () => {
     if (!invoiceId) {
       fetchInvoiceNumbers();
     }
+
     fetchProducts();
     fetchBooks();
     fetchInvoiceData();
@@ -602,7 +603,7 @@ const SetInvoice = () => {
     );
     setFormData((val) => ({
       ...val,
-      book: { id: value, name: data.name, bookRef },
+      book: { name: data.name, bookRef },
     }));
   }
 
@@ -849,7 +850,7 @@ const SetInvoice = () => {
                 <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
-                    defaultValue=""
+                    value={formData.book.bookRef?.id}
                     onChange={onSelectBook}
                     className="border p-2 rounded w-full"
                   >
@@ -857,8 +858,8 @@ const SetInvoice = () => {
                       Select Bank/Book
                     </option>
                     {books.length > 0 &&
-                      books.map((book) => (
-                        <option value={book.id} key={book.id}>
+                      books.map((book, index) => (
+                        <option value={book.bookRef?.id} key={index}>
                           {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
