@@ -24,7 +24,12 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const productRef = collection(db, "companies", companyDetails.companyId ,"products");
+      const productRef = collection(
+        db,
+        "companies",
+        companyDetails.companyId,
+        "products"
+      );
       // const productQuery = query(
       //   productRef,
       //   where("companyRef", "==", companyRef)
@@ -33,22 +38,23 @@ const ProductList = () => {
       const querySnapshot = await getDocs(productRef);
       const productsData = querySnapshot.docs.map((doc) => {
         const data = doc.data();
-        const netAmount = +data.sellingPrice - (+data.discount || 0);
+        // const netAmount = +data.sellingPrice - (+data.discount || 0);
         const taxRate = data.tax || 0;
-        const sgst = taxRate / 2;
-        const cgst = taxRate / 2;
-        const sgstAmount = netAmount * (sgst / 100);
-        const cgstAmount = netAmount * (cgst / 100);
+        // const sgst = taxRate / 2;
+        // const cgst = taxRate / 2;
+        // const sgstAmount = netAmount * (sgst / 100);
+        // const cgstAmount = netAmount * (cgst / 100);
 
         return {
           id: doc.id,
           name: data.name || "N/A",
-          image: data.image || null,
+          image: data.image || "",
           description: data.description || "No description available",
           unitPrice: data.sellingPrice ?? 0,
           discount: data.discount ?? 0,
+          discountType: data.discountType ?? true,
           tax: data.tax || 0,
-          barcode: data.barcode | "",
+          barcode: data.barcode || "",
           purchasePrice: data.purchasePrice || 0,
           sellingPrice: data.sellingPrice || 0,
           includingTax: data.sellingPriceTaxType || false,
@@ -57,10 +63,11 @@ const ProductList = () => {
           units: data.units,
           category: data.category,
           warehouse: data.warehouse,
-          netAmount: netAmount,
-          sgstAmount: sgstAmount.toFixed(2),
-          cgstAmount: cgstAmount.toFixed(2),
-          totalAmount: (netAmount + sgstAmount + cgstAmount).toFixed(2),
+
+          // netAmount: netAmount,
+          // sgstAmount: sgstAmount.toFixed(2),
+          // cgstAmount: cgstAmount.toFixed(2),
+          // totalAmount: (netAmount + sgstAmount + cgstAmount).toFixed(2),
         };
       });
       setProducts(productsData);
@@ -76,7 +83,9 @@ const ProductList = () => {
     if (!confirmDelete) return;
 
     try {
-      await deleteDoc(doc(db, "products", productId));
+      await deleteDoc(
+        doc(db, "companies", companyDetails.companyId, "products", productId)
+      );
       fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -91,7 +100,7 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
-   console.log('products',products)
+  console.log("products", products);
   return (
     <div className="bg-white p-4 overflow-y-auto" style={{ height: "80vh" }}>
       <div className="flex justify-between mb-4">
@@ -158,7 +167,11 @@ const ProductList = () => {
                     <td className="px-4 py-3">{product.name}</td>
                     <td className="px-4 py-3">{product.description}</td>
                     <td className="px-4 py-3">₹{product.unitPrice}</td>
-                    <td className="px-4 py-3">₹{product.discount}</td>
+                    <td className="px-4 py-3">
+                      {product.discountType
+                        ? `${product.discount}%`
+                        : `₹${product.discount}`}
+                    </td>
                     <td className="px-4 py-3">{product.tax}%</td>
                     <td className="px-4 py-3">₹{product.purchasePrice}</td>
                     <td className="px-4 py-3">
