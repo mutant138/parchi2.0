@@ -9,14 +9,17 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import NewCustomerModal from "./NewCustomerModal/NewCustomerModal";
 import { FaSearch, FaRegEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import {
+  deleteCustomerDetails,
+  setAllCustomersDetails,
+} from "../../store/CustomerSlice";
 
 const CustomerList = () => {
-  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,33 +28,45 @@ const CustomerList = () => {
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  const customersDetails = useSelector((state) => state.customers).data;
+  const dispatch = useDispatch();
 
+  console.log("🚀 ~ CustomerList ~ customersDetails:", customersDetails);
   const fetchCustomers = async () => {
+    if (customersDetails.length !== 0) {
+      return;
+    }
     setLoading(true);
     try {
       const customersRef = collection(db, "customers");
-      const q = query(customersRef, where("companyId", "==", companyId));
+      const companyRef = doc(db, "companies", companyId);
+      const q = query(customersRef, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
-      const customersData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setCustomers(customersData);
+      const customersData = querySnapshot.docs.map((doc) => {
+        const { createdAt, companyRef, ...data } = doc.data();
+        return {
+          id: doc.id,
+          createdAt: JSON.stringify(createdAt),
+          companyRef: JSON.stringify(companyRef),
+          ...data,
+        };
+      });
+      dispatch(setAllCustomersDetails(customersData));
     } catch (error) {
       console.error("Error fetching customers:", error);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (companyId) {
       fetchCustomers();
     }
   }, [companyId]);
 
-  const filteredCustomers = customers.filter((customer) =>
+  const filteredCustomers = customersDetails.filter((customer) =>
     `${customer.name} ${customer.phone} ${customer.email}`
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
@@ -61,7 +76,6 @@ const CustomerList = () => {
   const handleEditClick = (customer) => {
     setSelectedCustomer(customer); // Set the selected customer
     // setIsModalOpen(true); // Open the modal
-
     navigator(customer.id);
   };
 
@@ -76,7 +90,8 @@ const CustomerList = () => {
       );
       if (!confirmDelete) return;
       await deleteDoc(doc(db, "customers", customerId));
-      setCustomers((val) => val.filter((ele) => ele.id !== customerId));
+      dispatch(deleteCustomerDetails(customerId));
+      // setCustomers((val) => val.filter((ele) => ele.id !== customerId));
     } catch (error) {
       console.log("🚀 ~ onHandleDeleteCustomer ~ error:", error);
     }

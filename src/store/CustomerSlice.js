@@ -1,46 +1,43 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import { collection, getDocs, query, where } from "firebase/firestore";
-// import { db } from "../firebase";
 
 let initialState = {
   data: [],
 };
-// const fetchData = async () => {
-//   try {
-//     const { companies } = JSON.parse(localStorage.getItem("user"));
-//     const ref = collection(db, "customers");
-//     const q = query(ref, where("companyId", "==", companies[0].companyId));
-//     const querySnapshot = await getDocs(q);
-
-//     const dataset = querySnapshot.docs.map((doc) => {
-//       const { createdAt, ...rest } = doc.data();
-//       return {
-//         id: doc.id,
-//         ...rest,
-//       };
-//     });
-
-//     console.log("🚀 ~data:", dataset);
-//     initialState.data = dataset;
-//   } catch (error) {
-//     console.error(`Error fetching ${"customers"}:`, error);
-//   }
-// };
-
-// if (localStorage.getItem("user")) {
-//   initialState.data = await fetchData();
-// }
 
 const CustomerSlice = createSlice({
   name: "customers",
   initialState,
   reducers: {
-    setCustomersDetails: (state, action) => {
+    setAllCustomersDetails: (state, action) => {
       state.data = action.payload;
+    },
+    deleteCustomerDetails: (state, action) => {
+      const customerId = action.payload;
+      state.data = state.data.filter((ele) => ele.id !== customerId);
+    },
+    setCustomerDetails: (state, action) => {
+      const customerData = action.payload;
+      state.data.push(customerData);
+    },
+    updateCustomerDetails: (state, action) => {
+      console.log("🚀 ~ action.payload:", action.payload);
+
+      const customerData = action.payload;
+      state.data = state.data.map((ele) => {
+        if (ele.id === customerData.id) {
+          ele = customerData;
+        }
+        return ele;
+      });
     },
   },
 });
 
-export const { setCustomersDetails } = CustomerSlice.actions;
+export const {
+  setAllCustomersDetails,
+  setCustomerDetails,
+  deleteCustomerDetails,
+  updateCustomerDetails,
+} = CustomerSlice.actions;
 
 export default CustomerSlice.reducer;

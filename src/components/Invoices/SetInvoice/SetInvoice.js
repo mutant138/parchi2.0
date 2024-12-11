@@ -12,15 +12,18 @@ import {
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../firebase";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
+import { setAllCustomersDetails } from "../../../store/CustomerSlice";
 
 const SetInvoice = () => {
   const { invoiceId } = useParams();
 
   const userDetails = useSelector((state) => state.users);
-
+  const customersDetails = useSelector((state) => state.customers).data;
+  console.log("🚀 ~ SetInvoice ~ customersDetails:", customersDetails);
+  const dispatch = useDispatch();
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
 
@@ -74,7 +77,6 @@ const SetInvoice = () => {
     totalAmount: 0,
   });
 
-  const [customersData, setCustomersData] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState({
     name: "",
   });
@@ -166,6 +168,10 @@ const SetInvoice = () => {
     }
 
     async function customerDetails() {
+      if (customersDetails.length !== 0) {
+        return;
+      }
+
       try {
         const customersRef = collection(db, "customers");
         const q = query(
@@ -173,12 +179,17 @@ const SetInvoice = () => {
           where("companyId", "==", companyDetails.companyId)
         );
         const company = await getDocs(q);
-        const customerData = company.docs.map((doc) => ({
-          customerId: doc.id,
-          ...doc.data(),
-        }));
-        setCustomersData(customerData);
-        setSuggestions(customerData);
+        const customersData = company.docs.map((doc) => {
+          const { createdAt, companyRef, ...data } = doc.data();
+          return {
+            id: doc.id,
+            createdAt: JSON.stringify(createdAt),
+            companyRef: JSON.stringify(companyRef),
+            ...data,
+          };
+        });
+        dispatch(setAllCustomersDetails(customersData));
+        setSuggestions(customersData);
       } catch (error) {
         console.log("🚀 ~ customerDetails ~ error:", error);
       }
@@ -298,6 +309,7 @@ const SetInvoice = () => {
         console.error("Error fetching invoices:", error);
       }
     };
+
     if (!invoiceId) {
       fetchInvoiceNumbers();
     }
@@ -312,13 +324,13 @@ const SetInvoice = () => {
     const value = e.target.value;
     setSelectedCustomerData({ name: value });
     if (value) {
-      const filteredSuggestions = customersData.filter((item) =>
+      const filteredSuggestions = customersDetails.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
       setIsDropdownVisible(true);
     } else {
-      setSuggestions(customersData);
+      setSuggestions(customersDetails);
     }
   };
 
@@ -422,6 +434,7 @@ const SetInvoice = () => {
       totalAmount,
     });
   }
+
   function total_TCS_TDS_Amount() {
     const totalQty = products.reduce((acc, cur) => {
       return acc + cur.actionQty;

@@ -5,12 +5,17 @@ import {
   serverTimestamp,
   doc,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../../firebase";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaUserEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
+import {
+  setCustomerDetails,
+  updateCustomerDetails,
+} from "../../../store/CustomerSlice";
 
 const NewCustomerModal = ({
   isOpen,
@@ -25,6 +30,7 @@ const NewCustomerModal = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [fileName, setFileName] = useState("No file chosen");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isOpen) {
@@ -136,15 +142,21 @@ const NewCustomerModal = ({
         const customerDocRef = doc(db, "customers", customerData.id);
         await updateDoc(customerDocRef, formData);
       } else {
-        await addDoc(collection(db, "customers"), {
+        const newCustomer = await addDoc(collection(db, "customers"), {
           ...formData,
           companyId: companyId,
           createdAt: serverTimestamp(),
         });
+        const payload = {
+          id: newCustomer.id,
+          ...formData,
+          createdAt: JSON.stringify(Timestamp.fromDate(new Date())),
+        };
+        dispatch(setCustomerDetails(payload));
       }
       setFileName("No file chosen");
       onClose();
-      onCustomerAdded();
+      // onCustomerAdded();
     } catch (error) {
       console.error("Error saving customer:", error);
     }
