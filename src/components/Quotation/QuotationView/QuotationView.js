@@ -23,10 +23,10 @@ function QuotationView({ quotation }) {
   useEffect(() => {
     if (quotation.items) {
       const tax = quotation?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.sellingPrice.taxSlab;
+        return acc + cur.sellingPrice.taxSlab;
       }, 0);
       const discount = quotation?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.discount.amount;
+        return acc + cur.discount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
@@ -175,9 +175,9 @@ function QuotationView({ quotation }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele.pricing.sellingPrice.amount}</div>
-                  <div>Tax :{ele.pricing.sellingPrice.taxSlab}</div>
-                  <div>Discount :{ele.pricing.discount.amount}</div>
+                  <div>Price: ₹ {ele.sellingPrice}</div>
+                  <div>Tax :{ele.tax}</div>
+                  <div>Discount :{ele.discount}</div>
                 </div>
               </div>
             ))}

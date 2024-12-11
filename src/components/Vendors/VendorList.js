@@ -110,7 +110,7 @@ const VendorList = () => {
       >
         <table className="min-w-full border border-gray-200">
           <thead className="sticky z-10 bg-white p-0" style={{ top: "-1px" }}>
-            <tr className="bg-gray-100 border-b">
+            <tr className="bg-gray-200 border-b">
               <th className="py-3 px-6 text-left font-semibold text-gray-600">
                 Name
               </th>
@@ -208,7 +208,7 @@ const VendorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center py-4">
+                <td colSpan="5" className="text-center py-4">
                   No vendors found
                 </td>
               </tr>

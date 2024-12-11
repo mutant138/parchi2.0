@@ -124,7 +124,11 @@ const CreatePOS = () => {
         const customersRef = collection(db, "customers");
         const q = query(
           customersRef,
-          where("companyId", "==", companyDetails.companyId)
+          where(
+            "companyRef",
+            "==",
+            doc(db, "companies", companyDetails.companyId)
+          )
         );
         const company = await getDocs(q);
         const customerData = company.docs.map((doc) => ({

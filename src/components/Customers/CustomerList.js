@@ -220,7 +220,7 @@ const CustomerList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center py-4">
+                <td colSpan="5" className="text-center py-4">
                   No customers found
                 </td>
               </tr>

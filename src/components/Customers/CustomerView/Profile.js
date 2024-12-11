@@ -186,19 +186,14 @@ const Profile = ({ customerData, refresh }) => {
                     <label className="text-sm text-gray-500">Street</label>
                     <input
                       type="text"
-                      value={
-                        UpdatedData.address?.address || (isEdit ? "" : "N/A")
-                      }
+                      value={UpdatedData.address || (isEdit ? "" : "N/A")}
                       className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                         isEdit ? "border" : "bg-gray-100"
                       }`}
                       onChange={(e) =>
                         setUpdatedData((val) => ({
                           ...val,
-                          address: {
-                            ...UpdatedData.address,
-                            address: e.target.value,
-                          },
+                          address: e.target.value,
                         }))
                       }
                       readOnly={!isEdit}
@@ -208,17 +203,14 @@ const Profile = ({ customerData, refresh }) => {
                     <label className="text-sm text-gray-500">City</label>
                     <input
                       type="text"
-                      value={UpdatedData.address?.city || (isEdit ? "" : "N/A")}
+                      value={UpdatedData.city || (isEdit ? "" : "N/A")}
                       className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                         isEdit ? "border" : "bg-gray-100"
                       }`}
                       onChange={(e) =>
                         setUpdatedData((val) => ({
                           ...val,
-                          address: {
-                            ...UpdatedData.address,
-                            city: e.target.value,
-                          },
+                          city: e.target.value,
                         }))
                       }
                       readOnly={!isEdit}
@@ -228,19 +220,14 @@ const Profile = ({ customerData, refresh }) => {
                     <label className="text-sm text-gray-500">Pincode</label>
                     <input
                       type="text"
-                      value={
-                        UpdatedData.address?.zip_code || (isEdit ? "" : "N/A")
-                      }
+                      value={UpdatedData.zipCode || (isEdit ? "" : "N/A")}
                       className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                         isEdit ? "border" : "bg-gray-100"
                       }`}
                       onChange={(e) =>
                         setUpdatedData((val) => ({
                           ...val,
-                          address: {
-                            ...UpdatedData.address,
-                            zip_code: e.target.value,
-                          },
+                          zipCode: e.target.value,
                         }))
                       }
                       readOnly={!isEdit}
