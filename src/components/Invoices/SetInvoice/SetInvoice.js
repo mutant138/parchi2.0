@@ -31,6 +31,7 @@ const SetInvoice = () => {
   const [invoiceDate, setInvoiceDate] = useState(
     Timestamp.fromDate(new Date())
   );
+  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -154,6 +155,7 @@ const SetInvoice = () => {
         const getData = (await getDoc(docRef)).data();
 
         setInvoiceDate(getData.invoiceDate);
+        setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -514,7 +516,8 @@ const SetInvoice = () => {
         ...formData,
         tds,
         tcs,
-        invoiceDate: invoiceDate,
+        invoiceDate,
+        dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -672,7 +675,7 @@ const SetInvoice = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
                   Invoice Date <span className="text-red-500">*</span>
@@ -685,6 +688,20 @@ const SetInvoice = () => {
                     setInvoiceDate(
                       Timestamp.fromDate(new Date(e.target.value))
                     );
+                  }}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  Due Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={DateFormate(dueDate)}
+                  className="border p-1 rounded w-full mt-1"
+                  onChange={(e) => {
+                    setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />
