@@ -227,7 +227,7 @@ function QuotationView({ quotation }) {
                     </div>
                   </div>
                 </div>
-                <Template1 ref={quotationRef} invoiceData={quotation} />
+                {/* <Template1 ref={quotationRef} invoiceData={quotation} /> */}
               </div>
             </div>
           </div>

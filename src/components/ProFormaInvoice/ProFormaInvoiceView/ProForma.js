@@ -229,7 +229,7 @@ function ProForma({ proForma }) {
                     </div>
                   </div>
                 </div>
-                <Template1 ref={proFormaRef} invoiceData={proForma} />
+                {/* <Template1 ref={proFormaRef} invoiceData={proForma} /> */}
               </div>
             </div>
           </div>

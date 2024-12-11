@@ -91,7 +91,6 @@ const SetInvoice = () => {
       ) {
         return;
       }
-      console.log("🚀 ~ addActionQty ~ products:", products);
       setIsProductSelected(true);
       let productData = products;
       for (let ele of formData.products) {
@@ -144,7 +143,6 @@ const SetInvoice = () => {
       if (!invoiceId) {
         return;
       }
-      console.log("🚀 ~ fetchInvoiceData ~ invoiceId:", invoiceId);
       try {
         const docRef = doc(
           db,
@@ -154,7 +152,7 @@ const SetInvoice = () => {
           invoiceId
         );
         const getData = (await getDoc(docRef)).data();
-        console.log("🚀 ~ fetchInvoiceData ~ getData:", getData);
+
         setInvoiceDate(getData.invoiceDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)

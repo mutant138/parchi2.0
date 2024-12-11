@@ -324,7 +324,7 @@ const InvoiceList = () => {
         </footer>
       </div>
 
-      <div
+      {/* <div
         className="fixed inset-0 z-20 "
         onClick={() => setIsInvoiceOpen(false)}
         style={{ display: isInvoiceOpen ? "block" : "none" }}
@@ -346,9 +346,9 @@ const InvoiceList = () => {
                   </div>
                 </div>
               </div>
-              {/* <Template1 ref={invoiceRef} invoiceData={selectedInvoiceData} /> */}
+               <Template1 ref={invoiceRef} invoiceData={selectedInvoiceData} /> 
             </div>
-            {/* <div className="flex justify-around ">
+             <div className="flex justify-around ">
                 <button
                   className="bg-red-500 text-white py-2 px-4 rounded"
                   onClick={() => {
@@ -364,10 +364,10 @@ const InvoiceList = () => {
                 >
                   Download
                 </button>
-              </div> */}
+              </div> 
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
