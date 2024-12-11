@@ -78,33 +78,49 @@ const CreateQuotation = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        const companyRef = doc(db, "companies", companyDetails.companyId);
         const productRef = collection(
           db,
           "companies",
           companyDetails.companyId,
           "products"
         );
-        const querySnapshot = await getDocs(productRef);
+        const q = query(productRef, where("companyRef", "==", companyRef));
+        const querySnapshot = await getDocs(q);
+
         const productsData = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          const netAmount =
-            +data.pricing.sellingPrice?.amount -
-            (+data.pricing.discount?.amount || 0);
-          const taxRate = data.pricing.gstTax || 0;
-          const sgst = taxRate / 2;
-          const cgst = taxRate / 2;
-          const taxAmount = netAmount * (taxRate / 100);
-          const sgstAmount = netAmount * (sgst / 100);
-          const cgstAmount = netAmount * (cgst / 100);
+          let discount = +data.discount || 0;
+
+          if (data.discountType) {
+            discount = (+data.sellingPrice / 100) * data.discount;
+          }
+          const netAmount = +data.sellingPrice - discount;
+          const taxRate = data.tax || 0;
+          let sgst = 0;
+          let cgst = 0;
+          let taxAmount = 0;
+          let sgstAmount = 0;
+          let cgstAmount = 0;
+
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
 
           return {
             id: doc.id,
-            itemName: data.itemName || "N/A",
-            quantity: data.stock?.quantity ?? 0,
-            unitPrice: data.pricing.sellingPrice?.amount ?? 0,
-            discount: data.pricing.discount?.amount ?? 0,
-            gstTax: data.pricing.gstTax,
-            fieldValue: data.pricing.discount?.fieldValue ?? 0,
+            description: data.description ?? "",
+            name: data.name ?? "N/A",
+            quantity: data.stock ?? 0,
+            sellingPrice: data.sellingPrice ?? 0,
+            sellingPriceTaxType: data.sellingPriceTaxType,
+            purchasePrice: data.purchasePrice ?? 0,
+            purchasePriceTaxType: data.purchasePriceTaxType,
+            discount: discount ?? 0,
+            discountType: data.discountType,
+            tax: data.tax,
             actionQty: 0,
             totalAmount: 0,
             netAmount: netAmount,
@@ -113,12 +129,11 @@ const CreateQuotation = () => {
             sgstAmount,
             cgstAmount,
             taxAmount,
-            taxSlab: data.pricing.sellingPrice?.taxSlab,
           };
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching quotations:", error);
+        console.error("Error fetching invoices:", error);
       }
     };
 
@@ -360,7 +375,7 @@ const CreateQuotation = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "inventories",
+          "products",
           product.id
         );
         subTotal += product.totalAmount;
@@ -386,7 +401,7 @@ const CreateQuotation = () => {
               type: "Percentage",
             },
           },
-          name: product.itemName,
+          name: product.name,
           productRef: productRef,
         });
       }
@@ -448,7 +463,7 @@ const CreateQuotation = () => {
         }
 
         const currentQuantity = products.find(
-          (val) => val.itemName === item.name
+          (val) => val.name === item.name
         ).quantity;
 
         if (currentQuantity <= 0) {
@@ -634,9 +649,11 @@ const CreateQuotation = () => {
                       (product) =>
                         product.actionQty > 0 && (
                           <tr key={product.id}>
-                            <td className="px-4 py-2">{product.itemName}</td>
+                            <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
-                            <td className="px-4 py-2">₹{product.unitPrice}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.sellingPrice}
+                            </td>
                             <td className="px-4 py-2">₹{product.discount}</td>
                             <td className="px-4 py-2">₹{product.netAmount}</td>
                             <td className="px-4 py-2">
