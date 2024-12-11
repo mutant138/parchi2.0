@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
+  console.log("🚀 ~ CreateProduct ~ onProductUpdated:", onProductUpdated);
   const userDetails = useSelector((state) => state.users);
   const [productImage, setProductImage] = useState("");
   const [categories, setCategories] = useState([]);
@@ -160,7 +161,6 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           // ),
           // userRef: doc(db, "users", userDetails.userId),
         };
-
         await updateDoc(productDocRef, payload); // Update product
         alert("Product successfully updated.");
       } else {

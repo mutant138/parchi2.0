@@ -616,7 +616,7 @@ function CreateService() {
                     {books.length > 0 &&
                       books.map((book) => (
                         <option value={book.id} key={book.id}>
-                          {`${book.name} - ${book.bankAccountDetails.bank_name} - ${book.bankAccountDetails.branch_name}`}
+                          {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
                   </select>

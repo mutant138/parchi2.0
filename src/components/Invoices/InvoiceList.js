@@ -33,7 +33,6 @@ const InvoiceList = () => {
           id: doc.id,
           ...doc.data(),
         }));
-
         // const q = query(invoiceRef, orderBy("date", "desc"));
         // const querySnapshot = await getDocs(q);
         // const invoicesData = querySnapshot.docs.map((doc) => ({
@@ -222,7 +221,7 @@ const InvoiceList = () => {
                         <td className="py-3">
                           {invoice.customerDetails?.name} <br />
                           <span className="text-gray-500">
-                            {invoice.customerDetails.phoneNumber}
+                            {invoice.customerDetails.phone}
                           </span>
                         </td>
                         <td className="py-3">{`₹ ${invoice.total.toFixed(
@@ -250,24 +249,22 @@ const InvoiceList = () => {
                             <option value="UnPaid">UnPaid</option>
                           </select>
                         </td>
-                        <td className="py-3">
-                          {invoice.mode || "Online"}
-                        </td>
+                        <td className="py-3">{invoice.mode || "Online"}</td>
                         <td className="py-3">{invoice.invoiceNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
-                              invoice.date &&
-                              typeof invoice.date.seconds === "number"
+                              invoice.invoiceDate.seconds &&
+                              typeof invoice.invoiceDate.seconds === "number"
                             ) {
-                              const invoiceDate = new Date(
-                                invoice.date.seconds * 1000
+                              const date = new Date(
+                                invoice.invoiceDate.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
-                                invoiceDate.setHours(0, 0, 0, 0);
+                                date.setHours(0, 0, 0, 0);
                               const daysDiff = Math.floor(
                                 timeDiff / (1000 * 60 * 60 * 24)
                               );
@@ -349,7 +346,7 @@ const InvoiceList = () => {
                   </div>
                 </div>
               </div>
-              <Template1 ref={invoiceRef} invoiceData={selectedInvoiceData} />
+              {/* <Template1 ref={invoiceRef} invoiceData={selectedInvoiceData} /> */}
             </div>
             {/* <div className="flex justify-around ">
                 <button
