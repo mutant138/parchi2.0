@@ -82,7 +82,7 @@ const CreateQuotation = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "inventories"
+          "products"
         );
         const querySnapshot = await getDocs(productRef);
         const productsData = querySnapshot.docs.map((doc) => {
@@ -127,7 +127,11 @@ const CreateQuotation = () => {
         const customersRef = collection(db, "customers");
         const q = query(
           customersRef,
-          where("companyId", "==", companyDetails.companyId)
+          where(
+            "companyRef",
+            "==",
+            doc(db, "companies", companyDetails.companyId)
+          )
         );
         const company = await getDocs(q);
         const customerData = company.docs.map((doc) => ({
