@@ -7,15 +7,18 @@ import {
   updateDoc,
   where,
   Timestamp,
+  getDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
 
-const CreateInvoice = () => {
+const SetInvoice = () => {
+  const { invoiceId } = useParams();
+
   const userDetails = useSelector((state) => state.users);
 
   const companyDetails =
@@ -23,8 +26,9 @@ const CreateInvoice = () => {
 
   const phoneNo = userDetails.phone;
 
-  // const [discountDropdownOpen, setDiscountDropdownOpen] = useState(false);
-  const [invoiceDate, setInvoiceDate] = useState(new Date());
+  const [invoiceDate, setInvoiceDate] = useState(
+    Timestamp.fromDate(new Date())
+  );
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -42,6 +46,7 @@ const CreateInvoice = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    book: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -77,68 +82,88 @@ const CreateInvoice = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const companyRef = doc(db, "companies", companyDetails.companyId);
-        const productRef = collection(db, "products");
-        const q = query(productRef, where("companyRef", "==", companyRef));
-        const querySnapshot = await getDocs(q);
-
-        const productsData = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          let discount = +data.discount || 0;
-
-          if (data.discountType) {
-            discount = (+data.sellingPrice / 100) * data.discount;
-          }
-          const netAmount = +data.sellingPrice - discount;
-          const taxRate = data.tax || 0;
-          let sgst = 0;
-          let cgst = 0;
-          let taxAmount = 0;
-          let sgstAmount = 0;
-          let cgstAmount = 0;
-          // let taxAmnt = netAmount * (taxRate / 100);
-          // if (!data.sellingPriceTaxType) {
-          sgst = taxRate / 2;
-          cgst = taxRate / 2;
-          taxAmount = netAmount * (taxRate / 100);
-          sgstAmount = netAmount * (sgst / 100);
-          cgstAmount = netAmount * (cgst / 100);
-          // }
-          // } else {
-          //   sgst = taxRate / 2;
-          //   cgst = taxRate / 2;
-          //   taxAmount = netAmount - taxAmnt;
-          //   sgstAmount = netAmount * (sgst / 100);
-          //   cgstAmount = netAmount * (cgst / 100);
-          // }
-
-          return {
-            id: doc.id,
-            itemName: data.itemName || "N/A",
-            quantity: data.stock ?? 0,
-            unitPrice: data.sellingPrice ?? 0,
-            discount: data.discount ?? 0,
-            isIncludedTax: data.sellingPriceTaxType,
-            gstTax: data.tax,
-            fieldValue: data.discount ?? 0,
-            actionQty: 0,
-            totalAmount: 0,
-            netAmount: netAmount,
-            sgst,
-            cgst,
-            sgstAmount,
-            cgstAmount,
-            taxAmount,
-            taxSlab: data.tax,
-          };
-        });
-        setProducts(productsData);
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
+    function addActionQty() {
+      if (
+        formData?.items?.length === 0 ||
+        products.length === 0 ||
+        !invoiceId
+      ) {
+        return;
       }
-    };
+      setIsProductSelected(true);
+      let productData = products;
+      for (let ele of formData.items) {
+        productData = products.map((pro) => {
+          if (pro.id === ele.productRef.id) {
+            pro.actionQty = ele.quantity;
+            pro.quantity += ele.quantity;
+            pro.totalAmount = ele.quantity * pro.netAmount;
+          }
+          return pro;
+        });
+      }
+      setProducts(productData);
+      calculateProduct(productData);
+    }
+    addActionQty();
+    if (invoiceId) {
+      fetchInvoiceNumbers();
+    }
+  }, [formData.items]);
+
+  const fetchInvoiceNumbers = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(db, "companies", companyDetails.companyId, "invoices")
+      );
+      const noList = querySnapshot.docs.map((doc) => doc.data().invoiceNo);
+      if (invoiceId) {
+        setPreInvoiceList(noList.filter((ele) => ele !== formData.invoiceNo));
+      } else {
+        setPreInvoiceList(noList);
+        setFormData((val) => ({
+          ...val,
+          invoiceNo: String(noList.length + 1).padStart(4, 0),
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  function onSelect_TDS_TCS(e) {
+    const taxId = e.target.value;
+    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
+    setSelectedTaxDetails(taxDetails);
+  }
+
+  useEffect(() => {
+    async function fetchInvoiceData() {
+      if (!invoiceId) {
+        return;
+      }
+      try {
+        const docRef = doc(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "invoices",
+          invoiceId
+        );
+        const getData = (await getDoc(docRef)).data();
+        setInvoiceDate(getData.date);
+        const customerData = (
+          await getDoc(getData.customerDetails.custRef)
+        ).data();
+        handleSelectCustomer({
+          customerId: getData.customerDetails.custRef.id,
+          ...customerData,
+        });
+        setFormData(getData);
+      } catch (error) {
+        console.log("🚀 ~ fetchInvoiceData ~ error:", error);
+      }
+    }
 
     async function customerDetails() {
       try {
@@ -158,6 +183,7 @@ const CreateInvoice = () => {
         console.log("🚀 ~ customerDetails ~ error:", error);
       }
     }
+
     async function fetchTax() {
       try {
         const tdsRef = collection(db, "tds");
@@ -193,22 +219,6 @@ const CreateInvoice = () => {
       }
     }
 
-    const fetchInvoiceNumbers = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "invoices")
-        );
-
-        const noList = querySnapshot.docs.map((doc) => doc.data().invoiceNo);
-        setPreInvoiceList(noList);
-        setFormData((val) => ({
-          ...val,
-          invoiceNo: String(noList.length + 1).padStart(4, 0),
-        }));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
     async function fetchBooks() {
       try {
         const bookRef = collection(
@@ -222,22 +232,85 @@ const CreateInvoice = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("🚀 ~ fetchBooks ~ fetchBooks:", fetchBooks);
         setBooks(fetchBooks);
       } catch (error) {
         console.log("🚀 ~ fetchBooks ~ error:", error);
       }
     }
+
+    const fetchProducts = async () => {
+      try {
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const productRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "products"
+        );
+        const q = query(productRef, where("companyRef", "==", companyRef));
+        const querySnapshot = await getDocs(q);
+
+        const productsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          let discount = +data.discount || 0;
+
+          if (data.discountType) {
+            discount = (+data.sellingPrice / 100) * data.discount;
+          }
+          const netAmount = +data.sellingPrice - discount;
+          const taxRate = data.tax || 0;
+          let sgst = 0;
+          let cgst = 0;
+          let taxAmount = 0;
+          let sgstAmount = 0;
+          let cgstAmount = 0;
+
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
+
+          return {
+            id: doc.id,
+            description: data.description ?? "",
+            name: data.name ?? "N/A",
+            quantity: data.stock ?? 0,
+            sellingPrice: data.sellingPrice ?? 0,
+            sellingPriceTaxType: data.sellingPriceTaxType,
+            purchasePrice: data.purchasePrice ?? 0,
+            purchasePriceTaxType: data.purchasePriceTaxType,
+            discount: discount ?? 0,
+            discountType: data.discountType,
+            tax: data.tax,
+            actionQty: 0,
+            totalAmount: 0,
+            netAmount: netAmount,
+            sgst,
+            cgst,
+            sgstAmount,
+            cgstAmount,
+            taxAmount,
+          };
+        });
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      }
+    };
+    if (!invoiceId) {
+      fetchInvoiceNumbers();
+    }
+    fetchProducts();
     fetchBooks();
-    fetchInvoiceNumbers();
+    fetchInvoiceData();
     fetchTax();
     customerDetails();
-    fetchProducts();
   }, [companyDetails]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setSelectedCustomerData({ name: e.target.value });
+    setSelectedCustomerData({ name: value });
     if (value) {
       const filteredSuggestions = customersData.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
@@ -276,34 +349,27 @@ const CreateInvoice = () => {
       return product;
     });
     setIsProductSelected(countOfSelect > 0);
+    calculateProduct(updatedProducts);
     // Calculate totals based on updated quantities
-    let totalTaxableAmount = 0;
-
-    totalTaxableAmount = updatedProducts.reduce((sum, product) => {
+  }
+  function calculateProduct(products) {
+    const totalTaxableAmount = products.reduce((sum, product) => {
       const cal =
         sum + (product.netAmount - product.taxAmount) * product.actionQty;
-      if (!product.isIncludedTax) {
+      if (!product.sellingPriceTaxType) {
         return sum + product.netAmount * product.actionQty;
       }
       return cal;
     }, 0);
 
-    // } else {
-    //   totalTaxableAmount = updatedProducts.reduce(
-    //     (sum, product) =>
-    //       sum + (product.netAmount - product.taxAmount) * product.actionQty,
-    //     0
-    //   );
-    //   console.log("totalTaxableAmount2", totalTaxableAmount);
-    // }
-    const totalSgstAmount_2_5 = updatedProducts.reduce(
+    const totalSgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.sgst === 2.5
           ? sum + product.sgstAmount * product.actionQty
           : sum,
       0
     );
-    const totalCgstAmount_2_5 = updatedProducts.reduce(
+    const totalCgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.cgst === 2.5
           ? sum + product.cgstAmount * product.actionQty
@@ -311,23 +377,24 @@ const CreateInvoice = () => {
       0
     );
 
-    const totalSgstAmount_6 = updatedProducts.reduce(
+    const totalSgstAmount_6 = products.reduce(
       (sum, product) =>
         product.sgst === 6 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_6 = updatedProducts.reduce(
+    const totalCgstAmount_6 = products.reduce(
       (sum, product) =>
         product.cgst === 6 ? sum + product.cgstAmount * product.actionQty : sum,
       0
     );
 
-    const totalSgstAmount_9 = updatedProducts.reduce(
+    const totalSgstAmount_9 = products.reduce(
       (sum, product) =>
         product.sgst === 9 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_9 = updatedProducts.reduce(
+
+    const totalCgstAmount_9 = products.reduce(
       (sum, product) =>
         product.cgst === 9 ? sum + product.cgstAmount * product.actionQty : sum,
       0
@@ -343,7 +410,7 @@ const CreateInvoice = () => {
       totalCgstAmount_9;
 
     // Set state with the new values
-    setProducts(updatedProducts);
+    setProducts(products);
     setTotalAmounts({
       totalTaxableAmount,
       totalSgstAmount_2_5,
@@ -355,7 +422,6 @@ const CreateInvoice = () => {
       totalAmount,
     });
   }
-
   function total_TCS_TDS_Amount() {
     const totalQty = products.reduce((acc, cur) => {
       return acc + cur.actionQty;
@@ -376,7 +442,7 @@ const CreateInvoice = () => {
     total_TCS_TDS_Amount();
   }, [products, selectedTaxDetails]);
 
-  async function onCreateInvoice() {
+  async function onSetInvoice() {
     try {
       if (!selectedCustomerData.customerId) {
         return;
@@ -389,34 +455,29 @@ const CreateInvoice = () => {
         if (product.actionQty === 0) {
           continue;
         }
-        const productRef = doc(db, "products", product.id);
+        const productRef = doc(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "products",
+          product.id
+        );
         subTotal += product.totalAmount;
         items.push({
+          name: product.name,
+          description: product.description,
+          discount: product.discount,
+          discountType: product.discountType,
+          purchasePrice: product.purchasePrice,
+          purchasePriceTaxType: product.purchasePriceTaxType,
+          sellingPrice: product.sellingPrice,
+          sellingPriceTaxType: product.sellingPriceTaxType,
+          tax: product.tax,
           quantity: product.actionQty,
-          desc: "",
-          pricing: {
-            gstTax: product.gstTax,
-            purchasePrice: {
-              includingTax: true,
-              amount: product.unitPrice,
-              taxSlab: product.taxSlab,
-            },
-            sellingPrice: {
-              amount: product.unitPrice,
-              taxAmount: product.totalAmount,
-              taxSlab: product.taxSlab,
-              includingTax: true,
-            },
-            discount: {
-              amount: product.discount,
-              fieldValue: product.fieldValue,
-              type: "Percentage",
-            },
-          },
-          name: product.itemName,
           productRef: productRef,
         });
       }
+
       let tcs = {
         isTcsApplicable: Boolean(taxSelect === "tcs"),
         tax: taxSelect === "tcs" ? selectedTaxDetails.tax : "",
@@ -441,11 +502,13 @@ const CreateInvoice = () => {
         ...formData,
         tds,
         tcs,
-        date: Timestamp.fromDate(invoiceDate),
+        invoiceDate: invoiceDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
-          address: {},
+          address: companyDetails.address ?? "",
+          city: companyDetails.city ?? "",
+          zipCode: companyDetails.zipCode ?? "",
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
@@ -454,20 +517,29 @@ const CreateInvoice = () => {
           formData.shippingCharges +
           formData.packagingCharges +
           total_Tax_Amount,
-        items: items,
+        products: items,
         customerDetails: {
-          gstNumber: selectedCustomerData.businessDetails.gst_number,
-          custRef: customerRef,
-          address: selectedCustomerData.address,
-          phoneNumber: selectedCustomerData.phone,
+          gstNumber: selectedCustomerData.gstNumber ?? "",
+          customerRef: customerRef,
+          address: selectedCustomerData.address ?? "",
+          city: selectedCustomerData.city ?? "",
+          zipCode: selectedCustomerData.zipCode ?? "",
+          phone: selectedCustomerData.phone ?? "",
           name: selectedCustomerData.name,
         },
       };
 
-      await addDoc(
-        collection(db, "companies", companyDetails.companyId, "invoices"),
-        payload
-      );
+      if (invoiceId) {
+        await updateDoc(
+          doc(db, "companies", companyDetails.companyId, "invoices", invoiceId),
+          payload
+        );
+      } else {
+        await addDoc(
+          collection(db, "companies", companyDetails.companyId, "invoices"),
+          payload
+        );
+      }
 
       for (const item of items) {
         if (item.quantity === 0) {
@@ -475,7 +547,7 @@ const CreateInvoice = () => {
         }
 
         const currentQuantity = products.find(
-          (val) => val.itemName === item.name
+          (val) => val.name === item.name
         ).quantity;
 
         if (currentQuantity <= 0) {
@@ -488,26 +560,23 @@ const CreateInvoice = () => {
         });
       }
 
-      alert("Successfully Created the Invoice");
+      alert("Successfully Updated the Invoice");
       navigate("/invoiceList");
     } catch (err) {
       console.error(err);
     }
   }
 
-  function onSelect_TDS_TCS(e) {
-    const taxId = e.target.value;
-    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
-    setSelectedTaxDetails(taxDetails);
-  }
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
 
-  function setCurrentDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${getFullYear}-${getMonth}-${getDate}`;
   }
-
   function onSelectBook(e) {
     const { value } = e.target;
     const data = books.find((ele) => ele.id === value);
@@ -531,12 +600,14 @@ const CreateInvoice = () => {
     >
       <header className="flex items-center space-x-3  my-2">
         <Link
-          className="flex items-center text-gray-700 py-1 px-1 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
+          className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
           to="/invoiceList"
         >
-          <AiOutlineArrowLeft className="w-5 h-5 mr-1" />
+          <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">Create Invoice</h1>
+        <h1 className="text-2xl font-bold">
+          {invoiceId ? "Edit" : "Create"} Invoice
+        </h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex gap-8 mb-6">
@@ -594,10 +665,12 @@ const CreateInvoice = () => {
                 </label>
                 <input
                   type="date"
-                  value={setCurrentDate(invoiceDate)}
+                  value={DateFormate(invoiceDate)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setInvoiceDate(new Date(e.target.value));
+                    setInvoiceDate(
+                      Timestamp.fromDate(new Date(e.target.value))
+                    );
                   }}
                   required
                 />
@@ -671,13 +744,15 @@ const CreateInvoice = () => {
                       (product) =>
                         product.actionQty > 0 && (
                           <tr key={product.id}>
-                            <td className="px-4 py-2">{product.itemName}</td>
+                            <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
-                            <td className="px-4 py-2">₹{product.unitPrice}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.sellingPrice}
+                            </td>
                             <td className="px-4 py-2">₹{product.discount}</td>
                             <td className="px-4 py-2">₹{product.netAmount}</td>
                             <td className="px-2 py-2">
-                              {product.isIncludedTax ? "Yes" : "No"}
+                              {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
                             <td className="px-4 py-2">
                               ₹{product.totalAmount}
@@ -771,7 +846,7 @@ const CreateInvoice = () => {
                     {books.length > 0 &&
                       books.map((book) => (
                         <option value={book.id} key={book.id}>
-                          {`${book.name} - ${book.bankAccountDetails.bank_name} - ${book.bankAccountDetails.branch_name}`}
+                          {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
                   </select>
@@ -803,6 +878,7 @@ const CreateInvoice = () => {
                   <div>Shipping Charges</div>
                   <input
                     type="number"
+                    value={formData.shippingCharges || ""}
                     placeholder="Shipping Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -817,6 +893,7 @@ const CreateInvoice = () => {
                   <div>Packaging Charges</div>
                   <input
                     type="number"
+                    value={formData.packagingCharges || ""}
                     placeholder="Packaging Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -827,8 +904,37 @@ const CreateInvoice = () => {
                     }}
                   />
                 </div>
-                <div className="w-full flex justify-between items-center mt-5">
-                  {/* <div>TDS</div>
+                <div className="w-full ">
+                  <div>Notes</div>
+                  <input
+                    type="text"
+                    value={formData.notes}
+                    placeholder="Notes"
+                    className="border p-2 rounded w-full"
+                    onChange={(e) => {
+                      setFormData((val) => ({
+                        ...val,
+                        notes: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+                <div className="w-full ">
+                  <div>Terms</div>
+                  <textarea
+                    type="text"
+                    value={formData.terms}
+                    className="border p-2 rounded w-full max-h-16 min-h-16"
+                    onChange={(e) => {
+                      setFormData((val) => ({
+                        ...val,
+                        terms: e.target.value,
+                      }));
+                    }}
+                  />
+                </div>
+                <div className="w-full flex justify-between items-center mt-5 space-x-3">
+                  <div>TDS</div>
                   <div>
                     <label className="relative inline-block w-14 h-8">
                       <input
@@ -863,7 +969,7 @@ const CreateInvoice = () => {
                       <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
                       <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
                     </label>
-                  </div>*/}
+                  </div>
                   <div className="w-full">
                     <select
                       className="border p-2 rounded w-full"
@@ -882,35 +988,8 @@ const CreateInvoice = () => {
                     </select>
                   </div>
                 </div>
-                <div className="w-full ">
-                  <div>Notes</div>
-                  <input
-                    type="text"
-                    placeholder="Notes"
-                    className="border p-2 rounded w-full"
-                    onChange={(e) => {
-                      setFormData((val) => ({
-                        ...val,
-                        notes: e.target.value,
-                      }));
-                    }}
-                  />
-                </div>
-                <div className="w-full ">
-                  <div>Terms</div>
-                  <textarea
-                    type="text"
-                    className="border p-2 rounded w-full max-h-16 min-h-16"
-                    onChange={(e) => {
-                      setFormData((val) => ({
-                        ...val,
-                        terms: e.target.value,
-                      }));
-                    }}
-                  />
-                </div>
               </div>
-              {/* <div>
+              <div>
                 <div className="w-full flex ">
                   {taxSelect === "tds" && (
                     <select
@@ -950,33 +1029,11 @@ const CreateInvoice = () => {
                     </div>
                   )}
                 </div>
-              </div> */}
+              </div>
             </div>
             <div className="flex justify-end items-center mt-4 border-t pt-4 bg-gray-50 p-4 ">
-              {/* <div className="flex items-center gap-2">
-                <label className="text-gray-600">
-                  Apply discount (%) to all items?
-                </label>
-                <input
-                  type="text"
-                  className="border border-green-500 p-1 rounded w-16"
-                  placeholder="%"
-                  onChange={(e) =>
-                    setFormData((val) => ({ ...val, discount: e.target.value }))
-                  }
-                />
-              </div> */}
-
               <div className="flex flex-col justify-between">
                 <div className=" p-6" style={{ width: "600px" }}>
-                  {/* <div className="flex items-center mb-4">
-                    <label className="mr-2">Extra Discount</label>
-                    <input
-                      type="text"
-                      placeholder="%"
-                      className="border p-1 rounded w-16 text-center"
-                    />
-                  </div> */}
                   {formData.shippingCharges > 0 && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>Shipping Charges</span>
@@ -1069,9 +1126,10 @@ const CreateInvoice = () => {
             </button> */}
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onCreateInvoice}
+              onClick={onSetInvoice}
             >
-              <span className="text-lg">+</span> Create Invoice
+              <span className="text-lg">+</span> {invoiceId ? "Edit" : "Create"}{" "}
+              Invoice
             </button>
           </div>
         </div>
@@ -1080,4 +1138,4 @@ const CreateInvoice = () => {
   );
 };
 
-export default CreateInvoice;
+export default SetInvoice;

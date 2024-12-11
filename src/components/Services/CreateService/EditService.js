@@ -142,7 +142,7 @@ function EditService() {
         console.log("🚀 ~ fetchInvoiceData ~ error:", error);
       }
     }
-  
+
     const fetchServices = async () => {
       try {
         const companyRef = doc(db, "companies", companyDetails.companyId);
@@ -286,7 +286,7 @@ function EditService() {
 
       const payload = {
         ...formData,
-        date:serviceDate,
+        date: serviceDate,
         subTotal: +totalAmounts.subTotalAmount,
         total: +totalAmounts.totalAmount,
         customerDetails: {
@@ -297,12 +297,12 @@ function EditService() {
           name: selectedCustomerData.name,
         },
         servicesList: serviceListPayload,
-        membershipStartDate:membershipStartDate,
+        membershipStartDate: membershipStartDate,
         membershipEndDate,
-        typeOfEndMembership:membershipPeriod
+        typeOfEndMembership: membershipPeriod,
       };
       await updateDoc(
-        doc(db, "companies", companyDetails.companyId, "services",id),
+        doc(db, "companies", companyDetails.companyId, "services", id),
         payload
       );
       if (formData.membershipId) {
@@ -434,7 +434,6 @@ function EditService() {
 
   useEffect(() => {
     function setMembershipDate() {
-      
       if (!membershipStartDate?.seconds || !membershipPeriod) {
         return;
       }
@@ -683,7 +682,7 @@ function EditService() {
                     {books.length > 0 &&
                       books.map((book) => (
                         <option value={book.id} key={book.id}>
-                          {`${book.name} - ${book.bankAccountDetails.bank_name} - ${book.bankAccountDetails.branch_name}`}
+                          {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
                   </select>

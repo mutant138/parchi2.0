@@ -2,7 +2,6 @@ import React from "react";
 import SideBar from "../UI/Sidebar";
 import Navbar from "../UI/Navbar";
 import InvoiceList from "../Invoices/InvoiceList";
-import CreateInvoice from "../Invoices/CreateInvoice/CreateInvoice";
 import {
   Routes,
   Route,
@@ -52,8 +51,8 @@ import Designation from "../Staff&Payout/Designation/Designation";
 import Assets from "../Staff&Payout/Assets/Assets";
 import Attendance from "../Staff&Payout/Attendance/Attendance";
 import DesignationView from "../Staff&Payout/Designation/DesignationView";
-import EditInvoice from "../Invoices/CreateInvoice/EditInvoice";
 import EditService from "../Services/CreateService/EditService";
+import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 
 const Home = () => {
   const location = useLocation();
@@ -89,11 +88,11 @@ const Home = () => {
             <Route path="/invoiceList/:id" element={<InvoiceView />}></Route>
             <Route
               path="/invoiceList/create-invoice"
-              element={<CreateInvoice />}
+              element={<SetInvoice />}
             ></Route>
             <Route
-              path="/invoiceList/:id/edit-invoice"
-              element={<EditInvoice />}
+              path="/invoiceList/:invoiceId/edit-invoice"
+              element={<SetInvoice />}
             ></Route>
             <Route path="/quotation" element={<Quotation />}></Route>
             <Route

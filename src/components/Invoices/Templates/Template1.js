@@ -9,9 +9,8 @@ const Template1 = forwardRef((props, ref) => {
 
   const ModifiedInvoiceData = {
     ...invoiceData,
-    items: invoiceData.items.map((item) => {
-      const netAmount =
-        item.pricing.sellingPrice.amount - (+item.pricing.discount.amount || 0);
+    items: invoiceData.products.map((item) => {
+      const netAmount = item.sellingPrice - (+item.discount || 0);
       const taxRate = item.pricing.gstTax || 0;
       const sgst = taxRate / 2;
       const cgst = taxRate / 2;

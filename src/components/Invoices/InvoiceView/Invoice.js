@@ -81,7 +81,7 @@ function Invoice({ invoice }) {
             db,
             "companies",
             companyId,
-            "inventories",
+            "products",
             inventoryItem.productRef.id
           );
 

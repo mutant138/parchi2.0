@@ -24,7 +24,12 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const productRef = collection(db, "companies", companyDetails.companyId ,"products");
+      const productRef = collection(
+        db,
+        "companies",
+        companyDetails.companyId,
+        "products"
+      );
       // const productQuery = query(
       //   productRef,
       //   where("companyRef", "==", companyRef)
@@ -48,7 +53,7 @@ const ProductList = () => {
           unitPrice: data.sellingPrice ?? 0,
           discount: data.discount ?? 0,
           tax: data.tax || 0,
-          barcode: data.barcode | "",
+          barcode: data.barcode || "",
           purchasePrice: data.purchasePrice || 0,
           sellingPrice: data.sellingPrice || 0,
           includingTax: data.sellingPriceTaxType || false,
@@ -91,7 +96,7 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
-   console.log('products',products)
+  console.log("products", products);
   return (
     <div className="bg-white p-4 overflow-y-auto" style={{ height: "80vh" }}>
       <div className="flex justify-between mb-4">

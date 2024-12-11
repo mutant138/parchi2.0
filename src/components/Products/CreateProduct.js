@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
+  console.log("🚀 ~ CreateProduct ~ onProductUpdated:", onProductUpdated);
   const userDetails = useSelector((state) => state.users);
   const [productImage, setProductImage] = useState("");
   const [categories, setCategories] = useState([]);
@@ -139,7 +140,13 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
       // }
 
       if (onProductUpdated?.id) {
-        const productDocRef = doc(db, "companies", companyDetails.companyId, "products", onProductUpdated.id);
+        const productDocRef = doc(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "products",
+          onProductUpdated.id
+        );
         // const productImageUrl = productImage.name
         //   ? await handleFileChange(productImage)
         //   : formData.image;
@@ -154,7 +161,7 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           // ),
           // userRef: doc(db, "users", userDetails.userId),
         };
-     console.log('payload', formData)
+        console.log("payload", formData);
         await updateDoc(productDocRef, payload); // Update product
         alert("Product successfully updated.");
       } else {
@@ -178,7 +185,13 @@ function CreateProduct({ isOpen, onClose, onProductAdded, onProductUpdated }) {
           userRef,
         };
         if (formData.barcode) {
-          productDocRef = doc(db,"companies", companyDetails.companyId, "products", formData.barcode);
+          productDocRef = doc(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "products",
+            formData.barcode
+          );
           await setDoc(productDocRef, payload);
         } else {
           // productDocRef = collection(db, "products");
