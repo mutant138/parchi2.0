@@ -850,7 +850,7 @@ const SetInvoice = () => {
                 <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
-                    value={formData.book.bookRef?.id}
+                    value={formData.book.bookRef?.id || ""}
                     onChange={onSelectBook}
                     className="border p-2 rounded w-full"
                   >
