@@ -1,8 +1,7 @@
 import React, { forwardRef } from "react";
 
 const Template1 = forwardRef((props, ref) => {
-  const { invoiceData } = props;
-
+  const { invoiceData, bankDetails } = props;
   if (!invoiceData) {
     return;
   }
@@ -10,8 +9,13 @@ const Template1 = forwardRef((props, ref) => {
   const ModifiedInvoiceData = {
     ...invoiceData,
     items: invoiceData.products.map((item) => {
-      const netAmount = item.sellingPrice - (+item.discount || 0);
-      const taxRate = item.pricing.gstTax || 0;
+      let discount = +item.discount || 0;
+
+      if (item.discountType) {
+        discount = (+item.sellingPrice / 100) * item.discount;
+      }
+      const netAmount = item.sellingPrice - (discount || 0);
+      const taxRate = item.tax || 0;
       const sgst = taxRate / 2;
       const cgst = taxRate / 2;
       const taxAmount = netAmount * (taxRate / 100);
@@ -71,14 +75,14 @@ const Template1 = forwardRef((props, ref) => {
     0
   );
 
-  // const totalAmount =
-  //   totalTaxableAmount +
-  //   totalSgstAmount_2_5 +
-  //   totalCgstAmount_2_5 +
-  //   totalSgstAmount_6 +
-  //   totalCgstAmount_6 +
-  //   totalSgstAmount_9 +
-  //   totalCgstAmount_9;
+  const totalAmount =
+    totalTaxableAmount +
+    totalSgstAmount_2_5 +
+    totalCgstAmount_2_5 +
+    totalSgstAmount_6 +
+    totalCgstAmount_6 +
+    totalSgstAmount_9 +
+    totalCgstAmount_9;
 
   return (
     <div
@@ -101,7 +105,7 @@ const Template1 = forwardRef((props, ref) => {
         <div className="mt-2 text-start">
           <strong>Bill To :</strong>
           <div>{ModifiedInvoiceData.customerDetails.name}</div>
-          <div>Ph : {ModifiedInvoiceData.customerDetails.phoneNumber}</div>
+          <div>Ph : {ModifiedInvoiceData.customerDetails.phone}</div>
         </div>
         <div>
           <div>
@@ -144,25 +148,25 @@ const Template1 = forwardRef((props, ref) => {
                   {item.name}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.pricing.sellingPrice.amount.toFixed(1)}
+                  {item.sellingPrice.toFixed(1)}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.pricing.discount.amount.toFixed(1)}
+                  {item.discount.toFixed(1)}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   {item.quantity}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.pricing.sellingPrice.amount.toFixed(1)}
+                  {item.sellingPrice.toFixed(1)}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.pricing.sellingPrice.taxSlab}%
+                  {item.sellingPrice.taxSlab}%
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   CGST SGST
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.pricing.sellingPrice.taxAmount.toFixed(2)}
+                  {item.taxAmount.toFixed(2)}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   {item.totalAmount.toFixed(2)}
@@ -237,15 +241,25 @@ const Template1 = forwardRef((props, ref) => {
         <h3>Total : {+ModifiedInvoiceData.total?.toFixed(2)}</h3>
       </div>
 
-      <div className="font-bold flex justify-between">
+      <div className=" flex justify-between">
         <div>
           <div>
             <strong>Bank Details</strong>
           </div>
-          <div>Bank : </div>
-          <div>Account # : </div>
-          <div>IFSC Code : </div>
-          <div>Branch : </div>
+          <div>
+            Bank : <span className="font-bold">{bankDetails.bankName}</span>{" "}
+          </div>
+          <div>
+            Account # :{" "}
+            <span className="font-bold">{bankDetails.accountNo}</span>
+          </div>
+          <div>
+            IFSC Code :{" "}
+            <span className="font-bold">{bankDetails.ifscCode}</span>
+          </div>
+          <div>
+            Branch : <span className="font-bold">{bankDetails.branch}</span>
+          </div>
         </div>
         <div className="mt-24">
           <div>Authorized Signatory</div>

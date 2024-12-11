@@ -221,7 +221,7 @@ function POSViewHome({ POS }) {
                     </div>
                   </div>
                 </div>
-                <Template1 ref={POSRef} invoiceData={POS} />
+                {/* <Template1 ref={POSRef} invoiceData={POS} /> */}
               </div>
             </div>
           </div>

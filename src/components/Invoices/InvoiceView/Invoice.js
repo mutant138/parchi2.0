@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import Template1 from "../Templates/Template1";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-function Invoice({ invoice }) {
+function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -228,7 +228,11 @@ function Invoice({ invoice }) {
                     </div>
                   </div>
                 </div>
-                {/* <Template1 ref={invoiceRef} invoiceData={invoice} /> */}
+                <Template1
+                  ref={invoiceRef}
+                  invoiceData={invoice}
+                  bankDetails={bankDetails}
+                />
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
   const [confirmAccount, setConfirmAccount] = useState("");
   const [formData, setFormData] = useState({
     accountNo: "",
-    IfscCode: "",
+    ifscCode: "",
     bankName: "",
     branch: "",
     name: "",
@@ -24,7 +24,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
   function resetForm() {
     setFormData({
       accountNo: "",
-      IfscCode: "",
+      ifscCode: "",
       bankName: "",
       branch: "",
       name: "",
@@ -154,7 +154,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
-                  IfscCode: e.target.value,
+                  ifscCode: e.target.value,
                 }))
               }
             />

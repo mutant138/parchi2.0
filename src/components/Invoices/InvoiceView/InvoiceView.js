@@ -13,6 +13,7 @@ function InvoiceView() {
   const [activeTab, setActiveTab] = useState("Invoice");
   const [invoice, setInvoice] = useState({});
   const userDetails = useSelector((state) => state.users);
+  const [bankDetails, setBankDetails] = useState({});
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
@@ -25,7 +26,8 @@ function InvoiceView() {
         id: resData.id,
         ...resData.data(),
       };
-      console.log("🚀 ~ fetchInvoices ~ invoicesData:", invoicesData);
+      const bankData = (await getDoc(invoicesData.book.bookRef)).data();
+      setBankDetails(bankData);
       setInvoice(invoicesData);
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -77,7 +79,7 @@ function InvoiceView() {
       <div className="w-full">
         {activeTab === "Invoice" && (
           <div>
-            <Invoice invoice={invoice} />
+            <Invoice invoice={invoice} bankDetails={bankDetails} />
           </div>
         )}
         {activeTab === "Returns" && (
