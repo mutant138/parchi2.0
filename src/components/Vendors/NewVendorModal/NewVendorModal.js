@@ -37,15 +37,11 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
     phone: "",
     email: "",
     profileImage: "",
-    address: {
-      address: "",
-      city: "",
-      zip_code: "",
-    },
-    businessDetails: {
-      gst_number: "",
-      pan_number: "",
-    },
+    address: "",
+    city: "",
+    zipCode: "",
+    gstNumber: "",
+    panNumber: "",
   });
 
   useEffect(() => {
@@ -55,15 +51,11 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
         phone: vendorData.phone || "",
         email: vendorData.email || "",
         profileImage: vendorData.profileImage || "",
-        address: vendorData.address || {
-          address: "",
-          city: "",
-          zip_code: "",
-        },
-        businessDetails: vendorData.businessDetails || {
-          gst_number: "",
-          pan_number: "",
-        },
+        address: vendorData.address || "",
+        city: vendorData.city || "",
+        zipCode: vendorData.zipCode || "",
+        gstNumber: vendorData.gstNumber || "",
+        panNumber: vendorData.panNumber || "",
       });
       setIsEditing(false);
     } else {
@@ -72,8 +64,11 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
         phone: "",
         email: "",
         profileImage: "",
-        address: { address: "", city: "", zip_code: "" },
-        businessDetails: { gst_number: "", pan_number: "" },
+        address: "",
+        city: "",
+        zipCode: "",
+        gstNumber: "",
+        panNumber: "",
       });
       setIsEditing(true);
     }
@@ -88,18 +83,18 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
       }
     }
 
-    if (name.includes(".")) {
-      const [group, key] = name.split(".");
-      setFormData((prevState) => ({
-        ...prevState,
-        [group]: {
-          ...prevState[group],
-          [key]: value,
-        },
-      }));
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    // if (name.includes(".")) {
+    //   const [group, key] = name.split(".");
+    //   setFormData((prevState) => ({
+    //     ...prevState,
+    //     [group]: {
+    //       ...prevState[group],
+    //       [key]: value,
+    //     },
+    //   }));
+    // } else {
+    setFormData({ ...formData, [name]: value });
+    // }
   };
 
   const handleFileChange = async (e) => {
@@ -132,7 +127,7 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
       } else {
         await addDoc(collection(db, "vendors"), {
           ...formData,
-          companyId: companyId,
+          companyRef: doc(db, "companies", companyId),
           createdAt: serverTimestamp(),
         });
       }
@@ -165,7 +160,7 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
         >
-            <IoMdClose size={24} />
+          <IoMdClose size={24} />
         </button>
 
         {vendorData && !isEditing && (
@@ -215,9 +210,8 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
                 <strong className="text-grey-500 font-bold">Address:</strong>{" "}
                 {vendorData.length > 0 ? (
                   <span className="text-gray-500 font-semibold">
-                    {vendorData.address?.address || "  "} -
-                    {vendorData.address?.city || "  "} -
-                    {vendorData.address?.zip_code || " "}
+                    {vendorData.address || "  "} -{vendorData.city || "  "} -
+                    {vendorData.zipCode || " "}
                   </span>
                 ) : (
                   " - "
@@ -226,13 +220,13 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
               <p className="text-gray-800 flex justify-between mb-3">
                 <strong className="text-grey-500 font-bold">GST:</strong>{" "}
                 <span className="text-gray-500 font-semibold">
-                  {vendorData.businessDetails?.gst_number || " - "}
+                  {vendorData.gstNumber || " - "}
                 </span>
               </p>
               <p className="text-gray-800 flex justify-between mb-3">
                 <strong className="text-grey-500 font-bold">PAN:</strong>{" "}
                 <span className="text-gray-500 font-semibold">
-                  {vendorData.businessDetails?.pan_number || " - "}
+                  {vendorData.panNumber || " - "}
                 </span>
               </p>
             </div>
@@ -339,8 +333,8 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
               <label className="block font-semibold">Address</label>
               <input
                 type="text"
-                name="address.address"
-                value={formData.address.address}
+                name="address"
+                value={formData.address}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md"
                 placeholder="Street Address"
@@ -349,16 +343,16 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
             <div className="flex space-x-2">
               <input
                 type="text"
-                name="address.zip_code"
-                value={formData.address.zip_code}
+                name="zipCode"
+                value={formData.zipCode}
                 onChange={handleChange}
                 placeholder="Pin Code"
                 className="w-1/2 border border-gray-300 p-2 rounded-md"
               />
               <input
                 type="text"
-                name="address.city"
-                value={formData.address.city}
+                name="city"
+                value={formData.city}
                 onChange={handleChange}
                 placeholder="City"
                 className="w-1/2 border border-gray-300 p-2 rounded-md"
@@ -369,8 +363,8 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
               <label className="block font-semibold">GST Number</label>
               <input
                 type="text"
-                name="businessDetails.gst_number"
-                value={formData.businessDetails.gst_number}
+                name="gstNumber"
+                value={formData.gstNumber}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md"
                 placeholder="GST Number"
@@ -380,8 +374,8 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
               <label className="block font-semibold">PAN Number</label>
               <input
                 type="text"
-                name="businessDetails.pan_number"
-                value={formData.businessDetails.pan_number}
+                name="panNumber"
+                value={formData.panNumber}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md"
                 placeholder="PAN Number"

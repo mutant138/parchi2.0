@@ -26,9 +26,10 @@ const VendorList = () => {
 
   const fetchVendors = async () => {
     setLoading(true);
+    const companyRef = doc(db, "companies", companyId);
     try {
       const vendorsRef = collection(db, "vendors");
-      const q = query(vendorsRef, where("companyId", "==", companyId));
+      const q = query(vendorsRef, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const vendorsData = querySnapshot.docs.map((doc) => ({

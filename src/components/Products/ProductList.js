@@ -100,7 +100,7 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
-  console.log("products", products);
+
   return (
     <div className="bg-white p-4 overflow-y-auto" style={{ height: "80vh" }}>
       <div className="flex justify-between mb-4">

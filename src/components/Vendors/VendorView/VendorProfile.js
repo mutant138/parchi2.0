@@ -21,9 +21,10 @@ const VendorProfile = ({ vendorData, refresh }) => {
   }
 
   async function onUpdateProfile() {
+    const { id, ...rest } = UpdatedData;
     try {
       const vendorRef = doc(db, "vendors", vendorData.id);
-      await updateDoc(vendorRef, UpdatedData);
+      await updateDoc(vendorRef, rest);
       refresh();
       alert("Profile updated successfully");
       setIsEdit(false);
@@ -90,7 +91,7 @@ const VendorProfile = ({ vendorData, refresh }) => {
               />
             ) : (
               <span className="bg-purple-500 text-white w-20 h-20 flex items-center justify-center rounded-full text-2xl shadow-md">
-                {UpdatedData.name.charAt(0)}
+                {UpdatedData.name.charAt(0).toUpperCase()}
               </span>
             )}
             <div className="flex-1">
@@ -179,19 +180,14 @@ const VendorProfile = ({ vendorData, refresh }) => {
                   <label className="text-sm text-gray-500">Street</label>
                   <input
                     type="text"
-                    value={
-                      UpdatedData.address?.address || (isEdit ? "" : "N/A")
-                    }
+                    value={UpdatedData.address || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        address: {
-                          ...UpdatedData.address,
-                          address: e.target.value,
-                        },
+                        address: e.target.value,
                       }))
                     }
                     readOnly={!isEdit}
@@ -201,17 +197,14 @@ const VendorProfile = ({ vendorData, refresh }) => {
                   <label className="text-sm text-gray-500">City</label>
                   <input
                     type="text"
-                    value={UpdatedData.address?.city || (isEdit ? "" : "N/A")}
+                    value={UpdatedData.city || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        address: {
-                          ...UpdatedData.address,
-                          city: e.target.value,
-                        },
+                        city: e.target.value,
                       }))
                     }
                     readOnly={!isEdit}
@@ -221,19 +214,14 @@ const VendorProfile = ({ vendorData, refresh }) => {
                   <label className="text-sm text-gray-500">Pincode</label>
                   <input
                     type="text"
-                    value={
-                      UpdatedData.address?.zip_code || (isEdit ? "" : "N/A")
-                    }
+                    value={UpdatedData.zipCode || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
                       setUpdatedData((val) => ({
                         ...val,
-                        address: {
-                          ...UpdatedData.address,
-                          zip_code: e.target.value,
-                        },
+                        zipCode: e.target.value,
                       }))
                     }
                     readOnly={!isEdit}
