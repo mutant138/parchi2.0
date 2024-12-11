@@ -9,10 +9,10 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useSelector } from "react-redux";
-import NewVendorModal from "./NewVendorModal/NewVendorModal";
 import { FaSearch, FaRegEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import CreateVendor from "./CreateVendor";
 
 const VendorList = () => {
   const [vendors, setVendors] = useState([]);
@@ -216,7 +216,7 @@ const VendorList = () => {
           </tbody>
         </table>
       </div>
-      <NewVendorModal
+      <CreateVendor
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);

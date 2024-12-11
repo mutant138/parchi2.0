@@ -38,7 +38,6 @@ import InvoiceView from "../Invoices/InvoiceView/InvoiceView";
 import Expense from "../Expense/Expense";
 import BookList from "../Expense/Book/BookList";
 import Quotation from "../Quotation/Quotation";
-import CreateQuotation from "../Quotation/CreateInvoice/CreateQuotation";
 import QuotationViewHome from "../Quotation/QuotationView/QuotationViewHome";
 import POS from "../POS/POS";
 import POSViewHome from "../POS/POSView/POSViewHome";
@@ -53,6 +52,7 @@ import Attendance from "../Staff&Payout/Attendance/Attendance";
 import DesignationView from "../Staff&Payout/Designation/DesignationView";
 import EditService from "../Services/CreateService/EditService";
 import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
+import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
 
 const Home = () => {
   const location = useLocation();
