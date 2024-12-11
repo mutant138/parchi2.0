@@ -8,11 +8,11 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../../firebase";
+import { db, storage } from "../../firebase";
 import { useSelector } from "react-redux";
 import { FaUserEdit } from "react-icons/fa";
 
-const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
+const CreateVendor = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
   const userDetails = useSelector((state) => state.users);
 
   const companyId =
@@ -395,4 +395,4 @@ const NewVendorModal = ({ isOpen, onClose, onVedorAdded, vendorData }) => {
   );
 };
 
-export default NewVendorModal;
+export default CreateVendor;
