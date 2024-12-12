@@ -112,6 +112,7 @@ function Attendance() {
             ...data,
             present,
             absent,
+            sum,
           };
         });
 
