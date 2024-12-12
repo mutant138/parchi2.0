@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import AddAttendanceSidebar from "./AddAttendanceSidebar";
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 
@@ -11,6 +18,10 @@ function Attendance() {
   const [loading, setLoading] = useState(false);
   const [staffData, setStaffData] = useState([]);
   const [staffAttendance, setStaffAttendance] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [overallSalary, setOverallSalary] = useState(0);
+  const [onUpdateAttendance, setOnUpdateAttendance] = useState({});
+
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
@@ -37,6 +48,7 @@ function Attendance() {
         setLoading(false);
       }
     }
+
     async function fetchStaffAttendance() {
       setLoading(true);
 
@@ -48,11 +60,13 @@ function Attendance() {
           "staffAttendance"
         );
         const staffAttendanceData = await getDocs(staffAttendanceRef);
+        let overallSum = 0;
 
         const staffAttendance = staffAttendanceData.docs.map((doc) => {
           const data = doc.data();
           let present = 0;
           let absent = 0;
+          let sum = 0;
 
           for (let att of data.staffs) {
             if (att.status === "present") {
@@ -61,6 +75,45 @@ function Attendance() {
               ++absent;
             }
           }
+
+          for (let att of data.staffs) {
+            const matchingStaff = staffData.find(
+              (staff) => staff.id === att.id
+            );
+
+            if (matchingStaff) {
+              let salary = 0;
+              if (matchingStaff.isDailyWages) {
+                salary = +matchingStaff.paymentdetails;
+              } else {
+                salary = +matchingStaff.paymentdetails / 30;
+              }
+
+              if (att.shift === 0.5) {
+                sum += salary * 0.5;
+              } else if (att.shift === 1) {
+                sum += salary * 1;
+              } else if (att.shift === 1.5) {
+                sum += salary * 1.5;
+              } else if (att.shift === 2) {
+                sum += salary * 2;
+              }
+
+              if (att.adjustments?.overTime) {
+                sum += att.adjustments?.amount;
+              } else if (att.adjustments?.lateFine) {
+                sum -= att.adjustments?.amount;
+              }
+
+              if (att.adjustments?.allowance) {
+                sum += att.adjustments?.amount;
+              } else if (att.adjustments?.deduction) {
+                sum -= att.adjustments?.amount;
+              }
+            }
+          }
+
+          overallSum += sum;
           return {
             id: doc.id,
             ...data,
@@ -68,6 +121,8 @@ function Attendance() {
             absent,
           };
         });
+
+        setOverallSalary(overallSum);
         setStaffAttendance(staffAttendance);
       } catch (error) {
         console.log("🚀 ~ fetchStaffData ~ error:", error);
@@ -75,9 +130,10 @@ function Attendance() {
         setLoading(false);
       }
     }
-    fetchStaffAttendance();
+
     fetchStaffData();
-  }, []);
+    fetchStaffAttendance();
+  }, [companyId]);
 
   function DateFormate(timestamp) {
     if (!timestamp) {
@@ -92,6 +148,25 @@ function Attendance() {
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
 
+  function markedAttendance(AttendanceId, data) {
+    const removedAlreadyAddAttendance = staffAttendance.filter(
+      (ele) => ele.id !== AttendanceId
+    );
+    for (let i = 0; i < removedAlreadyAddAttendance.length; i++) {
+      if (removedAlreadyAddAttendance[i].id > data.id) {
+        removedAlreadyAddAttendance.splice(i, 0, data);
+        break;
+      }
+    }
+    setStaffAttendance(removedAlreadyAddAttendance);
+  }
+
+  const filteredAttendance = staffAttendance.filter((ele) => {
+    if (!selectedMonth) {
+      return true;
+    }
+    return ele.id.slice(2) === selectedMonth.split("-").reverse().join("");
+  });
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
@@ -121,34 +196,54 @@ function Attendance() {
         </div>
         <div>
           <div>Overall Salary</div>
-          <div>₹ 222</div>
+          <div>₹ {overallSalary.toFixed(2)}</div>
         </div>
       </div>
-      <div className="py-3">Details</div>
+      <div className="py-3 text-right">
+        <label htmlFor="monthFilter">Filter by Month:</label>
+        <input
+          id="monthFilter"
+          type="month"
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="ml-2 p-1 border rounded-lg"
+        />
+      </div>
       <div>
         {loading ? (
           <div className="text-center">Loading...</div>
-        ) : staffAttendance.length > 0 ? (
-          staffAttendance.map((ele) => (
-            <div
-              className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
-              key={ele.id}
-            >
-              <div>{DateFormate(ele.date)}</div>
-              <div className="flex justify-between items-center">
-                <div>
-                  Total Presents{" "}
-                  <span className="text-green-500">{ele.present}</span>
-                </div>
-                <div>
-                  Total Absent{" "}
-                  <span className="text-red-500">{ele.absent}</span>
+        ) : filteredAttendance.length > 0 ? (
+          <div
+            className="flex  flex-col-reverse overflow-y-auto"
+            style={{ height: "60vh" }}
+          >
+            {filteredAttendance.map((ele) => (
+              <div
+                className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
+                key={ele.id}
+                onClick={() => {
+                  setOnUpdateAttendance(ele);
+                  setIsSidebarOpen(true);
+                }}
+              >
+                <div>{DateFormate(ele.date)}</div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    Total Presents{" "}
+                    <span className="text-green-500">{ele.present}</span>
+                  </div>
+                  <div>
+                    Total Absent{" "}
+                    <span className="text-red-500">{ele.absent}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
-          <div className="text-center">No Attendance Found</div>
+          <div className="text-center">
+            No Attendance Found for the Selected Month
+          </div>
         )}
       </div>
       {isSidebarOpen && (
@@ -156,6 +251,8 @@ function Attendance() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           staff={staffData}
+          markedAttendance={markedAttendance}
+          onUpdateAttendance={onUpdateAttendance}
         />
       )}
     </div>

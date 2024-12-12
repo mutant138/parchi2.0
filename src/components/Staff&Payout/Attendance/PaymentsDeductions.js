@@ -15,7 +15,6 @@ function PaymentsDeductions({ onClose, staff, addPaymentDeductionToStaff }) {
   });
 
   useEffect(() => {
-    console.log("🚀 ~ PaymentsDeductions ~ staff:", staff);
     setSelectedShift(staff.shift);
     if (!staff?.adjustments) {
       return;
@@ -35,10 +34,6 @@ function PaymentsDeductions({ onClose, staff, addPaymentDeductionToStaff }) {
       });
     }
     if (staff?.adjustments?.allowance) {
-      console.log(
-        "🚀 ~ useEffect ~ staff?.adjustments?.allowance:",
-        staff?.adjustments?.allowance
-      );
       setSelectedAllowance({
         type: "allowance",
         hours: staff.adjustments?.allowance.hours,
