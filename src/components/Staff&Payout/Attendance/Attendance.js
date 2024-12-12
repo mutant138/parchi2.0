@@ -150,18 +150,22 @@ function Attendance() {
   }
 
   function markedAttendance(AttendanceId, data) {
-    const removedAlreadyAddAttendance = staffAttendance.filter(
-      (ele) =>
-        ele.id !== AttendanceId &&
-        onUpdateAttendance.id &&
-        ele.id !== onUpdateAttendance.id
-    );
+    const removedAlreadyAddAttendance = staffAttendance.filter((ele) => {
+      if (ele.id === AttendanceId) {
+        return false;
+      }
+      if (onUpdateAttendance.id && ele.id !== onUpdateAttendance.id) {
+        return false;
+      }
+
+      return true;
+    });
     removedAlreadyAddAttendance.push(data);
 
     const sortedData = removedAlreadyAddAttendance.sort((a, b) =>
       b.id.localeCompare(a.id)
     );
-    if (onUpdateAttendance) {
+    if (onUpdateAttendance.id) {
       setOnUpdateAttendance("");
     }
     setStaffAttendance(sortedData);
@@ -173,7 +177,6 @@ function Attendance() {
     }
     return ele.id.slice(2) === selectedMonth.split("-").reverse().join("");
   });
-
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
