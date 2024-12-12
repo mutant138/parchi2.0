@@ -1,14 +1,4 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  Timestamp,
-  where,
-} from "firebase/firestore";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -18,7 +8,8 @@ import PaymentsDeductions from "./PaymentsDeductions";
 
 function AddAttendanceSidebar({ onClose, isOpen, staff }) {
   const userDetails = useSelector((state) => state.users);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activePaymentDeductionsStaff, setActivePaymentDeductionsStaff] =
+    useState("");
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [staffData, setStaffData] = useState([]);
@@ -31,8 +22,8 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
     setStaffData(staff);
   }, [staff]);
 
-  function isPresent(id) {
-    return attendanceForm.staffs.find((ele) => ele.id === id)?.status;
+  function getAttendanceStaffData(id) {
+    return attendanceForm.staffs.find((ele) => ele.id === id);
   }
 
   function onUpdatedStaffAttendance(value, staff) {
@@ -43,7 +34,12 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
       ...val,
       staffs: [
         ...removedPreviousStaffAttendance,
-        { id: staff.id, name: staff.name, status: value },
+        {
+          id: staff.id,
+          name: staff.name,
+          status: value,
+          shift: value === "present" ? 1 : 0,
+        },
       ],
     }));
   }
@@ -61,7 +57,7 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
     return `${getFullYear}-${getMonth}-${getDate}`;
   }
   const today = new Date().toISOString().split("T")[0];
-  function setDateToId(timestamp) {
+  function setDateAsId(timestamp) {
     if (!timestamp) {
       return;
     }
@@ -76,7 +72,7 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
 
   async function AddAttendance() {
     try {
-      if (!setDateToId(attendanceForm.date)) {
+      if (!setDateAsId(attendanceForm.date)) {
         alert("please Select Date");
         return;
       }
@@ -86,16 +82,31 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
         createdAt: Timestamp.fromDate(new Date()),
       };
 
-      await addDoc(
-        collection(db, "companies", companyId, "staffAttendance"),
+      await setDoc(
+        doc(
+          db,
+          "companies",
+          companyId,
+          "staffAttendance",
+          setDateAsId(attendanceForm.date)
+        ),
         payload
       );
-      alert("Successfully Mark Attendance");
+
+      alert("Successfully Marked Attendance");
     } catch (error) {
       console.log("🚀 ~ AddAttendance ~ error:", error);
     }
   }
-
+  function addPaymentDeductionToStaff(staffId, data) {
+    const updatedAttendance = attendanceForm.staffs.map((ele) => {
+      if (staffId === ele.id) {
+        ele = { ...ele, ...data };
+      }
+      return ele;
+    });
+    setAttendanceForm((val) => ({ ...val, staffs: updatedAttendance }));
+  }
   return (
     <div
       className={`fixed inset-0 z-50 flex justify-end bg-black bg-opacity-25 transition-opacity ${
@@ -140,7 +151,20 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
                 <div key={staff.id} className="border-b-2 py-2">
                   <div
                     className="text-sm block font-semibold mt-2 p-2 flex justify-between items-center cursor-pointer"
-                    onClick={() => setIsSidebarOpen(true)}
+                    onClick={() => {
+                      const staffAttendanceData = getAttendanceStaffData(
+                        staff.id
+                      );
+                      if (staffAttendanceData?.status !== "present") {
+                        alert("select Attendance");
+                        return;
+                      }
+                      setActivePaymentDeductionsStaff({
+                        name: staff.name,
+                        isDailyWages: staff.isDailyWages,
+                        ...staffAttendanceData,
+                      });
+                    }}
                   >
                     {staff.name} <FaChevronRight />
                   </div>
@@ -161,7 +185,8 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
                           <label
                             htmlFor={attendance + staff.id}
                             className={`inline-block px-5 py-2 cursor-pointer border rounded-lg transition-all ease-in-out text-sm m-1 shadow-md ${
-                              isPresent(staff.id) === attendance
+                              getAttendanceStaffData(staff.id)?.status ===
+                              attendance
                                 ? " border-blue-700 text-white" +
                                   ((attendance === "present" &&
                                     " bg-green-700 ") ||
@@ -196,9 +221,9 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
       </div>
       <div>
         <PaymentsDeductions
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          staff={staffData}
+          onClose={() => setActivePaymentDeductionsStaff("")}
+          staff={activePaymentDeductionsStaff}
+          addPaymentDeductionToStaff={addPaymentDeductionToStaff}
         />
       </div>
     </div>

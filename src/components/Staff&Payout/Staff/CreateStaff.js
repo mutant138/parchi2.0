@@ -1,12 +1,19 @@
-import { addDoc, collection, doc, Timestamp } from "firebase/firestore";
-import React, { useState } from "react";
+import {
+  addDoc,
+  getDocs,
+  collection,
+  doc,
+  Timestamp,
+  query,
+  where,
+} from "firebase/firestore";
+import React, { useState, useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { db } from "../../../firebase";
 
 function CreateStaff({ isOpen, onClose, staffAdded }) {
   const userDetails = useSelector((state) => state.users);
-
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [formData, setFormData] = useState({
@@ -17,12 +24,13 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
     designation: "",
     emailId: "",
     idNo: "",
-    isdailywages: false,
+    isDailyWages: false,
     name: "",
     panNumber: "",
     paymentdetails: 0,
     phone: "",
   });
+  const [designations, setDesignations] = useState([]);
 
   const handlePhoneNumberChange = (event) => {
     const inputValue = event.target.value;
@@ -32,6 +40,30 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
       setFormData((val) => ({ ...val, phone: event.target.value }));
     }
   };
+
+  const fetchDesignation = async () => {
+    try {
+      const companyRef = doc(db, "companies", companyId);
+
+      const designationRef = collection(db, "designations");
+
+      const q = query(designationRef, where("companyRef", "==", companyRef));
+      const querySnapshot = await getDocs(q);
+
+      const designationData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setDesignations(designationData);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDesignation();
+  }, [companyId]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -163,7 +195,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
             />
           </div>
           <div>
-            <label className="text-sm block font-semibold ">Role</label>
+            <label className="text-sm block font-semibold ">Designation</label>
             <select
               className="w-full border border-gray-300 p-2 rounded-md  focus:outline-none"
               defaultValue={""}
@@ -174,12 +206,22 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
               <option value={""} disabled>
                 Designation
               </option>
-              <option value="Voice Support">Voice Support</option>
+
+              {designations.length > 0 &&
+                designations.map((designation) => (
+                  <option
+                    key={designation.designationName}
+                    value={designation.designationName}
+                  >
+                    {designation.designationName}
+                  </option>
+                ))}
+              {/* <option value="Voice Support">Voice Support</option>
               <option value="Customer Support">Customer Support</option>
               <option value="Admin">Admin</option>
               <option value="Data Analyst">Data Analyst</option>
               <option value="des2">des2</option>
-              <option value="des3">des3</option>
+              <option value="des3">des3</option> */}
             </select>
           </div>
           <div>
@@ -204,7 +246,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
                   onChange={(e) =>
                     setFormData((val) => ({
                       ...val,
-                      isdailywages: e.target.checked,
+                      isDailyWages: e.target.checked,
                     }))
                   }
                 />
