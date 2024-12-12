@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import AddAttendanceSidebar from "./AddAttendanceSidebar";
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 
@@ -11,10 +18,9 @@ function Attendance() {
   const [loading, setLoading] = useState(false);
   const [staffData, setStaffData] = useState([]);
   const [staffAttendance, setStaffAttendance] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toISOString().slice(0, 7)
-  );
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [overallSalary, setOverallSalary] = useState(0);
+  const [onUpdateAttendance, setOnUpdateAttendance] = useState({});
 
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -163,25 +169,26 @@ function Attendance() {
     const getFullYear = date.getFullYear();
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
   function markedAttendance(AttendanceId, data) {
     const removedAlreadyAddAttendance = staffAttendance.filter(
       (ele) => ele.id !== AttendanceId
     );
-    removedAlreadyAddAttendance.push(data);
+    for (let i = 0; i < removedAlreadyAddAttendance.length; i++) {
+      if (removedAlreadyAddAttendance[i].id > data.id) {
+        removedAlreadyAddAttendance.splice(i, 0, data);
+        break;
+      }
+    }
     setStaffAttendance(removedAlreadyAddAttendance);
   }
 
-  const groupedAttendance = staffAttendance.reduce((acc, attendance) => {
-    const attendanceMonth = attendance.date.toDate().toISOString().slice(0, 7);
-    if (!acc[attendanceMonth]) {
-      acc[attendanceMonth] = [];
+  const filteredAttendance = staffAttendance.filter((ele) => {
+    if (!selectedMonth) {
+      return true;
     }
-    acc[attendanceMonth].push(attendance);
-    return acc;
-  }, {});
-
-  const filteredAttendance = groupedAttendance[selectedMonth] || [];
-
+    return ele.id.slice(2) === selectedMonth.split("-").reverse().join("");
+  });
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
@@ -228,24 +235,33 @@ function Attendance() {
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : filteredAttendance.length > 0 ? (
-          filteredAttendance.map((ele) => (
-            <div
-              className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
-              key={ele.id}
-            >
-              <div>{DateFormate(ele.date)}</div>
-              <div className="flex justify-between items-center">
-                <div>
-                  Total Presents{" "}
-                  <span className="text-green-500">{ele.present}</span>
-                </div>
-                <div>
-                  Total Absent{" "}
-                  <span className="text-red-500">{ele.absent}</span>
+          <div
+            className="flex  flex-col-reverse overflow-y-auto"
+            style={{ height: "60vh" }}
+          >
+            {filteredAttendance.map((ele) => (
+              <div
+                className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
+                key={ele.id}
+                onClick={() => {
+                  setOnUpdateAttendance(ele);
+                  setIsSidebarOpen(true);
+                }}
+              >
+                <div>{DateFormate(ele.date)}</div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    Total Presents{" "}
+                    <span className="text-green-500">{ele.present}</span>
+                  </div>
+                  <div>
+                    Total Absent{" "}
+                    <span className="text-red-500">{ele.absent}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
           <div className="text-center">
             No Attendance Found for the Selected Month
@@ -258,6 +274,7 @@ function Attendance() {
           onClose={() => setIsSidebarOpen(false)}
           staff={staffData}
           markedAttendance={markedAttendance}
+          onUpdateAttendance={onUpdateAttendance}
         />
       )}
     </div>
