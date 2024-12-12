@@ -186,10 +186,7 @@ function Tasks() {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(
-          "🚀 ~ fetchTaskMessages ~ fetchTaskMessages:",
-          fetchTaskMessages
-        );
+
         setTaskMessagesData((val) => ({
           ...val,
           [selectedTask.id]: fetchTaskMessages,
@@ -457,7 +454,7 @@ function Tasks() {
                             {new Date(
                               item.createdAt.seconds * 1000 +
                                 item.createdAt.nanoseconds / 1000000
-                            ).toLocaleString("en-GB", { timeZone: "UTC" })}
+                            ).toLocaleString()}
                           </div>
                         </div>
                       ))
