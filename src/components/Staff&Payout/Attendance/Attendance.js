@@ -11,6 +11,7 @@ function Attendance() {
   const [loading, setLoading] = useState(false);
   const [staffData, setStaffData] = useState([]);
   const [staffAttendance, setStaffAttendance] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [overallSalary, setOverallSalary] = useState(0);
 
   const userDetails = useSelector((state) => state.users);
@@ -126,7 +127,7 @@ function Attendance() {
     }
     fetchStaffAttendance();
     fetchStaffData();
-  }, []);
+  }, [companyId]);
 
   console.log("staffData", staffData);
 
@@ -142,6 +143,19 @@ function Attendance() {
     const getFullYear = date.getFullYear();
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
+ 
+  const groupedAttendance = staffAttendance.reduce((acc, attendance) => {
+    const attendanceMonth = attendance.date.toDate().toISOString().slice(0, 7);
+    if (!acc[attendanceMonth]) {
+      acc[attendanceMonth] = [];
+    }
+    acc[attendanceMonth].push(attendance);
+    return acc;
+  }, {});
+
+ 
+  const filteredAttendance = groupedAttendance[selectedMonth] || [];
 
   return (
     <div
@@ -175,12 +189,21 @@ function Attendance() {
           <div>₹ {overallSalary.toFixed(2)}</div>
         </div>
       </div>
-      <div className="py-3">Details</div>
+      <div className="py-3 text-right">
+        <label htmlFor="monthFilter">Filter by Month:</label>
+        <input
+          id="monthFilter"
+          type="month"
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="ml-2 p-1 border rounded-lg"
+        />
+      </div>
       <div>
         {loading ? (
           <div className="text-center">Loading...</div>
-        ) : staffAttendance.length > 0 ? (
-          staffAttendance.map((ele) => (
+        ) : filteredAttendance.length > 0 ? (
+          filteredAttendance.map((ele) => (
             <div
               className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
               key={ele.id}
@@ -199,7 +222,7 @@ function Attendance() {
             </div>
           ))
         ) : (
-          <div className="text-center">No Attendance Found</div>
+          <div className="text-center">No Attendance Found for the Selected Month</div>
         )}
       </div>
       {isSidebarOpen && (
