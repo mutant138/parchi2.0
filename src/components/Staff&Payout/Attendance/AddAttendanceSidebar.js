@@ -56,7 +56,9 @@ function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
     const getFullYear = date.getFullYear();
     return `${getFullYear}-${getMonth}-${getDate}`;
   }
+
   const today = new Date().toISOString().split("T")[0];
+
   function setDateAsId(timestamp) {
     if (!timestamp) {
       return;
@@ -64,8 +66,8 @@ function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
     const milliseconds =
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
     const date = new Date(milliseconds);
-    const getDate = date.getDate();
-    const getMonth = date.getMonth() + 1;
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
     const getFullYear = date.getFullYear();
     return `${getDate}${getMonth}${getFullYear}`;
   }

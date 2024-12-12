@@ -11,6 +11,8 @@ function Attendance() {
   const [loading, setLoading] = useState(false);
   const [staffData, setStaffData] = useState([]);
   const [staffAttendance, setStaffAttendance] = useState([]);
+  const [overallSalary, setOverallSalary] = useState(0);
+
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
@@ -48,11 +50,13 @@ function Attendance() {
           "staffAttendance"
         );
         const staffAttendanceData = await getDocs(staffAttendanceRef);
+        let overallSum = 0;
 
         const staffAttendance = staffAttendanceData.docs.map((doc) => {
           const data = doc.data();
           let present = 0;
           let absent = 0;
+          let sum = 0;
 
           for (let att of data.staffs) {
             if (att.status === "present") {
@@ -61,6 +65,48 @@ function Attendance() {
               ++absent;
             }
           }
+          console.log("att", data.staffs);
+          for (let att of data.staffs) {
+            const matchingStaff = staffData.find(
+              (staff) => staff.id === att.id
+            );
+
+            console.log("matchingstaff", matchingStaff);
+
+            if (matchingStaff) {
+              let salary = 0;
+              if (matchingStaff.isdailywages) {
+                salary = +matchingStaff.paymentdetails;
+              } else {
+                salary = +matchingStaff.paymentdetails / 30;
+              }
+
+              if (att.shift === 0.5) {
+                sum += salary * 0.5;
+              } else if (att.shift === 1) {
+                sum += salary * 1;
+              } else if (att.shift === 1.5) {
+                sum += salary * 1.5;
+              } else if (att.shift === 2) {
+                sum += salary * 2;
+              }
+
+              if (att.adjustments?.type === "overtime") {
+                sum += att.adjustments?.amount;
+              } else if (att.adjustments?.type === "latefine") {
+                sum -= att.adjustments?.amount;
+              }
+
+              if (att.adjustments?.type === "allowance") {
+                sum += att.adjustments?.amount;
+              } else if (att.adjustments?.type === "deduction") {
+                sum -= att.adjustments?.amount;
+              }
+            }
+          }
+
+          overallSum += sum;
+          console.log("sum", sum);
           return {
             id: doc.id,
             ...data,
@@ -68,7 +114,8 @@ function Attendance() {
             absent,
           };
         });
-        console.log("🚀 ~ staffAttendance ~ staffAttendance:", staffAttendance);
+
+        setOverallSalary(overallSum);
         setStaffAttendance(staffAttendance);
       } catch (error) {
         console.log("🚀 ~ fetchStaffData ~ error:", error);
@@ -79,6 +126,8 @@ function Attendance() {
     fetchStaffAttendance();
     fetchStaffData();
   }, []);
+
+  console.log("staffData", staffData);
 
   function DateFormate(timestamp) {
     if (!timestamp) {
@@ -128,7 +177,7 @@ function Attendance() {
         </div>
         <div>
           <div>Overall Salary</div>
-          <div>₹ 222</div>
+          <div>₹ {overallSalary.toFixed(2)}</div>
         </div>
       </div>
       <div className="py-3">Details</div>

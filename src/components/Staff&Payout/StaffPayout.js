@@ -60,7 +60,9 @@ function StaffPayout() {
       icon: <IoMdTime />,
       name: "Week off",
       totalLabelName: "Total Projects",
-      onClick: () => {},
+      onClick: () => {
+        navigate("weekOff");
+      },
     },
     {
       icon: <RiShieldUserLine />,
