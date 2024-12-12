@@ -318,6 +318,9 @@ function EditService() {
   }
 
   function DateFormate(timestamp) {
+    if (!timestamp.seconds || timestamp.nanoseconds) {
+      return;
+    }
     const milliseconds =
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
     const date = new Date(milliseconds);
@@ -485,7 +488,7 @@ function EditService() {
                   onChange={handleInputChange}
                   onFocus={() => setIsDropdownVisible(true)}
                   onBlur={() => {
-                    if (!selectedCustomerData.customerId) {
+                    if (!selectedCustomerData?.customerId) {
                       setSelectedCustomerData({ name: "" });
                     }
                     setIsDropdownVisible(false);
@@ -545,7 +548,7 @@ function EditService() {
                   type="text"
                   placeholder="Enter Service No. "
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.serviceNo}
+                  value={formData?.serviceNo}
                   onChange={(e) => {
                     setFormData((val) => ({
                       ...val,
@@ -612,7 +615,7 @@ function EditService() {
                     type="text"
                     placeholder="Membership Id"
                     className="border p-2 rounded w-full"
-                    value={formData.membershipId}
+                    value={formData?.membershipId}
                     onChange={(e) => {
                       setFormData((val) => ({
                         ...val,
@@ -731,7 +734,7 @@ function EditService() {
                     type="text"
                     placeholder="Notes"
                     className="border p-2 rounded w-full"
-                    value={formData.notes}
+                    value={formData?.notes}
                     onChange={(e) => {
                       setFormData((val) => ({
                         ...val,
@@ -745,7 +748,7 @@ function EditService() {
                   <div>Terms</div>
                   <textarea
                     type="text"
-                    defaultValue={formData.terms}
+                    defaultValue={formData?.terms}
                     className="border p-2 rounded w-full max-h-16 min-h-16"
                     onChange={(e) => {
                       setFormData((val) => ({
@@ -778,7 +781,7 @@ function EditService() {
                     />
                     <select
                       className="border p-2 rounded"
-                      value={formData.extraDiscount?.type}
+                      value={formData?.extraDiscount?.type}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
