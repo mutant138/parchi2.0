@@ -38,10 +38,13 @@ const Roles = () => {
         where("companyRef", "==", companyRef)
       );
       const getData = await getDocs(q);
-      const staffData = getData.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const staffData = getData.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+          isExpand: false,
+        };
+      });
       setStaffData(staffData);
     } catch (error) {
       console.log("🚀 ~ fetchStaffData ~ error:", error);
@@ -91,7 +94,51 @@ const Roles = () => {
           {loading ? (
             <div className="text-center py-6">Loading Roles...</div>
           ) : (
-            <div></div>
+            staffData.length > 0 &&
+            staffData.map((ele) => (
+              <div
+                className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 "
+                key={ele.id}
+                onClick={() =>
+                  setStaffData(
+                    staffData.map((staff) => {
+                      if (staff.id == ele.id) {
+                        staff.isExpand = !staff.isExpand;
+                      }
+                      return staff;
+                    })
+                  )
+                }
+              >
+                <div className="px-5 space-y-3">
+                  <div className="font-bold">{ele.name}</div>
+
+                  {ele.isExpand &&
+                    [
+                      "CreateInvoice",
+                      "CreateEstimate",
+                      "CreatePurchase",
+                      "CreateCustomer",
+                      "CreateVendor",
+                    ].map((ele, index) => (
+                      <div key={index} className="flex justify-between">
+                        <div>{ele}</div>
+                        <div>
+                          <label className="relative inline-block w-14 h-8">
+                            <input
+                              type="checkbox"
+                              name="tcs"
+                              className="sr-only peer"
+                            />
+                            <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
+                            <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>
