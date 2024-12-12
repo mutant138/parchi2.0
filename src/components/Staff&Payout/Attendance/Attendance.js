@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import AddAttendanceSidebar from "./AddAttendanceSidebar";
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 
@@ -11,10 +18,9 @@ function Attendance() {
   const [loading, setLoading] = useState(false);
   const [staffData, setStaffData] = useState([]);
   const [staffAttendance, setStaffAttendance] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toISOString().slice(0, 7)
-  );
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [overallSalary, setOverallSalary] = useState(0);
+  const [onUpdateAttendance, setOnUpdateAttendance] = useState({});
 
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -53,14 +59,13 @@ function Attendance() {
           companyId,
           "staffAttendance"
         );
-        const staffAttendanceData = await getDocs(staffAttendanceRef);
-        let overallSum = 0;
+        const q = query(staffAttendanceRef, orderBy("date", "desc"));
+        const staffAttendanceData = await getDocs(q);
 
         const staffAttendance = staffAttendanceData.docs.map((doc) => {
           const data = doc.data();
           let present = 0;
           let absent = 0;
-          let sum = 0;
 
           for (let att of data.staffs) {
             if (att.status === "present") {
@@ -70,44 +75,6 @@ function Attendance() {
             }
           }
 
-          for (let att of data.staffs) {
-            const matchingStaff = staffData.find(
-              (staff) => staff.id === att.id
-            );
-
-            if (matchingStaff) {
-              let salary = 0;
-              if (matchingStaff.isDailyWages) {
-                salary = +matchingStaff.paymentdetails;
-              } else {
-                salary = +matchingStaff.paymentdetails / 30;
-              }
-
-              if (att.shift === 0.5) {
-                sum += salary * 0.5;
-              } else if (att.shift === 1) {
-                sum += salary * 1;
-              } else if (att.shift === 1.5) {
-                sum += salary * 1.5;
-              } else if (att.shift === 2) {
-                sum += salary * 2;
-              }
-
-              if (att.adjustments?.overTime) {
-                sum += att.adjustments?.amount;
-              } else if (att.adjustments?.lateFine) {
-                sum -= att.adjustments?.amount;
-              }
-
-              if (att.adjustments?.allowance) {
-                sum += att.adjustments?.amount;
-              } else if (att.adjustments?.deduction) {
-                sum -= att.adjustments?.amount;
-              }
-            }
-          }
-
-          overallSum += sum;
           return {
             id: doc.id,
             ...data,
@@ -116,7 +83,6 @@ function Attendance() {
           };
         });
 
-        setOverallSalary(overallSum);
         setStaffAttendance(staffAttendance);
       } catch (error) {
         console.log("🚀 ~ fetchStaffData ~ error:", error);
@@ -128,6 +94,69 @@ function Attendance() {
     fetchStaffData();
     fetchStaffAttendance();
   }, [companyId]);
+
+  useEffect(() => {
+    if (staffData.length > 0 && staffAttendance.length > 0) {
+      async function fetchCalculation() {
+        try {
+          let overallSum = 0;
+
+          staffAttendance.forEach((data) => {
+            let sum = 0;
+            for (let att of data.staffs) {
+              const matchingStaff = staffData.find(
+                (staff) => staff.id === att.id
+              );
+
+              if (matchingStaff) {
+                let salary = 0;
+                const attendanceDate = new Date(data.date.seconds * 1000);
+                const year = attendanceDate.getFullYear();
+                const month = attendanceDate.getMonth() + 1;
+
+                const daysInMonth = new Date(year, month, 0).getDate();
+                if (matchingStaff.isDailyWages) {
+                  salary = +matchingStaff.paymentDetails;
+                } else {
+                  salary = +matchingStaff.paymentDetails / daysInMonth;
+                }
+
+                if (att.shift === 0.5) {
+                  sum += salary * 0.5;
+                } else if (att.shift === 1) {
+                  sum += salary * 1;
+                } else if (att.shift === 1.5) {
+                  sum += salary * 1.5;
+                } else if (att.shift === 2) {
+                  sum += salary * 2;
+                }
+
+                if (att.adjustments?.overTime) {
+                  sum += att.adjustments?.overTime?.amount;
+                } else if (att.adjustments?.lateFine) {
+                  sum -= att.adjustments?.lateFine?.amount;
+                }
+
+                if (att.adjustments?.allowance) {
+                  sum += att.adjustments?.allowance?.amount;
+                } else if (att.adjustments?.deduction) {
+                  sum -= att.adjustments?.deduction?.amount;
+                }
+              }
+            }
+
+            overallSum += sum;
+          });
+
+          setOverallSalary(overallSum);
+        } catch (error) {
+          console.log("🚀 ~ fetchStaffData ~ error:", error);
+        }
+      }
+
+      fetchCalculation();
+    }
+  }, [staffData, staffAttendance]);
 
   function DateFormate(timestamp) {
     if (!timestamp) {
@@ -141,24 +170,35 @@ function Attendance() {
     const getFullYear = date.getFullYear();
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
   function markedAttendance(AttendanceId, data) {
-    const removedAlreadyAddAttendance = staffAttendance.filter(
-      (ele) => ele.id !== AttendanceId
-    );
+    const removedAlreadyAddAttendance = staffAttendance.filter((ele) => {
+      if (ele.id === AttendanceId) {
+        return false;
+      }
+      if (onUpdateAttendance.id && ele.id !== onUpdateAttendance.id) {
+        return false;
+      }
+
+      return true;
+    });
     removedAlreadyAddAttendance.push(data);
-    setStaffAttendance(removedAlreadyAddAttendance);
+
+    const sortedData = removedAlreadyAddAttendance.sort((a, b) =>
+      b.id.localeCompare(a.id)
+    );
+    if (onUpdateAttendance.id) {
+      setOnUpdateAttendance("");
+    }
+    setStaffAttendance(sortedData);
   }
 
-  const groupedAttendance = staffAttendance.reduce((acc, attendance) => {
-    const attendanceMonth = attendance.date.toDate().toISOString().slice(0, 7);
-    if (!acc[attendanceMonth]) {
-      acc[attendanceMonth] = [];
+  const filteredAttendance = staffAttendance.filter((ele) => {
+    if (!selectedMonth) {
+      return true;
     }
-    acc[attendanceMonth].push(attendance);
-    return acc;
-  }, {});
-
-  const filteredAttendance = groupedAttendance[selectedMonth] || [];
+    return ele.id.slice(2) === selectedMonth.split("-").reverse().join("");
+  });
 
   return (
     <div
@@ -206,24 +246,30 @@ function Attendance() {
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : filteredAttendance.length > 0 ? (
-          filteredAttendance.map((ele) => (
-            <div
-              className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
-              key={ele.id}
-            >
-              <div>{DateFormate(ele.date)}</div>
-              <div className="flex justify-between items-center">
-                <div>
-                  Total Presents{" "}
-                  <span className="text-green-500">{ele.present}</span>
-                </div>
-                <div>
-                  Total Absent{" "}
-                  <span className="text-red-500">{ele.absent}</span>
+          <div className="overflow-y-auto" style={{ height: "60vh" }}>
+            {filteredAttendance.map((ele) => (
+              <div
+                className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
+                key={ele.id}
+                onClick={() => {
+                  setOnUpdateAttendance(ele);
+                  setIsSidebarOpen(true);
+                }}
+              >
+                <div>{DateFormate(ele.date)}</div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    Total Presents{" "}
+                    <span className="text-green-500">{ele.present}</span>
+                  </div>
+                  <div>
+                    Total Absent{" "}
+                    <span className="text-red-500">{ele.absent}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
           <div className="text-center">
             No Attendance Found for the Selected Month
@@ -234,8 +280,9 @@ function Attendance() {
         <AddAttendanceSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          staff={staffData}
+          staffData={staffData}
           markedAttendance={markedAttendance}
+          onUpdateAttendance={onUpdateAttendance}
         />
       )}
     </div>

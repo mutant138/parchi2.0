@@ -1,4 +1,4 @@
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { deleteDoc, doc, setDoc, Timestamp } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -6,21 +6,30 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import PaymentsDeductions from "./PaymentsDeductions";
 
-function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
+function AddAttendanceSidebar({
+  onClose,
+  isOpen,
+  staffData,
+  markedAttendance,
+  onUpdateAttendance,
+}) {
   const userDetails = useSelector((state) => state.users);
   const [activePaymentDeductionsStaff, setActivePaymentDeductionsStaff] =
     useState("");
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
-  const [staffData, setStaffData] = useState([]);
+
   const [attendanceForm, setAttendanceForm] = useState({
     date: Timestamp.fromDate(new Date()),
     staffs: [],
   });
 
   useEffect(() => {
-    setStaffData(staff);
-  }, [staff]);
+    if (!onUpdateAttendance.id) {
+      return;
+    }
+    setAttendanceForm(onUpdateAttendance);
+  }, [onUpdateAttendance.id]);
 
   function getAttendanceStaffData(id) {
     return attendanceForm.staffs.find((ele) => ele.id === id);
@@ -79,11 +88,27 @@ function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
         alert("please Select Date");
         return;
       }
-
-      const payload = {
+      let payload = {
         ...attendanceForm,
         createdAt: Timestamp.fromDate(new Date()),
       };
+
+      if (onUpdateAttendance.id) {
+        delete payload.id;
+        payload.createdAt = onUpdateAttendance.createdAt;
+
+        if (onUpdateAttendance.id != attendanceId) {
+          await deleteDoc(
+            doc(
+              db,
+              "companies",
+              companyId,
+              "staffAttendance",
+              onUpdateAttendance.id
+            )
+          );
+        }
+      }
 
       await setDoc(
         doc(db, "companies", companyId, "staffAttendance", attendanceId),
@@ -106,6 +131,7 @@ function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
         present,
         absent,
       });
+      onClose();
     } catch (error) {
       console.log("🚀 ~ AddAttendance ~ error:", error);
     }
