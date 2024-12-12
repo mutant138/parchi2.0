@@ -5,7 +5,16 @@ const Template1 = forwardRef((props, ref) => {
   if (!invoiceData) {
     return;
   }
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
 
+    return `${getDate}/${getMonth}/${getFullYear}`;
+  }
   const ModifiedInvoiceData = {
     ...invoiceData,
     items: invoiceData.products.map((item) => {
@@ -112,10 +121,12 @@ const Template1 = forwardRef((props, ref) => {
             <strong>Invoice # :</strong> {ModifiedInvoiceData.invoiceNo}
           </div>
           <div>
-            <strong>Invoice Date :</strong> 2024-11-05
+            <strong>Invoice Date :</strong>{" "}
+            {DateFormate(ModifiedInvoiceData.invoiceDate)}
           </div>
           <div>
-            <strong>Due Date :</strong> -
+            <strong>Due Date :</strong>{" "}
+            {DateFormate(ModifiedInvoiceData.dueDate)}
           </div>
           <div>
             <strong>Place of Supply :</strong> -

@@ -122,6 +122,7 @@ function Tasks() {
       };
 
       await addDoc(collection(taskRef, "taskMessages"), payloadTaskMSG);
+
       setTaskMessagesData((val) => ({
         ...val,
         [selectedTask.id]: [...val[selectedTask.id], payloadTaskMSG],
@@ -185,6 +186,10 @@ function Tasks() {
           id: doc.id,
           ...doc.data(),
         }));
+        console.log(
+          "🚀 ~ fetchTaskMessages ~ fetchTaskMessages:",
+          fetchTaskMessages
+        );
         setTaskMessagesData((val) => ({
           ...val,
           [selectedTask.id]: fetchTaskMessages,
@@ -271,9 +276,9 @@ function Tasks() {
                 <button
                   className={
                     "px-4 py-1" +
-                    (filter === "on-Going" ? " bg-gray-300 rounded-full" : "")
+                    (filter === "On-Going" ? " bg-gray-300 rounded-full" : "")
                   }
-                  onClick={() => setFilter("on-Going")}
+                  onClick={() => setFilter("On-Going")}
                 >
                   On-Going
                 </button>
@@ -449,10 +454,10 @@ function Tasks() {
                         >
                           <div>{item.msg}</div>
                           <div className="text-xs text-gray-500">
-                            {new Date(item.createdAt.seconds).toLocaleString(
-                              "en-GB",
-                              { timeZone: "UTC" }
-                            )}
+                            {new Date(
+                              item.createdAt.seconds * 1000 +
+                                item.createdAt.nanoseconds / 1000000
+                            ).toLocaleString("en-GB", { timeZone: "UTC" })}
                           </div>
                         </div>
                       ))

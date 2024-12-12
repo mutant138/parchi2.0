@@ -26,8 +26,10 @@ function InvoiceView() {
         id: resData.id,
         ...resData.data(),
       };
-      const bankData = (await getDoc(invoicesData.book.bookRef)).data();
-      setBankDetails(bankData);
+      if (invoicesData.book.bookRef) {
+        const bankData = (await getDoc(invoicesData.book.bookRef)).data();
+        setBankDetails(bankData);
+      }
       setInvoice(invoicesData);
     } catch (error) {
       console.error("Error fetching invoices:", error);

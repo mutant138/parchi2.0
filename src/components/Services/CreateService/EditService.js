@@ -63,7 +63,7 @@ function EditService() {
   const [preServicesList, setPreServicesList] = useState([]);
 
   const [servicesList, setServicesList] = useState([]);
-  const [SelectedServicesList, setSelectedServicesList] = useState([]);
+  const [selectedServicesList, setSelectedServicesList] = useState([]);
 
   const [customersData, setCustomersData] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState({
@@ -82,8 +82,8 @@ function EditService() {
 
       for (let ele of formData?.servicesList) {
         serviceData.push(
-          ...servicesList.filter((pro) => {
-            return pro.id === ele.serviceRef.id;
+          ...servicesList.filter((ser) => {
+            return ser.id === ele.serviceRef.id;
           })
         );
       }
@@ -191,10 +191,8 @@ function EditService() {
     async function customerDetails() {
       try {
         const customersRef = collection(db, "customers");
-        const q = query(
-          customersRef,
-          where("companyId", "==", companyDetails.companyId)
-        );
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(customersRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
         const customerData = company.docs.map((doc) => ({
           customerId: doc.id,
@@ -254,15 +252,13 @@ function EditService() {
 
   async function onEditService() {
     try {
-      if (SelectedServicesList.length == 0) {
+      if (selectedServicesList.length == 0) {
         return;
       }
       const customerRef = doc(db, "customers", selectedCustomerData.customerId);
 
-      const companyRef = doc(db, "companies", companyDetails.companyId);
-
       const serviceListPayload = [];
-      for (const service of SelectedServicesList) {
+      for (const service of selectedServicesList) {
         const serviceRef = doc(db, "services", service.id);
         serviceListPayload.push({
           pricing: {
@@ -318,6 +314,9 @@ function EditService() {
   }
 
   function DateFormate(timestamp) {
+    if (!timestamp.seconds || timestamp.nanoseconds) {
+      return;
+    }
     const milliseconds =
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
     const date = new Date(milliseconds);
@@ -334,10 +333,10 @@ function EditService() {
   }
 
   useEffect(() => {
-    if (SelectedServicesList.length > 0) {
-      calculationService(SelectedServicesList);
+    if (selectedServicesList.length > 0) {
+      calculationService(selectedServicesList);
     }
-  }, [SelectedServicesList]);
+  }, [selectedServicesList]);
 
   function calculationService(data) {
     // const totalTaxableAmount = data.reduce(
@@ -481,11 +480,11 @@ function EditService() {
                   type="text"
                   placeholder="Search your Customers, Company Name, GSTIN..."
                   className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
-                  value={selectedCustomerData?.name}
+                  value={selectedCustomerData?.name ?? ""}
                   onChange={handleInputChange}
                   onFocus={() => setIsDropdownVisible(true)}
                   onBlur={() => {
-                    if (!selectedCustomerData.customerId) {
+                    if (!selectedCustomerData?.name) {
                       setSelectedCustomerData({ name: "" });
                     }
                     setIsDropdownVisible(false);
@@ -517,7 +516,7 @@ function EditService() {
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(serviceDate)}
+                  value={DateFormate(serviceDate) || ""}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
                     setServiceDate(
@@ -545,7 +544,7 @@ function EditService() {
                   type="text"
                   placeholder="Enter Service No. "
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.serviceNo}
+                  value={formData?.serviceNo || ""}
                   onChange={(e) => {
                     setFormData((val) => ({
                       ...val,
@@ -582,8 +581,8 @@ function EditService() {
                 </thead>
 
                 <tbody>
-                  {SelectedServicesList.length ? (
-                    SelectedServicesList.map((service) => (
+                  {selectedServicesList.length ? (
+                    selectedServicesList.map((service) => (
                       <tr key={service.id}>
                         <td className="px-4 py-2">{service.serviceName}</td>
                         <td className="px-4 py-2">₹{service.unitPrice}</td>
@@ -612,7 +611,7 @@ function EditService() {
                     type="text"
                     placeholder="Membership Id"
                     className="border p-2 rounded w-full"
-                    value={formData.membershipId}
+                    value={formData?.membershipId || ""}
                     onChange={(e) => {
                       setFormData((val) => ({
                         ...val,
@@ -672,7 +671,7 @@ function EditService() {
                 <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
-                    defaultValue=""
+                    value={formData.book?.id || ""}
                     onChange={onSelectBook}
                     className="border p-2 rounded w-full"
                   >
@@ -689,11 +688,7 @@ function EditService() {
                 </div>
                 <div className="w-full ">
                   <div>Sign</div>
-                  <select
-                    value=""
-                    onChange={() => {}}
-                    className="border p-2 rounded w-full"
-                  >
+                  <select className="border p-2 rounded w-full">
                     <option value="" disabled>
                       Select Sign
                     </option>
@@ -714,10 +709,14 @@ function EditService() {
                   <div>Payment Mode</div>
                   <select
                     className="border p-2 rounded w-full"
+                    value={formData.mode}
                     onChange={(e) =>
                       setFormData((val) => ({ ...val, mode: e.target.value }))
                     }
                   >
+                    <option value="" disabled>
+                      Select Payment Mode
+                    </option>
                     <option value="Cash">Cash</option>
                     <option value="Emi">Emi</option>
                     <option value="Cheque">Cheque</option>
@@ -731,7 +730,7 @@ function EditService() {
                     type="text"
                     placeholder="Notes"
                     className="border p-2 rounded w-full"
-                    value={formData.notes}
+                    value={formData?.notes}
                     onChange={(e) => {
                       setFormData((val) => ({
                         ...val,
@@ -745,7 +744,7 @@ function EditService() {
                   <div>Terms</div>
                   <textarea
                     type="text"
-                    defaultValue={formData.terms}
+                    defaultValue={formData?.terms || ""}
                     className="border p-2 rounded w-full max-h-16 min-h-16"
                     onChange={(e) => {
                       setFormData((val) => ({
@@ -778,7 +777,7 @@ function EditService() {
                     />
                     <select
                       className="border p-2 rounded"
-                      value={formData.extraDiscount?.type}
+                      value={formData?.extraDiscount?.type || ""}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
