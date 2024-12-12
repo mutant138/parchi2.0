@@ -11,7 +11,9 @@ function Attendance() {
   const [loading, setLoading] = useState(false);
   const [staffData, setStaffData] = useState([]);
   const [staffAttendance, setStaffAttendance] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().toISOString().slice(0, 7)
+  );
   const [overallSalary, setOverallSalary] = useState(0);
 
   const userDetails = useSelector((state) => state.users);
@@ -40,6 +42,7 @@ function Attendance() {
         setLoading(false);
       }
     }
+
     async function fetchStaffAttendance() {
       setLoading(true);
 
@@ -66,17 +69,15 @@ function Attendance() {
               ++absent;
             }
           }
-          console.log("att", data.staffs);
+
           for (let att of data.staffs) {
             const matchingStaff = staffData.find(
               (staff) => staff.id === att.id
             );
 
-            console.log("matchingstaff", matchingStaff);
-
             if (matchingStaff) {
               let salary = 0;
-              if (matchingStaff.isdailywages) {
+              if (matchingStaff.isDailyWages) {
                 salary = +matchingStaff.paymentdetails;
               } else {
                 salary = +matchingStaff.paymentdetails / 30;
@@ -92,22 +93,21 @@ function Attendance() {
                 sum += salary * 2;
               }
 
-              if (att.adjustments?.type === "overtime") {
+              if (att.adjustments?.overTime) {
                 sum += att.adjustments?.amount;
-              } else if (att.adjustments?.type === "latefine") {
+              } else if (att.adjustments?.lateFine) {
                 sum -= att.adjustments?.amount;
               }
 
-              if (att.adjustments?.type === "allowance") {
+              if (att.adjustments?.allowance) {
                 sum += att.adjustments?.amount;
-              } else if (att.adjustments?.type === "deduction") {
+              } else if (att.adjustments?.deduction) {
                 sum -= att.adjustments?.amount;
               }
             }
           }
 
           overallSum += sum;
-          console.log("sum", sum);
           return {
             id: doc.id,
             ...data,
@@ -125,11 +125,10 @@ function Attendance() {
         setLoading(false);
       }
     }
-    fetchStaffAttendance();
-    fetchStaffData();
-  }, [companyId]);
 
-  console.log("staffData", staffData);
+    fetchStaffData();
+    fetchStaffAttendance();
+  }, [companyId]);
 
   function DateFormate(timestamp) {
     if (!timestamp) {
@@ -143,8 +142,14 @@ function Attendance() {
     const getFullYear = date.getFullYear();
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+  function markedAttendance(AttendanceId, data) {
+    const removedAlreadyAddAttendance = staffAttendance.filter(
+      (ele) => ele.id !== AttendanceId
+    );
+    removedAlreadyAddAttendance.push(data);
+    setStaffAttendance(removedAlreadyAddAttendance);
+  }
 
- 
   const groupedAttendance = staffAttendance.reduce((acc, attendance) => {
     const attendanceMonth = attendance.date.toDate().toISOString().slice(0, 7);
     if (!acc[attendanceMonth]) {
@@ -154,7 +159,6 @@ function Attendance() {
     return acc;
   }, {});
 
- 
   const filteredAttendance = groupedAttendance[selectedMonth] || [];
 
   return (
@@ -222,7 +226,9 @@ function Attendance() {
             </div>
           ))
         ) : (
-          <div className="text-center">No Attendance Found for the Selected Month</div>
+          <div className="text-center">
+            No Attendance Found for the Selected Month
+          </div>
         )}
       </div>
       {isSidebarOpen && (
@@ -230,6 +236,7 @@ function Attendance() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           staff={staffData}
+          markedAttendance={markedAttendance}
         />
       )}
     </div>

@@ -27,7 +27,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
     isDailyWages: false,
     name: "",
     panNumber: "",
-    paymentdetails: 0,
+    paymentDetails: 0,
     phone: "",
   });
   const [designations, setDesignations] = useState([]);
@@ -261,13 +261,13 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
             </label>
             <input
               type="text"
-              name="PaymentDetails"
+              name="paymentDetails"
               className="w-full border border-gray-300 p-2 rounded-md  focus:outline-none"
-              placeholder="PaymentDetails"
+              placeholder="paymentDetails"
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
-                  paymentdetails: e.target.value,
+                  paymentDetails: e.target.value,
                 }))
               }
             />

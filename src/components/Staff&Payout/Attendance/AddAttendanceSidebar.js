@@ -6,7 +6,7 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import PaymentsDeductions from "./PaymentsDeductions";
 
-function AddAttendanceSidebar({ onClose, isOpen, staff }) {
+function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
   const userDetails = useSelector((state) => state.users);
   const [activePaymentDeductionsStaff, setActivePaymentDeductionsStaff] =
     useState("");
@@ -56,7 +56,9 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
     const getFullYear = date.getFullYear();
     return `${getFullYear}-${getMonth}-${getDate}`;
   }
+
   const today = new Date().toISOString().split("T")[0];
+
   function setDateAsId(timestamp) {
     if (!timestamp) {
       return;
@@ -64,15 +66,16 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
     const milliseconds =
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
     const date = new Date(milliseconds);
-    const getDate = date.getDate();
-    const getMonth = date.getMonth() + 1;
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
     const getFullYear = date.getFullYear();
     return `${getDate}${getMonth}${getFullYear}`;
   }
 
   async function AddAttendance() {
     try {
-      if (!setDateAsId(attendanceForm.date)) {
+      const attendanceId = setDateAsId(attendanceForm.date);
+      if (!attendanceId) {
         alert("please Select Date");
         return;
       }
@@ -83,17 +86,26 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
       };
 
       await setDoc(
-        doc(
-          db,
-          "companies",
-          companyId,
-          "staffAttendance",
-          setDateAsId(attendanceForm.date)
-        ),
+        doc(db, "companies", companyId, "staffAttendance", attendanceId),
         payload
       );
-
       alert("Successfully Marked Attendance");
+      let present = 0;
+      let absent = 0;
+      attendanceForm.staffs.forEach((ele) => {
+        if (ele.status == "present") {
+          present++;
+        }
+        if (ele.status == "absent") {
+          absent++;
+        }
+      });
+      markedAttendance(attendanceId, {
+        id: attendanceId,
+        ...payload,
+        present,
+        absent,
+      });
     } catch (error) {
       console.log("🚀 ~ AddAttendance ~ error:", error);
     }
