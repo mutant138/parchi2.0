@@ -24,7 +24,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
     designation: "",
     emailId: "",
     idNo: "",
-    isdailywages: false,
+    isDailyWages: false,
     name: "",
     panNumber: "",
     paymentdetails: 0,
@@ -246,7 +246,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
                   onChange={(e) =>
                     setFormData((val) => ({
                       ...val,
-                      isdailywages: e.target.checked,
+                      isDailyWages: e.target.checked,
                     }))
                   }
                 />

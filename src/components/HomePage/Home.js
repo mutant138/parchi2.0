@@ -50,6 +50,7 @@ import Designation from "../Staff&Payout/Designation/Designation";
 import Assets from "../Staff&Payout/Assets/Assets";
 import Attendance from "../Staff&Payout/Attendance/Attendance";
 import DesignationView from "../Staff&Payout/Designation/DesignationView";
+import WeekOff from "../Staff&Payout/WeekOff/WeekOff";
 import EditService from "../Services/CreateService/EditService";
 import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
@@ -160,6 +161,7 @@ const Home = () => {
             ></Route>
             <Route path="/staff-payout/roles" element={<Roles />}></Route>
             <Route path="/staff-payout/assets" element={<Assets />}></Route>
+            <Route path="/staff-payout/weekOff" element={<WeekOff />}></Route>
             <Route
               path="/staff-payout/attendance"
               element={<Attendance />}
