@@ -125,10 +125,8 @@ const CreateProFormaInvoice = () => {
     async function customerDetails() {
       try {
         const customersRef = collection(db, "customers");
-        const q = query(
-          customersRef,
-          where("companyId", "==", companyDetails.companyId)
-        );
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(customersRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
         const customerData = company.docs.map((doc) => ({
           customerId: doc.id,
