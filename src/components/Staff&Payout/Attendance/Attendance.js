@@ -61,13 +61,11 @@ function Attendance() {
         );
         const q = query(staffAttendanceRef, orderBy("date", "desc"));
         const staffAttendanceData = await getDocs(q);
-        let overallSum = 0;
 
         const staffAttendance = staffAttendanceData.docs.map((doc) => {
           const data = doc.data();
           let present = 0;
           let absent = 0;
-          let sum = 0;
 
           for (let att of data.staffs) {
             if (att.status === "present") {
@@ -77,44 +75,6 @@ function Attendance() {
             }
           }
 
-          for (let att of data.staffs) {
-            const matchingStaff = staffData.find(
-              (staff) => staff.id === att.id
-            );
-
-            if (matchingStaff) {
-              let salary = 0;
-              if (matchingStaff.isDailyWages) {
-                salary = +matchingStaff.paymentdetails;
-              } else {
-                salary = +matchingStaff.paymentdetails / 30;
-              }
-
-              if (att.shift === 0.5) {
-                sum += salary * 0.5;
-              } else if (att.shift === 1) {
-                sum += salary * 1;
-              } else if (att.shift === 1.5) {
-                sum += salary * 1.5;
-              } else if (att.shift === 2) {
-                sum += salary * 2;
-              }
-
-              if (att.adjustments?.overTime) {
-                sum += att.adjustments?.amount;
-              } else if (att.adjustments?.lateFine) {
-                sum -= att.adjustments?.amount;
-              }
-
-              if (att.adjustments?.allowance) {
-                sum += att.adjustments?.amount;
-              } else if (att.adjustments?.deduction) {
-                sum -= att.adjustments?.amount;
-              }
-            }
-          }
-
-          overallSum += sum;
           return {
             id: doc.id,
             ...data,
@@ -123,7 +83,6 @@ function Attendance() {
           };
         });
 
-        setOverallSalary(overallSum);
         setStaffAttendance(staffAttendance);
       } catch (error) {
         console.log("🚀 ~ fetchStaffData ~ error:", error);
@@ -135,6 +94,69 @@ function Attendance() {
     fetchStaffData();
     fetchStaffAttendance();
   }, [companyId]);
+
+  useEffect(() => {
+    if (staffData.length > 0 && staffAttendance.length > 0) {
+      async function fetchCalculation() {
+        try {
+          let overallSum = 0;
+
+          staffAttendance.forEach((data) => {
+            let sum = 0;
+            for (let att of data.staffs) {
+              const matchingStaff = staffData.find(
+                (staff) => staff.id === att.id
+              );
+
+              if (matchingStaff) {
+                let salary = 0;
+                const attendanceDate = new Date(data.date.seconds * 1000);
+                const year = attendanceDate.getFullYear();
+                const month = attendanceDate.getMonth() + 1;
+
+                const daysInMonth = new Date(year, month, 0).getDate();
+                if (matchingStaff.isDailyWages) {
+                  salary = +matchingStaff.paymentDetails;
+                } else {
+                  salary = +matchingStaff.paymentDetails / daysInMonth;
+                }
+
+                if (att.shift === 0.5) {
+                  sum += salary * 0.5;
+                } else if (att.shift === 1) {
+                  sum += salary * 1;
+                } else if (att.shift === 1.5) {
+                  sum += salary * 1.5;
+                } else if (att.shift === 2) {
+                  sum += salary * 2;
+                }
+
+                if (att.adjustments?.overTime) {
+                  sum += att.adjustments?.overTime?.amount;
+                } else if (att.adjustments?.lateFine) {
+                  sum -= att.adjustments?.lateFine?.amount;
+                }
+
+                if (att.adjustments?.allowance) {
+                  sum += att.adjustments?.allowance?.amount;
+                } else if (att.adjustments?.deduction) {
+                  sum -= att.adjustments?.deduction?.amount;
+                }
+              }
+            }
+
+            overallSum += sum;
+          });
+
+          setOverallSalary(overallSum);
+        } catch (error) {
+          console.log("🚀 ~ fetchStaffData ~ error:", error);
+        }
+      }
+
+      fetchCalculation();
+    }
+  }, [staffData, staffAttendance]);
 
   function DateFormate(timestamp) {
     if (!timestamp) {
@@ -177,6 +199,7 @@ function Attendance() {
     }
     return ele.id.slice(2) === selectedMonth.split("-").reverse().join("");
   });
+
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
