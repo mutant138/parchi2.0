@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import PaymentsDeductions from "./PaymentsDeductions";
 
 function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
+  console.log("🚀 ~ AddAttendanceSidebar ~ staff:", staff);
   const userDetails = useSelector((state) => state.users);
   const [activePaymentDeductionsStaff, setActivePaymentDeductionsStaff] =
     useState("");
@@ -106,6 +107,7 @@ function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
         present,
         absent,
       });
+      onClose();
     } catch (error) {
       console.log("🚀 ~ AddAttendance ~ error:", error);
     }
