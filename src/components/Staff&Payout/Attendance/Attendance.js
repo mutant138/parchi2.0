@@ -59,7 +59,8 @@ function Attendance() {
           companyId,
           "staffAttendance"
         );
-        const staffAttendanceData = await getDocs(staffAttendanceRef);
+        const q = query(staffAttendanceRef, orderBy("date", "desc"));
+        const staffAttendanceData = await getDocs(q);
         let overallSum = 0;
 
         const staffAttendance = staffAttendanceData.docs.map((doc) => {
@@ -150,15 +151,20 @@ function Attendance() {
 
   function markedAttendance(AttendanceId, data) {
     const removedAlreadyAddAttendance = staffAttendance.filter(
-      (ele) => ele.id !== AttendanceId
+      (ele) =>
+        ele.id !== AttendanceId &&
+        onUpdateAttendance.id &&
+        ele.id !== onUpdateAttendance.id
     );
-    for (let i = 0; i < removedAlreadyAddAttendance.length; i++) {
-      if (removedAlreadyAddAttendance[i].id > data.id) {
-        removedAlreadyAddAttendance.splice(i, 0, data);
-        break;
-      }
+    removedAlreadyAddAttendance.push(data);
+
+    const sortedData = removedAlreadyAddAttendance.sort((a, b) =>
+      b.id.localeCompare(a.id)
+    );
+    if (onUpdateAttendance) {
+      setOnUpdateAttendance("");
     }
-    setStaffAttendance(removedAlreadyAddAttendance);
+    setStaffAttendance(sortedData);
   }
 
   const filteredAttendance = staffAttendance.filter((ele) => {
@@ -167,6 +173,7 @@ function Attendance() {
     }
     return ele.id.slice(2) === selectedMonth.split("-").reverse().join("");
   });
+
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
@@ -213,10 +220,7 @@ function Attendance() {
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : filteredAttendance.length > 0 ? (
-          <div
-            className="flex  flex-col-reverse overflow-y-auto"
-            style={{ height: "60vh" }}
-          >
+          <div className="overflow-y-auto" style={{ height: "60vh" }}>
             {filteredAttendance.map((ele) => (
               <div
                 className=" bg-white p-3 rounded-lg mb-3 cursor-pointer border hover:shadow"
@@ -250,7 +254,7 @@ function Attendance() {
         <AddAttendanceSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          staff={staffData}
+          staffData={staffData}
           markedAttendance={markedAttendance}
           onUpdateAttendance={onUpdateAttendance}
         />
