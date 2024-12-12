@@ -6,7 +6,7 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import PaymentsDeductions from "./PaymentsDeductions";
 
-function AddAttendanceSidebar({ onClose, isOpen, staff }) {
+function AddAttendanceSidebar({ onClose, isOpen, staff, markedAttendance }) {
   const userDetails = useSelector((state) => state.users);
   const [activePaymentDeductionsStaff, setActivePaymentDeductionsStaff] =
     useState("");
@@ -72,7 +72,8 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
 
   async function AddAttendance() {
     try {
-      if (!setDateAsId(attendanceForm.date)) {
+      const attendanceId = setDateAsId(attendanceForm.date);
+      if (!attendanceId) {
         alert("please Select Date");
         return;
       }
@@ -83,17 +84,26 @@ function AddAttendanceSidebar({ onClose, isOpen, staff }) {
       };
 
       await setDoc(
-        doc(
-          db,
-          "companies",
-          companyId,
-          "staffAttendance",
-          setDateAsId(attendanceForm.date)
-        ),
+        doc(db, "companies", companyId, "staffAttendance", attendanceId),
         payload
       );
-
       alert("Successfully Marked Attendance");
+      let present = 0;
+      let absent = 0;
+      attendanceForm.staffs.forEach((ele) => {
+        if (ele.status == "present") {
+          present++;
+        }
+        if (ele.status == "absent") {
+          absent++;
+        }
+      });
+      markedAttendance(attendanceId, {
+        id: attendanceId,
+        ...payload,
+        present,
+        absent,
+      });
     } catch (error) {
       console.log("🚀 ~ AddAttendance ~ error:", error);
     }

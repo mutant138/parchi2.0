@@ -68,6 +68,7 @@ function Attendance() {
             absent,
           };
         });
+        console.log("🚀 ~ staffAttendance ~ staffAttendance:", staffAttendance);
         setStaffAttendance(staffAttendance);
       } catch (error) {
         console.log("🚀 ~ fetchStaffData ~ error:", error);
@@ -91,7 +92,13 @@ function Attendance() {
     const getFullYear = date.getFullYear();
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-
+  function markedAttendance(AttendanceId, data) {
+    const removedAlreadyAddAttendance = staffAttendance.filter(
+      (ele) => ele.id !== AttendanceId
+    );
+    removedAlreadyAddAttendance.push(data);
+    setStaffAttendance(removedAlreadyAddAttendance);
+  }
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
@@ -156,6 +163,7 @@ function Attendance() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           staff={staffData}
+          markedAttendance={markedAttendance}
         />
       )}
     </div>
