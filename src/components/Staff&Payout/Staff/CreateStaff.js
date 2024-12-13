@@ -31,14 +31,41 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
     phone: "",
   });
   const [designations, setDesignations] = useState([]);
+  const [phoneExists, setPhoneExists] = useState(false);
+  const [idExists, setIdExists] = useState(false);
 
-  const handlePhoneNumberChange = (event) => {
-    const inputValue = event.target.value;
-    const isValidPhoneNumber = /^\d{0,10}$/.test(inputValue);
+  const handlePhoneNumberChange = async (event) => {
+    try {
+      const inputValue = event.target.value;
+      const isValidPhoneNumber = /^\d{0,10}$/.test(inputValue);
 
-    if (isValidPhoneNumber) {
-      setFormData((val) => ({ ...val, phone: event.target.value }));
+      if (isValidPhoneNumber) {
+        setFormData((val) => ({ ...val, phone: event.target.value }));
+
+        const staffRef = collection(db, "staff");
+        const q = query(staffRef, where("phone", "==", inputValue));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          setPhoneExists(true);
+        } else {
+          setPhoneExists(false);
+        }
+      }
+    } catch (err) {
+      console.log("Error in handle Phone number:", err);
     }
+  };
+
+  const handleIdNumberChange = async (event) => {
+    const inputValue = event.target.value;
+    setFormData((val) => ({ ...val, idNo: inputValue }));
+
+    const staffRef = collection(db, "staff");
+    const q = query(staffRef, where("idNo", "==", inputValue));
+    const querySnapshot = await getDocs(q);
+
+    setIdExists(!querySnapshot.empty);
   };
 
   const fetchDesignation = async () => {
@@ -67,6 +94,7 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
 
   async function onSubmit(e) {
     e.preventDefault();
+
     try {
       const companyRef = doc(db, "companies", companyId);
       const payload = { ...formData, companyRef };
@@ -115,7 +143,14 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
             />
           </div>
           <div>
-            <label className="text-sm block font-semibold ">Phone</label>
+            <label className="text-sm block font-semibold ">
+              Phone
+              {phoneExists && (
+                <span className="ml-2 text-red-500 text-xs">
+                  "Phone number is already in use.*"
+                </span>
+              )}
+            </label>
             <div className="flex items-center mb-4">
               <span className="px-3 py-2 bg-gray-200 border border-r-0 rounded-l-md text-gray-700">
                 +91
@@ -132,15 +167,20 @@ function CreateStaff({ isOpen, onClose, staffAdded }) {
             </div>
           </div>
           <div>
-            <label className="text-sm block font-semibold">ID No.</label>
+            <label className="text-sm block font-semibold">
+              ID No.
+              {idExists && (
+                <span className="ml-2 text-red-500 text-xs">
+                  "Already ID No. exist*"
+                </span>
+              )}
+            </label>
             <input
               type="text"
               name="idNo"
               className="w-full border border-gray-300 p-2 rounded-md  focus:outline-none"
               placeholder="ID No."
-              onChange={(e) =>
-                setFormData((val) => ({ ...val, idNo: e.target.value }))
-              }
+              onChange={handleIdNumberChange}
             />
           </div>
           <div>
