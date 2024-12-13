@@ -120,8 +120,7 @@ const Roles = () => {
         <div>
           {loading ? (
             <div className="text-center py-6">Loading Roles...</div>
-          ) : (
-            staffData.length > 0 &&
+          ) : staffData.length > 0 ? (
             staffData.map((ele) => (
               <div
                 className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 "
@@ -180,6 +179,10 @@ const Roles = () => {
                 </div>
               </div>
             ))
+          ) : (
+            <div className="text-center border-2 shadow cursor-pointer rounded-lg p-3 mt-3">
+              No Staff
+            </div>
           )}
         </div>
       </div>
