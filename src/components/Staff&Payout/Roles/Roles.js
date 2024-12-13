@@ -123,7 +123,10 @@ const Roles = () => {
           ) : (
             staffData.length > 0 &&
             staffData.map((ele) => (
-              <div className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 ">
+              <div
+                className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 "
+                key={ele.id}
+              >
                 <div className="px-5 space-y-3">
                   <div
                     className="font-bold"

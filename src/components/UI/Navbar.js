@@ -25,11 +25,18 @@ const Navbar = () => {
   const [editForm, setEditForm] = useState({ name: "", email: "", phone: "" });
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.users);
+
   function onSwitchCompany(index) {
     const payload = { ...userDetails, selectedCompanyIndex: index };
     dispatch(setUserLogin(payload));
     setIsCompanyOpen(false);
   }
+  function onSwitchDashboard(e) {
+    const { value } = e.target;
+    const payload = { ...userDetails, selectedDashboard: value };
+    dispatch(setUserLogin(payload));
+  }
+
   const navigate = useNavigate();
   const handleEditClick = () => {
     setIsEditing(true);
@@ -84,8 +91,19 @@ const Navbar = () => {
                 Change Company
               </div>
             </div>
+            <div>
+              <select
+                className="border-b-2 p-2 px-5"
+                value={userDetails.selectedDashboard || ""}
+                onChange={onSwitchDashboard}
+              >
+                <option value="">default</option>
+                <option value="customer">customer</option>
+                <option value="vendor">vendor</option>
+                <option value="staff">staff</option>
+              </select>
+            </div>
           </div>
-
           {/* <div className="flex-1 flex items-center justify-center">
             <div className="flex-grow mx-4 max-w-[400px] m-2 relative">
               <input

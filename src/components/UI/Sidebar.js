@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { GrMenu } from "react-icons/gr";
 import { LiaMoneyBillWaveSolid } from "react-icons/lia";
@@ -7,12 +7,19 @@ import { CgMoreVerticalO } from "react-icons/cg";
 import { FaAngleUp } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
+import { useSelector } from "react-redux";
 
 function SideBar() {
   const location = useLocation();
   const [isSideBarExpend, setIsSideBarExpend] = useState(true);
-
-  const [sideBarDetails, setSideBarDetails] = useState({
+  const userDetails = useSelector((state) => state.users);
+  const selectedDashboardUser = userDetails.selectedDashboard;
+  const viewDashBoardList = {
+    customer: ["Invoice", "Projects", "Quotation"],
+    vendor: ["POS", "Projects", "Quotation"],
+    staff: [],
+  };
+  const constSideBarDetails = {
     sales: {
       // image: <LiaMoneyBillWaveSolid size={30} />,
       isExpend: true,
@@ -60,7 +67,7 @@ function SideBar() {
       isExpend: true,
       items: [
         {
-          name: "Project",
+          name: "Projects",
           path: "/projects",
         },
         {
@@ -111,7 +118,32 @@ function SideBar() {
         },
       ],
     },
-  });
+  };
+  const [sideBarDetails, setSideBarDetails] = useState(constSideBarDetails);
+  useEffect(() => {
+    if (selectedDashboardUser === "") {
+      setSideBarDetails(constSideBarDetails);
+      return;
+    }
+    let updatedSidebarData = {};
+    for (let key of Object.keys(constSideBarDetails)) {
+      if (!updatedSidebarData[key]) {
+        updatedSidebarData[key] = {
+          isExpend: true,
+          items: [],
+        };
+      }
+      updatedSidebarData[key].items = constSideBarDetails[key].items?.filter(
+        (ele) => {
+          if (viewDashBoardList[selectedDashboardUser]?.includes(ele.name)) {
+            return true;
+          }
+          return false;
+        }
+      );
+    }
+    setSideBarDetails(updatedSidebarData);
+  }, [selectedDashboardUser]);
 
   return (
     <div

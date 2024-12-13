@@ -159,6 +159,7 @@ const LandingPage = () => {
           isLogin: true,
           selectedCompanyIndex: 0,
           token,
+          selectedDashboard: "",
         };
 
         dispatch(setUserLogin(payload));
