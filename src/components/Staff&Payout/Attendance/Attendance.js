@@ -187,9 +187,6 @@ function Attendance() {
     const sortedData = removedAlreadyAddAttendance.sort((a, b) =>
       b.id.localeCompare(a.id)
     );
-    if (onUpdateAttendance.id) {
-      setOnUpdateAttendance("");
-    }
     setStaffAttendance(sortedData);
   }
 
@@ -279,7 +276,10 @@ function Attendance() {
       {isSidebarOpen && (
         <AddAttendanceSidebar
           isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
+          onClose={() => {
+            setIsSidebarOpen(false);
+            setOnUpdateAttendance("");
+          }}
           staffData={staffData}
           markedAttendance={markedAttendance}
           onUpdateAttendance={onUpdateAttendance}

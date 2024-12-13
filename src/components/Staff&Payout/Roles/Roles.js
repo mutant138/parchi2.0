@@ -17,13 +17,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
 const Roles = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roles, setRoles] = useState([]);
-  const [rolesCount, setRolesCount] = useState({
-    total: 0,
-  });
   const [loading, setLoading] = useState(true);
-  const [searchInput, setSearchInput] = useState("");
   const userDetails = useSelector((state) => state.users);
   const [staffData, setStaffData] = useState([]);
 
