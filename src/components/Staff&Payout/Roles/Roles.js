@@ -16,13 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
 const Roles = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roles, setRoles] = useState([]);
-  const [rolesCount, setRolesCount] = useState({
-    total: 0,
-  });
   const [loading, setLoading] = useState(true);
-  const [searchInput, setSearchInput] = useState("");
   const userDetails = useSelector((state) => state.users);
   const [staffData, setStaffData] = useState([]);
 
@@ -43,6 +37,7 @@ const Roles = () => {
           id: doc.id,
           ...doc.data(),
           isExpand: false,
+          roles: [],
         };
       });
       setStaffData(staffData);
@@ -127,8 +122,9 @@ const Roles = () => {
                           <label className="relative inline-block w-14 h-8">
                             <input
                               type="checkbox"
-                              name="tcs"
+                              name="permission"
                               className="sr-only peer"
+                              checked={true}
                             />
                             <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
                             <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
