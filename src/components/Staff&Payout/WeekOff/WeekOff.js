@@ -74,7 +74,7 @@ const WeekOff = () => {
   async function onSubmitWeekOff(staff) {
     try {
       await updateDoc(doc(db, "staff", staff.id), { weekOff: staff.weekOff });
-      tempStaff[staff.id] = staff.weekOff;
+      setTempStaff((val) => ({ ...val, [staff.id]: staff.weekOff }));
     } catch (error) {
       console.log("🚀 ~ onSubmitWeekOff ~ error:", error);
     }
@@ -82,15 +82,12 @@ const WeekOff = () => {
 
   async function onSubmitCompanyWeekOff() {
     try {
-      console.log(
-        "🚀 ~ onSubmitCompanyWeekOff ~ selectedWeekDays:",
-        selectedWeekDays
-      );
       const payload = { weekOff: selectedWeekDays };
       updateDoc(doc(db, "companies", companyDetails.companyId), payload);
       dispatch(
         updateCompanyDetails({ ...companyDetails, weekOff: selectedWeekDays })
       );
+      setPreviousWeekDays(selectedWeekDays);
     } catch (error) {
       console.log("🚀 ~ onSubmitCompanyWeekDay ~ error:", error);
     }
@@ -124,7 +121,7 @@ const WeekOff = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <header className="flex justify-between items-center my-2">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center">
           <Link
             to="/staff-payout"
             className="flex items-center text-gray-700 py-1 px-4 rounded-full hover: transition duration-200"
@@ -283,7 +280,9 @@ const WeekOff = () => {
       {selectedLevel === "Business Level" && (
         <div>
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold mb-4">Select Week Days</h3>
+            <h3 className="text-lg font-bold mb-4">
+              Select Company's Week Offs
+            </h3>
             {isDataUpdated(selectedWeekDays, previousWeekDays) && (
               <div className="space-x-3">
                 <button
