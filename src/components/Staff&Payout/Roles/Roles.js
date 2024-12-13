@@ -9,6 +9,8 @@ import {
   Timestamp,
   query,
   where,
+  setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { IoSearch } from "react-icons/io5";
@@ -32,12 +34,14 @@ const Roles = () => {
         where("companyRef", "==", companyRef)
       );
       const getData = await getDocs(q);
-      const staffData = getData.docs.map((doc) => {
+      const staffData = await getData.docs.map((doc) => {
+        const staffId = doc.id;
+        const staff = doc.data();
+
         return {
-          id: doc.id,
-          ...doc.data(),
+          id: staffId,
+          ...staff,
           isExpand: false,
-          roles: [],
         };
       });
       setStaffData(staffData);
@@ -45,6 +49,34 @@ const Roles = () => {
       console.log("🚀 ~ fetchStaffData ~ error:", error);
     }
     setLoading(false);
+  }
+
+  async function handleRoleToggle(staff, roleName, isChecked, id) {
+    try {
+      const staffRef = doc(db, "staff", staff.id);
+      const payload = {
+        ...staff.roles,
+        [roleName]: isChecked,
+      };
+      await updateDoc(staffRef, { roles: payload });
+
+      setStaffData((prevData) =>
+        prevData.map((item) => {
+          if (item.id === staff.id) {
+            return {
+              ...item,
+              roles: {
+                ...item.roles,
+                [roleName]: isChecked,
+              },
+            };
+          }
+          return item;
+        })
+      );
+    } catch (error) {
+      console.log("Error in handleRoleToggle:", error);
+    }
   }
 
   useEffect(() => {
@@ -91,22 +123,24 @@ const Roles = () => {
           ) : (
             staffData.length > 0 &&
             staffData.map((ele) => (
-              <div
-                className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 "
-                key={ele.id}
-                onClick={() =>
-                  setStaffData(
-                    staffData.map((staff) => {
-                      if (staff.id == ele.id) {
-                        staff.isExpand = !staff.isExpand;
-                      }
-                      return staff;
-                    })
-                  )
-                }
-              >
+              <div className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 ">
                 <div className="px-5 space-y-3">
-                  <div className="font-bold">{ele.name}</div>
+                  <div
+                    className="font-bold"
+                    key={ele.id}
+                    onClick={() =>
+                      setStaffData(
+                        staffData.map((staff) => {
+                          if (staff.id == ele.id) {
+                            staff.isExpand = !staff.isExpand;
+                          }
+                          return staff;
+                        })
+                      )
+                    }
+                  >
+                    {ele.name}
+                  </div>
 
                   {ele.isExpand &&
                     [
@@ -115,16 +149,24 @@ const Roles = () => {
                       "CreatePurchase",
                       "CreateCustomer",
                       "CreateVendor",
-                    ].map((ele, index) => (
-                      <div key={index} className="flex justify-between">
-                        <div>{ele}</div>
+                    ].map((roleName, index) => (
+                      <div key={roleName} className="flex justify-between">
+                        <div>{roleName}</div>
                         <div>
                           <label className="relative inline-block w-14 h-8">
                             <input
                               type="checkbox"
-                              name="permission"
+                              name={roleName}
                               className="sr-only peer"
-                              checked={true}
+                              checked={ele.roles?.[roleName] || false}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleRoleToggle(
+                                  ele,
+                                  roleName,
+                                  e.target.checked
+                                );
+                              }}
                             />
                             <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
                             <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>

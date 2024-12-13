@@ -70,10 +70,33 @@ const userSlice = createSlice({
       const updatedUser = { ...state, name, email, phone };
       localStorage.setItem("user", JSON.stringify(updatedUser));
     },
+    updateCompanyDetails: (state, action) => {
+      const { isCalendarMonth, name, userType, weekOff } = action.payload;
+      const updatedCompanies = state.companies;
+      state.companies[state.selectedCompanyIndex].isCalendarMonth =
+        isCalendarMonth;
+      state.companies[state.selectedCompanyIndex].name = name;
+      state.companies[state.selectedCompanyIndex].userType = userType;
+      state.companies[state.selectedCompanyIndex].weekOff = weekOff;
+
+      updatedCompanies[state.selectedCompanyIndex] = {
+        ...updatedCompanies[state.selectedCompanyIndex],
+        isCalendarMonth,
+        name,
+        userType,
+        weekOff,
+      };
+      const updatedData = { ...state, companies: updatedCompanies };
+      localStorage.setItem("user", JSON.stringify(updatedData));
+    },
   },
 });
 
-export const { setUserLogin, setUserLogout, updateUserDetails } =
-  userSlice.actions;
+export const {
+  setUserLogin,
+  setUserLogout,
+  updateUserDetails,
+  updateCompanyDetails,
+} = userSlice.actions;
 
 export default userSlice.reducer;
