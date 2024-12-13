@@ -43,11 +43,11 @@ function SideBar() {
         },
         {
           name: "Delivery Challan",
-          path: "",
+          path: "/delivery-challan",
         },
         {
           name: "Credit Note",
-          path: "",
+          path: "/credit-note",
         },
         {
           name: "POS",
