@@ -55,7 +55,7 @@ const WeekOff = () => {
         <div className="flex items-center space-x-3">
           <Link
             to="/staff-payout"
-            className="flex items-center  text-gray-700 py-1 px-4 rounded-full hover:  transition duration-200"
+            className="flex items-center text-gray-700 py-1 px-4 rounded-full hover: transition duration-200"
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
           </Link>
@@ -63,17 +63,22 @@ const WeekOff = () => {
         </div>
       </header>
 
-      <div>
-        <h3 className="text-lg font-medium mt-6 mb-4">
-          Choose Week Off Calculation
-        </h3>
-        <select
-          className="block w-full py-2 px-3 border bg-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          onChange={(e) => setSelectedOption(e.target.value)}
-        >
-          <option value="Calendar Month">Calendar Month</option>
-          <option value="Exclude Week Offs">Exclude Week Offs</option>
-        </select>
+      <div className="flex gap-4">
+      
+        <div className="flex-1 p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100">
+        <h3 className="text-lg font-medium mt-2 mb-4">Calendar Month</h3>
+          {/* Additional content for Calendar Month */}
+          <p className="text-sm text-gray-600">
+            Ex. March-31 days, April -30 days etc (per day salary = salary / No. of days in month)
+            </p>
+        </div>
+        <div className="flex-1 p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100">
+          <h3 className="text-lg font-medium mt-2 mb-4">Exclude Week Offs</h3>
+          {/* Additional content for Exclude Week Offs */}
+          <p className="text-sm text-gray-600">
+           Ex. Monthly with 31 days and 4 weekly - offs will have 27 payable days (per day salary = salary/Payable days)
+            </p>
+        </div>
       </div>
 
       <div className="flex gap-4 my-3">
@@ -130,7 +135,7 @@ const WeekOff = () => {
       {selectedLevel === "Business Level" && (
         <div>
           <h3 className="text-lg font-bold mb-4">Select Week Days</h3>
-          <div className=" space-x-2 flex justify-between">
+          <div className="space-x-2 flex justify-between">
             {weekDays.map((day) => (
               <div
                 key={day}
