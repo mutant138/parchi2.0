@@ -6,14 +6,10 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 
 const WeekOff = () => {
-  const [weekPreference, setWeekPreference] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedLevel, setSelectedLevel] = useState("Staff Level");
-  const [selectedStaff, setSelectedStaff] = useState([]);
   const [staffList, setStaffList] = useState([]);
-  const [selectedDays, setSelectedDays] = useState({});
-  const [expandedStaff, setExpandedStaff] = useState({});
-
+  const [updatedStaff, setUpdatedStaff] = useState({});
   const weekDays = [
     "Sunday",
     "Monday",
@@ -39,6 +35,8 @@ const WeekOff = () => {
         const staffData = staffSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          docRef: doc,
+          isExpend: false,
         }));
         setStaffList(staffData);
       } catch (error) {
@@ -48,6 +46,13 @@ const WeekOff = () => {
 
     fetchStaffData();
   }, [companyId]);
+
+  async function onSubmitWeekOff() {
+    try {
+    } catch (error) {
+      console.log("🚀 ~ onSubmitWeekOff ~ error:", error);
+    }
+  }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -94,25 +99,83 @@ const WeekOff = () => {
 
       {selectedLevel === "Staff Level" && (
         <div>
-          <h3 className="text-lg font-bold mb-4">Staff Members</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold mb-4">Staff Members</h3>
+            <button
+              className="px-4 py-2 rounded-lg font-medium bg-blue-500 text-white"
+              onClick={onSubmitWeekOff}
+            >
+              Save
+            </button>
+          </div>
           <div className="space-y-2">
             {staffList.map((staff) => (
               <div
                 key={staff.id}
-                className="p-3 bg-white border rounded-lg shadow-sm hover:bg-gray-100 cursor-pointer"
-                onClick={() => {}}
+                className="px-3 bg-white border rounded-lg shadow-sm hover:bg-gray-100 cursor-pointer"
               >
-                {staff.name}
+                <div
+                  className="py-3"
+                  onClick={() => {
+                    const updateData = staffList.map((ele) => {
+                      if (ele.id === staff.id) {
+                        ele.isExpend = !staff.isExpend;
+                      }
+                      return ele;
+                    });
+                    setStaffList(updateData);
+                  }}
+                >
+                  {staff.name}
+                </div>
                 <div>
-                  {!expandedStaff[staff.id] && (
-                    <div className="space-x-2 flex justify-between border-t-2 pt-2">
+                  {staff.isExpend && (
+                    <div className="space-x-2 flex justify-between border-t-2 py-2">
                       {weekDays.map((day) => (
                         <div
                           key={day}
-                          className="flex w-full items-center justify-center p-3 bg-white border-2 rounded-lg shadow hover:bg-gray-100"
+                          className={
+                            "flex w-full items-center justify-center p-3 bg-white border-2 rounded-lg shadow hover:bg-gray-100"
+                          }
                         >
                           <input
                             type="checkbox"
+                            checked={
+                              staff.weekOff.includes(day.toLowerCase()) || false
+                            }
+                            onChange={(e) => {
+                              const updatedData = staffList.map((ele) => {
+                                if (ele.id === staff.id) {
+                                  if (e.target.checked) {
+                                    ele.weekOff.push(day.toLowerCase());
+                                  } else {
+                                    ele.weekOff = ele.weekOff.filter(
+                                      (ele) => ele !== day.toLowerCase()
+                                    );
+                                  }
+                                }
+                                return ele;
+                              });
+                              setStaffList(updatedData);
+
+                              //   updatedStaff[staff.id].push();
+                              //   if (e.target.checked) {
+                              //     setUpdatedStaff((val) => ({
+                              //       ...val,
+                              //       [staff.id]: [
+                              //         ...val[staff.id],
+                              //         day.toLowerCase(),
+                              //       ],
+                              //     }));
+                              //   } else {
+                              //     setUpdatedStaff((val) => ({
+                              //       ...val,
+                              //       [staff.id]: val[staff.id].filter(
+                              //         (staff) => staff !== day.toLowerCase()
+                              //       ),
+                              //     }));
+                              //   }
+                            }}
                             className="h-4 w-4 text-blue-600 border-gray-300 rounded"
                           />
                           <label className="ml-2">{day}</label>
