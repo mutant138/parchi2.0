@@ -121,7 +121,10 @@ function Staff() {
                       <span>{ele.phone}</span>
                     </div>
                   </div>
-                  <div className=" rounded-lg bg-cyan-200 p-3"> $ 340</div>
+                  <div className=" rounded-lg bg-cyan-200 p-3">
+                    {" "}
+                    ₹{ele.paymentDetails}
+                  </div>
                 </div>
               </div>
             ))

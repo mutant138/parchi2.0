@@ -9,6 +9,7 @@ import {
   Timestamp,
   query,
   where,
+  setDoc,
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { IoSearch } from "react-icons/io5";
@@ -38,18 +39,55 @@ const Roles = () => {
         where("companyRef", "==", companyRef)
       );
       const getData = await getDocs(q);
-      const staffData = getData.docs.map((doc) => {
-        return {
-          id: doc.id,
-          ...doc.data(),
-          isExpand: false,
-        };
-      });
+      const staffData = await Promise.all(
+        getData.docs.map(async (doc) => {
+          const staffId = doc.id;
+          const staff = doc.data();
+
+          const rolesRef = collection(db, "staff", staffId, "roles");
+          const rolesSnapshot = await getDocs(rolesRef);
+          const roles = {};
+          rolesSnapshot.forEach((roleDoc) => {
+            roles[roleDoc.id] = roleDoc.data().enabled || false;
+          });
+
+          return {
+            id: staffId,
+            ...staff,
+            roles,
+            isExpand: false,
+          };
+        })
+      );
       setStaffData(staffData);
     } catch (error) {
       console.log("🚀 ~ fetchStaffData ~ error:", error);
     }
     setLoading(false);
+  }
+
+  async function handleRoleToggle(staffId, roleName, isChecked) {
+    try {
+      const roleRef = doc(db, "staff", staffId, "roles", roleName);
+      await setDoc(roleRef, { [roleName]: isChecked }, { merge: true });
+
+      setStaffData((prevData) =>
+        prevData.map((staff) => {
+          if (staff.id === staffId) {
+            return {
+              ...staff,
+              roles: {
+                ...staff.roles,
+                [roleName]: isChecked,
+              },
+            };
+          }
+          return staff;
+        })
+      );
+    } catch (error) {
+      console.log("Error in handleRoleToggle:", error);
+    }
   }
 
   useEffect(() => {
@@ -120,15 +158,23 @@ const Roles = () => {
                       "CreatePurchase",
                       "CreateCustomer",
                       "CreateVendor",
-                    ].map((ele, index) => (
-                      <div key={index} className="flex justify-between">
-                        <div>{ele}</div>
+                    ].map((roleName, index) => (
+                      <div key={roleName} className="flex justify-between">
+                        <div>{roleName}</div>
                         <div>
                           <label className="relative inline-block w-14 h-8">
                             <input
                               type="checkbox"
-                              name="tcs"
+                              name={roleName}
                               className="sr-only peer"
+                              checked={ele.roles?.[roleName] || false}
+                              onChange={(e) => {
+                                handleRoleToggle(
+                                  ele.id,
+                                  roleName,
+                                  e.target.checked
+                                );
+                              }}
                             />
                             <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
                             <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
