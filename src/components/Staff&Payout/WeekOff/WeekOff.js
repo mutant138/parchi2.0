@@ -1,5 +1,5 @@
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { collection, doc, getDocs, query, where } from "firebase/firestore";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { db } from "../../../firebase";
@@ -12,181 +12,120 @@ const WeekOff = () => {
   const [selectedStaff, setSelectedStaff] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [selectedDays, setSelectedDays] = useState({});
+  const [expandedStaff, setExpandedStaff] = useState({});
 
-  const weekDays = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const userDetails = useSelector((state) => state.users);
-
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
-  async function fetchStaffData() {
-    try {
-      const companyRef = doc(db, "companies", companyId);
-
-      const q = query(
-        collection(db, "staff"),
-        where("companyRef", "==", companyRef)
-      );
-      const getData = await getDocs(q);
-      const staffData = getData.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setStaffList(staffData);
-    } catch (error) {
-      console.log("🚀 ~ fetchStaffData ~ error:", error);
-    }
-  }
+  const companyId = userDetails.companies[userDetails.selectedCompanyIndex].companyId;
 
   useEffect(() => {
-    fetchStaffData();
-  }, []);
-  const handleLevelChange = (level) => {
-    setSelectedLevel(level);
-  };
+    const fetchStaffData = async () => {
+      try {
+        const companyRef = doc(db, "companies", companyId);
+        const staffQuery = query(collection(db, "staff"), where("companyRef", "==", companyRef));
+        const staffSnapshot = await getDocs(staffQuery);
+        const staffData = staffSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setStaffList(staffData);
+      } catch (error) {
+        console.error("Error fetching staff data:", error);
+      }
+    };
 
-  const handleSelection = (item, selectionType) => {
-    if (selectionType === "staff") {
-      setSelectedStaff((prevSelected) =>
-        prevSelected.includes(item)
-          ? prevSelected.filter((m) => m !== item)
-          : [...prevSelected, item]
+    fetchStaffData();
+  }, [companyId]);
+
+  const toggleSelection = (item, type) => {
+    if (type === "staff") {
+      setSelectedStaff((prev) =>
+        prev.includes(item) ? prev.filter((s) => s !== item) : [...prev, item]
       );
-    } else if (selectionType === "day") {
-      setSelectedDays({
-        ...selectedDays,
-        [item]: !selectedDays[item],
-      });
+      setExpandedStaff((prev) => ({ ...prev, [item.id]: !prev[item.id] }));
+    } else {
+      setSelectedDays((prev) => ({ ...prev, [item]: !prev[item] }));
     }
   };
+
+  const renderCheckbox = (day) => (
+    <div key={day} className="flex items-center p-3 bg-white border rounded-lg shadow-sm hover:bg-gray-100">
+      <input
+        type="checkbox"
+        checked={selectedDays[day] || false}
+        onChange={() => toggleSelection(day, "day")}
+        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+      />
+      <label className="ml-2 text-sm">{day}</label>
+    </div>
+  );
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <header className="flex justify-between items-center space-x-3  my-2">
-        <div className="flex space-x-3 justify-center">
+      <header className="flex justify-between items-center my-2">
+        <div className="flex items-center space-x-3">
           <Link
-            className="flex items-center  rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
             to="/staff-payout"
+            className="flex items-center  text-gray-700 py-1 px-4 rounded-full hover:  transition duration-200"
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
           </Link>
-          <h2 className="text-xl font-bold mb-4">Week Off Preferences</h2>
+          <h1 className="text-2xl font-bold">Week Off Preferences</h1>
         </div>
       </header>
-      {/* {!weekPreference && (
-        <div>
-          <h3 className="text-lg font-bold mb-4">Select Week Preference</h3>
+
+      <div>
+        <h3 className="text-lg font-medium mt-6 mb-4">Choose Week Off Calculation</h3>
+        <select
+          className="block w-full py-2 px-3 border bg-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          onChange={(e) => setSelectedOption(e.target.value)}
+        >
+          <option value="Calendar Month">Calendar Month</option>
+          <option value="Exclude Week Offs">Exclude Week Offs</option>
+        </select>
+      </div>
+
+      <div className="flex gap-4 my-3">
+        {["Staff Level", "Business Level"].map((level) => (
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600"
-            onClick={() => setWeekPreference(true)}
+            key={level}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              selectedLevel === level ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setSelectedLevel(level)}
           >
-            Select Week Preferences
+            {level}
           </button>
-        </div>
-      )} */}
-      <>
-        {/* Calendar Month or Exclude Week Off Selection */}
+        ))}
+      </div>
+
+      {selectedLevel === "Staff Level" && (
         <div>
-          <h3 className="text-lg font-bold mb-4">
-            Choose Week Off Calculation
-          </h3>
-          <select
-            className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            onChange={(e) => setSelectedOption(e.target.value)}
-          >
-            <option value="Calendar Month">Calendar Month</option>
-            <option value="Exclude Week Offs">Exclude Week Offs</option>
-          </select>
+          <h3 className="text-lg font-bold mb-4">Staff Members</h3>
+          <ul className="space-y-2">
+            {staffList.map((staff) => (
+              <li
+                key={staff.id}
+                className="p-3 bg-white border rounded-lg shadow-sm hover:bg-gray-100 cursor-pointer"
+                onClick={() => toggleSelection(staff, "staff")}
+              >
+                {staff.name}
+                {expandedStaff[staff.id] && (
+                  <ul className="mt-2 space-y-1">
+                    {weekDays.map(renderCheckbox)}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
-        <>
-          {/* <div className="mb-4">
-            <h4 className="font-medium text-blue-600">
-              Selected: {selectedOption}
-            </h4>
-            <button
-              className="text-sm text-red-500 underline"
-              onClick={() => setSelectedOption(null)}
-            >
-              Change Week Off Calculation
-            </button>
-          </div> */}
+      )}
 
-          {/* Staff Level and Business Level Tabs */}
-          <div className="flex gap-4 mb-6 mt-3">
-            <button
-              className={`px-4 py-2 rounded-lg font-medium ${
-                selectedLevel === "Staff Level"
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200"
-              }`}
-              onClick={() => handleLevelChange("Staff Level")}
-            >
-              Staff Level
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg font-medium ${
-                selectedLevel === "Business Level"
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200"
-              }`}
-              onClick={() => handleLevelChange("Business Level")}
-            >
-              Business Level
-            </button>
+      {selectedLevel === "Business Level" && (
+        <div>
+          <h3 className="text-lg font-bold mb-4">Select Week Days</h3>
+          <div className="space-y-2">
+            {weekDays.map(renderCheckbox)}
           </div>
-
-          {/* Staff Level Content */}
-          {selectedLevel === "Staff Level" && (
-            <div>
-              <h3 className="text-lg font-bold mb-4">Staff Members</h3>
-              <ul className="space-y-2">
-                {staffList.length > 0 &&
-                  staffList.map((staff) => (
-                    <li
-                      key={staff.id}
-                      className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelection(staff, "staff")}
-                    >
-                      {staff.name}
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          )}
-          {/* Business Level Content with checkboxes for each weekday */}
-          {selectedLevel === "Business Level" && (
-            <div>
-              <h3 className="text-lg font-bold mb-4">Select Week Days</h3>
-              <div className="space-y-2">
-                {weekDays.map((day, index) => (
-                  <div key={index} className="flex items-center">
-                    <input
-                      id={`day-${index}`}
-                      type="checkbox"
-                      checked={selectedDays[day] || false}
-                      onChange={() => handleSelection(day, "day")}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label
-                      htmlFor={`day-${index}`}
-                      className="ml-2 block text-sm text-gray-900"
-                    >
-                      {day}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      </>
+        </div>
+      )}
     </div>
   );
 };
