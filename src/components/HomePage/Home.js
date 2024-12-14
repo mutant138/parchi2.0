@@ -178,14 +178,16 @@ const Home = () => {
               path="/services/:id/edit-service"
               element={<EditService />}
             ></Route>
-            <Route path="/chats" element={<Chats />}></Route>
             <Route path="/po" element={<PO />}></Route>
-            <Route path="/create-po" element={<CreatePo />}></Route>     
+            <Route path="/create-po" element={<CreatePo />}></Route>
             <Route path="/reminder" element={<Reminder />}></Route>
             <Route path="/expense" element={<BookList />}></Route>
             <Route path="/expense/:id" element={<Expense />}></Route>
-            <Route path="/delivery-challan" element={<DeliveryChallan />}></Route>
-            <Route path="/credit-note" element={ <CreditNote />}></Route>
+            <Route
+              path="/delivery-challan"
+              element={<DeliveryChallan />}
+            ></Route>
+            <Route path="/credit-note" element={<CreditNote />}></Route>
           </Routes>
           <Outlet />
         </div>
@@ -193,6 +195,5 @@ const Home = () => {
     </div>
   );
 };
-
 
 export default Home;

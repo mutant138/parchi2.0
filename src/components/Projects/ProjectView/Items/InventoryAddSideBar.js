@@ -30,7 +30,7 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
       setLoadingItems(true);
       try {
         const companyRef = doc(db, "companies", companyId);
-        const inventoryRef = collection(db, "products");
+        const inventoryRef = collection(db, "companies", companyId, "products");
         const q = query(inventoryRef, where("companyRef", "==", companyRef));
         const querySnapshot = await getDocs(q);
 
@@ -93,7 +93,7 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
         createdAt: Timestamp.fromDate(new Date()),
         description: description,
         itemPricePerPiece: selectedItem.price,
-        itemName: selectedItem.name,
+        name: selectedItem.name,
         projectRef,
         quantity: +quantity,
         remainingQuantity: +quantity,
@@ -121,9 +121,9 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
     const data = itemList.find((ele) => ele.id === e.target.value);
     setSelectedItem({
       id: data.id,
-      name: data.itemName,
-      quantity: data.stock?.quantity,
-      price: data.pricing?.sellingPrice?.amount,
+      name: data.name,
+      quantity: data.stock,
+      price: data.sellingPrice,
     });
   }
   return (
@@ -163,8 +163,7 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
                   key={item.id}
                   disabled={item.stock === 0}
                 >
-                  {item.itemName} - {item.stock} Quantity - ₹{item.sellingPrice}{" "}
-                  Pc
+                  {item.name} - {item.stock} Quantity - ₹{item.sellingPrice} Pc
                 </option>
               ))}
             </select>
@@ -200,14 +199,14 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
                       onClick={() => {
                         setSelectedItem({
                           id: item.id,
-                          name: item.itemName,
+                          name: item.name,
                           quantity: item.stock?.quantity,
                           price: item.pricing?.sellingPrice?.amount,
                         });
                         setShowDropdownItem(false);
                       }}
                     >
-                      {item.itemName} - {item.stock?.quantity} units - ₹
+                      {item.name} - {item.stock?.quantity} units - ₹
                       {item.pricing?.sellingPrice?.amount}
                     </div>
                   ))

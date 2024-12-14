@@ -51,7 +51,6 @@ const userSlice = createSlice({
       state.token = token;
       state.isLogin = true;
       state.companies = companies;
-      state.selectedDashboard = "";
       state.selectedDashboard = selectedDashboard;
 
       state.selectedCompanyIndex = selectedCompanyIndex;
