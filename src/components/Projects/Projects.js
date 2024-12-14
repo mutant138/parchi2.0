@@ -99,6 +99,7 @@ function Projects() {
   function onSearchFilter(e) {
     setSearchInput(e.target.value);
   }
+  
 
   // function onDateChange(e) {
   //   const { name, value } = e.target;

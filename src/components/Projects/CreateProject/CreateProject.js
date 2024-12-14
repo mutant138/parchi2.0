@@ -15,18 +15,21 @@ function CreateProject() {
     location: "",
     description: "",
     name: "",
-    dueDate: null,
-    startDate: null,
+    dueDate: "",
+    startDate: "",
   });
 
   const [isMoreChecked, setIsMoreChecked] = useState(false);
   const [books, setBooks] = useState([]);
-  const [formData, setFormData] = useState({ book: { bookRef: { id: "" } } });
 
   const onSelectBook = (e) => {
-    setFormData((prevData) => ({
+    const{value}=e.target;
+    const bookRef=doc(db, "companies", companyDetails.companyId, "books", value);
+const bankBookName= books.find((book) => book.id === value).name;
+console.log(bankBookName, bookRef)
+setProjectForm((prevData) => ({
       ...prevData,
-      book: { bookRef: { id: e.target.value } },
+      book: { bookRef,  id: value ,name:bankBookName},
     }));
   };
 
@@ -162,8 +165,8 @@ function CreateProject() {
             <div className="">
               <label className="text-lg text-gray-600">Bank/Book Details</label>
               <select
-                value={formData.book.bookRef?.id || ""}
                 onChange={onSelectBook}
+                defaultValue=""
                 className="border p-2 rounded w-full mt-1"
               >
                 <option value="" disabled>

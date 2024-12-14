@@ -17,11 +17,14 @@ import {
   getDoc,
   Timestamp,
   deleteDoc,
+  collection,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { TiMessages } from "react-icons/ti";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TbEdit } from "react-icons/tb";
+import { useSelector } from "react-redux";
 
 function ProjectView() {
   const { id } = useParams();
@@ -29,8 +32,10 @@ function ProjectView() {
   const [project, setProject] = useState({});
   const [isEdit, setIsEdit] = useState(false);
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({});
+  const [bankBooks, setBankBooks] = useState([]);
+  const [selectedBankBook, setSelectedBankBook] = useState(null);
+  const userDetails = useSelector((state) => state.users);
 
   useEffect(() => {
     if (project) {
@@ -50,7 +55,6 @@ function ProjectView() {
 
   const handleUpdate = async () => {
     const projectDoc = doc(db, "projects", id);
-
     const updatedData = {
       ...formData,
       startDate: formData.startDate
@@ -59,6 +63,7 @@ function ProjectView() {
       dueDate: formData.dueDate
         ? Timestamp.fromDate(new Date(formData.dueDate))
         : null,
+      bankBookRef: selectedBankBook ? doc(db, "createProjects", selectedBankBook) : null,
     };
 
     try {
@@ -71,6 +76,7 @@ function ProjectView() {
       alert("Failed to update the project.");
     }
   };
+
   function DateFormate(timestamp, format = "dd/mm/yyyy") {
     const milliseconds =
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
@@ -86,7 +92,8 @@ function ProjectView() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    fetchBankBooks();
+  }, [id]);
 
   async function fetchData() {
     const getData = await getDoc(doc(db, "projects", id));
@@ -103,7 +110,23 @@ function ProjectView() {
     };
 
     setProject(payload);
+    setSelectedBankBook(data.bankBookRef?.id);
   }
+  async function fetchBankBooks() {
+    const bankBookRef = collection(db, "companies",  userDetails?.companies[userDetails.selectedCompanyIndex]?.companyId, "books");
+    const getBankBooks = await getDocs(bankBookRef);
+    const bankBooksData = getBankBooks.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setBankBooks(bankBooksData);
+  }
+
+  const handleBankBookChange = (e) => {
+    setSelectedBankBook(e.target.value);
+  };
+  
+
   const manageProjectItems = [
     {
       name: "Users",
@@ -166,6 +189,7 @@ function ProjectView() {
       console.log("🚀 ~ onChangeStatus ~ error:", error);
     }
   }
+
   async function handleDelete() {
     try {
       const confirmDelete = window.confirm(
@@ -251,27 +275,49 @@ function ProjectView() {
         </div>
 
         {!isEdit ? (
-          <div className="bg-white p-4 rounded-lg shadow my-4">
-            <div className="border-b pb-3 h-8">{project.name}</div>
-            <div className="py-3">{project.description}</div>
+        <div className="bg-white p-4 rounded-lg shadow my-4">
+          <div className="border-b pb-3 h-8">{project.name}</div>
+          <div className="py-3">{project.description}</div>
+          {project?.bankBookRef ? (
+            <div className="py-3 text-gray-600">Bank Book: {project.book.name}</div>
+          ) : (
+            <div className="py-3 text-gray-600">No Bank Book</div>
+          )}
+        </div>
+      ) : (
+        <div className="bg-white p-4 rounded-lg shadow my-4">
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="border w-full px-2 py-1 rounded"
+          />
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="border w-full px-2 py-1 rounded mt-3"
+          />
+          <div className="py-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Select Bank Book
+            </label>
+            <select
+              value={selectedBankBook || ""}
+              onChange={handleBankBookChange}
+              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select Bank Book</option>
+              {bankBooks.map((book) => (
+                <option key={book.id} value={book.id}>
+                  {book.name}
+                </option>
+              ))}
+            </select>
           </div>
-        ) : (
-          <div className="bg-white p-4 rounded-lg shadow my-4">
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="border w-full px-2 py-1 rounded"
-            />
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="border w-full px-2 py-1 rounded mt-3"
-            />
-          </div>
-        )}
+        </div>
+      )}
 
         <div className="grid justify-items-end">
           {!isEdit ? (
