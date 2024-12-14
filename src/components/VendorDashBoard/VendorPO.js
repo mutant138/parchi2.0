@@ -113,7 +113,7 @@ const VendorPO = () => {
                         <td className="py-3">{`₹ ${p.total.toFixed(2)}`}</td>
                         <td className="py-3">{p.paymentStatus}</td>
                         <td className="py-3">{p.mode || "Online"}</td>
-                        <td className="py-3">{p.poNo}</td>
+                        <td className="py-3">{p.no}</td>
 
                         <td className="py-3">
                           {(() => {
