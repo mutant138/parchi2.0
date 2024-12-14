@@ -13,6 +13,10 @@ function PO() {
   const userDetails = useSelector((state) => state.users);
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
+
+  const selectedDashboardUser = userDetails.selectedDashboard;
+
+  console.log("selectedDashboardUser", selectedDashboardUser);
   const [POList, setPOList] = useState([]);
 
   const [POCount, setPOCount] = useState({

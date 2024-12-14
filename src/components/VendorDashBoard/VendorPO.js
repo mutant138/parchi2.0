@@ -1,28 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMdDownload } from "react-icons/io";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
 import { db } from "../../firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 
-function Invoice() {
-  const userDetails = useSelector((state) => state.users);
+const VendorPO = () => {
   const [loading, setLoading] = useState(false);
   const [companiesId, setCompaniesId] = useState([]);
-  const [invoices, setInvoices] = useState([]);
+  const [po, setPo] = useState([]);
+  const userDetails = useSelector((state) => state.users);
+  const phone = userDetails.phone;
 
   useEffect(() => {
-    async function fetchCustomerCompanies() {
+    async function fetchVendorCompanies() {
       setLoading(true);
       try {
-        const customerRef = collection(db, "customers");
-        const q = query(customerRef, where("phone", "==", userDetails.phone));
+        const customerRef = collection(db, "vendors");
+        const q = query(customerRef, where("phone", "==", phone));
         const getData = await getDocs(q);
         const getCompaniesId = getData.docs.map((doc) => {
           const { name, companyRef } = doc.data();
@@ -34,53 +28,52 @@ function Invoice() {
         });
         setCompaniesId(getCompaniesId);
       } catch (error) {
-        console.log("🚀 ~ fetchCustomerCompanies ~ error:", error);
+        console.log("🚀 ~ fetchVendorCompanies ~ error:", error);
       } finally {
         setLoading(false);
       }
     }
-    fetchCustomerCompanies();
+    fetchVendorCompanies();
   }, []);
 
   useEffect(() => {
     setLoading(true);
-    async function fetchInvoices() {
+    async function fetchPO() {
       try {
-        const invoiceList = [];
+        const POList = [];
+        const phoneNo = phone.startsWith("+91") ? phone.slice(3) : phone;
         for (const company of companiesId) {
           console.log(company.companyId);
 
-          const invoiceRef = collection(
+          const poRef = collection(
             db,
             "companies",
             company.companyId,
-            "invoices"
+            "purchases"
           );
-          const q = query(
-            invoiceRef,
-            where("customerDetails.phone", "==", "1234567890")
-          );
+          const q = query(poRef, where("vendorDetails.phone", "==", phoneNo));
           const getData = await getDocs(q);
-          const getAllInvoices = getData.docs.map((doc) => {
+          const getAllPO = getData.docs.map((doc) => {
             const data = doc.data();
             return {
               id: doc.id,
               ...data,
             };
           });
-          invoiceList.push(...getAllInvoices);
+          POList.push(...getAllPO);
         }
-        console.log("🚀 ~ fetchInvoices ~ invoiceList:", invoiceList);
+        console.log("🚀 ~ fetchPO ~ POList:", POList);
 
-        setInvoices(invoiceList);
+        setPo(POList);
       } catch (error) {
-        console.log("🚀 ~ fetchInvoices ~ error:", error);
+        console.log("🚀 ~ fetchPO ~ error:", error);
       } finally {
         setLoading(false);
       }
     }
-    fetchInvoices();
+    fetchPO();
   }, [companiesId]);
+
   return (
     <div className="w-full">
       <div
@@ -88,51 +81,47 @@ function Invoice() {
         style={{ height: "92vh" }}
       >
         <header className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold">Invoices</h1>
+          <h1 className="text-2xl font-bold">PO</h1>
         </header>
         <div className="bg-white p-4 rounded-lg shadow mb-4">
           {loading ? (
-            <div className="text-center py-6">Loading invoices...</div>
+            <div className="text-center py-6">Loading PO...</div>
           ) : (
             <div className="overflow-y-auto" style={{ height: "70vh" }}>
               <table className="w-full border-collapse  h-28 text-center">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="border-b">
-                    <th className="p-4">company</th>
+                    <th className="p-4">Company Name</th>
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
-                    <th className="p-4">Invoice NO</th>
+                    <th className="p-4">PO NO</th>
                     <th className="p-4">Date / Updated Time</th>
                     <th className="p-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.length > 0 ? (
-                    invoices.map((invoice) => (
-                      <tr key={invoice.id} className="border-b text-center">
+                  {po.length > 0 ? (
+                    po.map((p) => (
+                      <tr key={p.id} className="border-b text-center">
                         <td className="py-3">
-                          {invoice.createdBy?.name} <br />
+                          {p.createdBy?.name} <br />
                           <span className="text-gray-500">
-                            {invoice.customerDetails.phone}
+                            {p.vendorDetails.phone}
                           </span>
                         </td>
-                        <td className="py-3">{`₹ ${invoice.total.toFixed(
-                          2
-                        )}`}</td>
-                        <td className="py-3">{invoice.paymentStatus}</td>
-                        <td className="py-3">{invoice.mode || "Online"}</td>
-                        <td className="py-3">{invoice.invoiceNo}</td>
+                        <td className="py-3">{`₹ ${p.total.toFixed(2)}`}</td>
+                        <td className="py-3">{p.paymentStatus}</td>
+                        <td className="py-3">{p.mode || "Online"}</td>
+                        <td className="py-3">{p.no}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
-                              invoice.invoiceDate.seconds &&
-                              typeof invoice.invoiceDate.seconds === "number"
+                              p.poDate.seconds &&
+                              typeof p.poDate.seconds === "number"
                             ) {
-                              const date = new Date(
-                                invoice.invoiceDate.seconds * 1000
-                              );
+                              const date = new Date(p.poDate.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
@@ -163,7 +152,7 @@ function Invoice() {
                   ) : (
                     <tr>
                       <td colSpan="6" className="text-center py-4">
-                        No invoices found
+                        No PO found
                       </td>
                     </tr>
                   )}
@@ -175,6 +164,6 @@ function Invoice() {
       </div>
     </div>
   );
-}
+};
 
-export default Invoice;
+export default VendorPO;

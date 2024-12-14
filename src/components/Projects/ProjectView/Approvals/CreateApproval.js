@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   query,
   Timestamp,
@@ -44,7 +45,8 @@ function CreateApproval({ isOpen, projectId, onClose, newApprovalAdded }) {
   const fetchData = async (collectionName, setData) => {
     try {
       const ref = collection(db, collectionName);
-      const q = query(ref, where("companyId", "==", companyId));
+      const companyRef = doc(db, "companies", companyId);
+      const q = query(ref, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const data = querySnapshot.docs.map((doc) => ({
@@ -84,10 +86,10 @@ function CreateApproval({ isOpen, projectId, onClose, newApprovalAdded }) {
 
   async function onCreateApproval() {
     try {
-      const storageRef = ref(storage, `files/${uploadedFile.name}`);
-      await uploadBytes(storageRef, uploadedFile);
-      const fileURL = await getDownloadURL(storageRef);
-      const fileField = typeOfFile === "Image" ? "image" : "pdfUrl";
+      // const storageRef = ref(storage, `files/${uploadedFile.name}`);
+      // await uploadBytes(storageRef, uploadedFile);
+      // const fileURL = await getDownloadURL(storageRef);
+      // const fileField = typeOfFile === "Image" ? "image" : "pdfUrl";
       const payload = {
         ...approvalForm,
         approvalBelongsTo: filter,
@@ -95,7 +97,7 @@ function CreateApproval({ isOpen, projectId, onClose, newApprovalAdded }) {
         createdAt: Timestamp.fromDate(new Date()),
         typeOfFile: typeOfFile,
       };
-      payload.file[fileField] = fileURL;
+      // payload.file[fileField] = fileURL;
       const approvalsRef = collection(db, `projects/${projectId}/approvals`);
       await addDoc(approvalsRef, payload);
       newApprovalAdded();

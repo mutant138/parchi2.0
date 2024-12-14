@@ -16,7 +16,7 @@ function SideBar() {
   const selectedDashboardUser = userDetails.selectedDashboard;
   const viewDashBoardList = {
     customer: ["Invoice", "Projects", "Quotation"],
-    vendor: ["POS", "Projects", "Quotation"],
+    vendor: ["PO", "Projects", "Quotation"],
     staff: [],
   };
 

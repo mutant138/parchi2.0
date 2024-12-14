@@ -2,14 +2,13 @@ import React from "react";
 import Navbar from "../UI/Navbar";
 import SideBar from "../UI/Sidebar";
 import { Outlet, Route, Routes } from "react-router-dom";
-import Invoice from "../CustomerDashboard/Invoice";
-import Quotations from "../CustomerDashboard/Quotations";
-import Projects from "../CustomerDashboard/Projects";
-import ProjectView from "../CustomerDashboard/ProjectView";
-import Files from "../CustomerDashboard/Files";
+import VendorPO from "../VendorDashBoard/VendorPO";
+import Projects from "../VendorDashBoard/Projects";
+import Files from "../VendorDashBoard/Files";
 import Approval from "../CustomerDashboard/Approval";
+import ProjectView from "../VendorDashBoard/ProjectView";
 
-function CustomerHome() {
+function VendorHome() {
   return (
     <div>
       <div style={{ height: "8vh" }}>
@@ -21,10 +20,10 @@ function CustomerHome() {
         </div>
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
           <Routes>
-            <Route path="/invoice" element={<Invoice />}></Route>
-            <Route path="/quotation" element={<Quotations />}></Route>
+            <Route path="/po" element={<VendorPO />}></Route>
             <Route path="/projects" element={<Projects />}></Route>
             <Route path="/projects/:id" element={<ProjectView />} />
+
             <Route path="/projects/:id/files" element={<Files />}></Route>
             <Route
               path="/projects/:id/approvals"
@@ -38,4 +37,4 @@ function CustomerHome() {
   );
 }
 
-export default CustomerHome;
+export default VendorHome;

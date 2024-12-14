@@ -39,10 +39,11 @@ const CreatePo = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    book: {},
     discount: 0,
-    orderStatus: "Pending",
-    no: "",
+    paymentStatus: "UnPaid",
     notes: "",
+    poNo: "",
     packagingCharges: 0,
     subTotal: 0,
     tds: {},
@@ -52,8 +53,7 @@ const CreatePo = () => {
     attachments: [],
     tcs: {},
     terms: "",
-    warehouse: {},
-    signature: {},
+    mode: "Cash",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -78,35 +78,49 @@ const CreatePo = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        const companyRef = doc(db, "companies", companyDetails.companyId);
         const productRef = collection(
           db,
           "companies",
           companyDetails.companyId,
-          "inventories"
+          "products"
         );
-        const querySnapshot = await getDocs(productRef);
+        const q = query(productRef, where("companyRef", "==", companyRef));
+        const querySnapshot = await getDocs(q);
+
         const productsData = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          const purchasePrice = data.pricing.purchasePrice?.amount;
-          const netAmount =
-            +data.pricing.sellingPrice?.amount -
-            (+data.pricing.discount?.amount || 0);
-          const taxRate = data.pricing.gstTax || 0;
-          const sgst = taxRate / 2;
-          const cgst = taxRate / 2;
-          const taxAmount = purchasePrice * (taxRate / 100);
-          const sgstAmount = purchasePrice * (sgst / 100);
-          const cgstAmount = purchasePrice * (cgst / 100);
+          let discount = +data.discount || 0;
+
+          if (data.discountType) {
+            discount = (+data.sellingPrice / 100) * data.discount;
+          }
+          const netAmount = +data.sellingPrice - discount;
+          const taxRate = data.tax || 0;
+          let sgst = 0;
+          let cgst = 0;
+          let taxAmount = 0;
+          let sgstAmount = 0;
+          let cgstAmount = 0;
+
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
 
           return {
             id: doc.id,
-            itemName: data.itemName || "N/A",
-            quantity: data.stock?.quantity ?? 0,
-            unitPrice: data.pricing.sellingPrice?.amount ?? 0,
-            purchasePrice: purchasePrice,
-            discount: data.pricing.discount?.amount ?? 0,
-            gstTax: data.pricing.gstTax,
-            fieldValue: data.pricing.discount?.fieldValue ?? 0,
+            description: data.description ?? "",
+            name: data.name ?? "N/A",
+            quantity: data.stock ?? 0,
+            sellingPrice: data.sellingPrice ?? 0,
+            sellingPriceTaxType: data.sellingPriceTaxType,
+            purchasePrice: data.purchasePrice ?? 0,
+            purchasePriceTaxType: data.purchasePriceTaxType,
+            discount: discount ?? 0,
+            discountType: data.discountType,
+            tax: data.tax,
             actionQty: 0,
             totalAmount: 0,
             netAmount: netAmount,
@@ -115,22 +129,20 @@ const CreatePo = () => {
             sgstAmount,
             cgstAmount,
             taxAmount,
-            taxSlab: data.pricing.sellingPrice?.taxSlab,
           };
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching pos:", error);
+        console.error("Error fetching po:", error);
       }
     };
 
     async function vendorDetails() {
       try {
         const vendorsRef = collection(db, "vendors");
-        const q = query(
-          vendorsRef,
-          where("companyId", "==", companyDetails.companyId)
-        );
+
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(vendorsRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
         const VendorData = company.docs.map((doc) => ({
           vendorId: doc.id,
@@ -377,33 +389,21 @@ const CreatePo = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "inventories",
+          "products",
           product.id
         );
         subTotal += product.totalAmount;
         items.push({
+          name: product.name,
+          description: product.description,
+          discount: product.discount,
+          discountType: product.discountType,
+          purchasePrice: product.purchasePrice,
+          purchasePriceTaxType: product.purchasePriceTaxType,
+          sellingPrice: product.sellingPrice,
+          sellingPriceTaxType: product.sellingPriceTaxType,
+          tax: product.tax,
           quantity: product.actionQty,
-          desc: "",
-          pricing: {
-            gstTax: product.gstTax,
-            purchasePrice: {
-              includingTax: true,
-              amount: product.purchasePrice,
-              taxSlab: product.taxSlab,
-            },
-            sellingPrice: {
-              amount: product.unitPrice,
-              taxAmount: product.totalAmount,
-              taxSlab: product.taxSlab,
-              includingTax: true,
-            },
-            discount: {
-              amount: product.discount,
-              fieldValue: product.fieldValue,
-              type: "Percentage",
-            },
-          },
-          name: product.itemName,
           productRef: productRef,
         });
       }
@@ -431,11 +431,13 @@ const CreatePo = () => {
         ...formData,
         tds,
         tcs,
-        date: Timestamp.fromDate(poDate),
+        poDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
-          address: {},
+          address: companyDetails.address ?? "",
+          city: companyDetails.city ?? "",
+          zipCode: companyDetails.zipCode ?? "",
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
@@ -444,12 +446,14 @@ const CreatePo = () => {
           formData.shippingCharges +
           formData.packagingCharges +
           total_Tax_Amount,
-        items: items,
+        products: items,
         vendorDetails: {
-          gstNumber: "",
+          gstNumber: selectedVendorData.gstNumber ?? "",
           vendorRef: vendorRef,
-          address: selectedVendorData.address,
-          phoneNumber: selectedVendorData.phone,
+          address: selectedVendorData.address ?? "",
+          city: selectedVendorData.city ?? "",
+          zipCode: selectedVendorData.zipCode ?? "",
+          phone: selectedVendorData.phone ?? "",
           name: selectedVendorData.name,
         },
       };
@@ -465,7 +469,7 @@ const CreatePo = () => {
         }
 
         const currentQuantity = products.find(
-          (val) => val.itemName === item.name
+          (val) => val.name === item.name
         ).quantity;
 
         if (currentQuantity <= 0) {
@@ -474,7 +478,7 @@ const CreatePo = () => {
         }
 
         await updateDoc(item.productRef, {
-          "stock.quantity": currentQuantity - item.quantity,
+          stock: currentQuantity - item.quantity,
         });
       }
 
@@ -506,7 +510,7 @@ const CreatePo = () => {
       <header className="flex items-center space-x-3  my-2">
         <Link
           className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
-          to="/po"
+          to={"./../"}
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
@@ -631,7 +635,7 @@ const CreatePo = () => {
                       (product) =>
                         product.actionQty > 0 && (
                           <tr key={product.id}>
-                            <td className="px-4 py-2">{product.itemName}</td>
+                            <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
                             <td className="px-4 py-2">₹{product.discount}</td>
                             <td className="px-4 py-2">₹{product.netAmount}</td>

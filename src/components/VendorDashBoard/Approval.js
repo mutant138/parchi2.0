@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../../../firebase"; // Ensure Firebase is configured correctly
-import { collection, getDocs } from "firebase/firestore";
-import CreateApproval from "./CreateApproval";
+import { db } from "../../firebase"; // Ensure Firebase is configured correctly
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
+import { useSelector } from "react-redux";
 
 const Approval = () => {
   const { id } = useParams();
   const projectId = id;
   const [approvals, setApprovals] = useState([]);
-  const [filter, setFilter] = useState("All");
+  const userDetails = useSelector((state) => state.users);
 
-  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const fetchApprovals = async () => {
     const approvalsRef = collection(db, `projects/${projectId}/approvals`);
-    const snapshot = await getDocs(approvalsRef);
+    const q = query(
+      approvalsRef,
+      where("phoneNumber", "==", userDetails.phone)
+    );
+
+    const snapshot = await getDocs(q);
 
     const approvalsData = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -27,11 +31,6 @@ const Approval = () => {
     fetchApprovals();
   }, [projectId]);
 
-  // Filter approvals based on selected category
-  const filteredApprovals = approvals.filter(
-    (approval) => filter === "All" || approval.categories === filter
-  );
-
   return (
     <div className="p-4">
       <div className="flex space-x-3 mb-4">
@@ -43,51 +42,11 @@ const Approval = () => {
         </Link>
         <h1 className="text-xl font-bold">Approvals</h1>
       </div>
-      {/* Filter Buttons */}
-      <div className="flex justify-between">
-        <div className="flex space-x-2 mb-4">
-          {["All", "Customer", "Vendor"].map((category) => (
-            <button
-              key={category}
-              onClick={() => setFilter(category)}
-              className={`px-4 py-2 rounded-full ${
-                filter === category
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-        <div>
-          <button
-            className="bg-blue-500 text-white py-1 px-2 rounded"
-            onClick={() => setIsSideBarOpen(true)}
-          >
-            + Create Approval
-          </button>
-        </div>
-      </div>
-
-      {/* Approval Cards */}
       <div className="space-y-4">
-        {filteredApprovals.map((approval) => (
+        {approvals.map((approval) => (
           <ApprovalCard key={approval.id} approval={approval} />
         ))}
       </div>
-      {isSideBarOpen && (
-        <div>
-          <CreateApproval
-            isOpen={isSideBarOpen}
-            projectId={projectId}
-            onClose={() => {
-              setIsSideBarOpen(false);
-            }}
-            newApprovalAdded={fetchApprovals}
-          />
-        </div>
-      )}
     </div>
   );
 };
@@ -117,9 +76,6 @@ const ApprovalCard = ({ approval, isSideBarOpen }) => {
           </p>
         </div>
       </div>
-      <button className="text-blue-500 hover:text-blue-700">
-        View Details
-      </button>
     </div>
   );
 };

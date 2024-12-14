@@ -15,7 +15,14 @@ const CreditNote = () => {
 
   const addCreditNote = (e) => {
     e.preventDefault();
-    if (!customerName || !invoiceNumber || !creditNoteDate || !reason || !amount) return;
+    if (
+      !customerName ||
+      !invoiceNumber ||
+      !creditNoteDate ||
+      !reason ||
+      !amount
+    )
+      return;
 
     const newCreditNote = {
       id: new Date().getTime(),
@@ -45,7 +52,7 @@ const CreditNote = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
           <Link
-            to="/credit-note"
+            to={"./../"}
             className="flex items-center text-gray-700 py-1 px-4 rounded-full hover:bg-gray-200 transition duration-200"
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
@@ -92,7 +99,9 @@ const CreditNote = () => {
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-end z-50">
           <div className="w-96 bg-white h-full p-6 shadow-lg overflow-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">Add Credit Note</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                Add Credit Note
+              </h2>
               <button
                 onClick={() => setIsSidebarOpen(false)}
                 className="text-gray-500 hover:text-gray-800 focus:outline-none"
@@ -102,7 +111,9 @@ const CreditNote = () => {
             </div>
             <form onSubmit={addCreditNote} className="space-y-4">
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Customer Name:</label>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Customer Name:
+                </label>
                 <input
                   type="text"
                   value={customerName}
@@ -111,7 +122,9 @@ const CreditNote = () => {
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Invoice Number:</label>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Invoice Number:
+                </label>
                 <input
                   type="text"
                   value={invoiceNumber}
@@ -120,7 +133,9 @@ const CreditNote = () => {
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Credit Note Date:</label>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Credit Note Date:
+                </label>
                 <input
                   type="date"
                   value={creditNoteDate}
@@ -129,7 +144,9 @@ const CreditNote = () => {
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Reason:</label>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Reason:
+                </label>
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
@@ -144,7 +161,9 @@ const CreditNote = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Amount:</label>
+                <label className="block text-gray-700 font-medium mb-2">
+                  Amount:
+                </label>
                 <input
                   type="number"
                   value={amount}

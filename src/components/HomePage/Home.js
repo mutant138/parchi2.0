@@ -56,6 +56,7 @@ import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
 import DeliveryChallan from "../DeliveryChallan/DeliveryChallan";
 import CreditNote from "../CreditNote/CreditNote";
+import VendorPO from "../VendorDashBoard/VendorPO";
 
 const Home = () => {
   const location = useLocation();
@@ -188,6 +189,7 @@ const Home = () => {
               element={<DeliveryChallan />}
             ></Route>
             <Route path="/credit-note" element={<CreditNote />}></Route>
+            <Route path="/vendor/po" element={<VendorPO />}></Route>
           </Routes>
           <Outlet />
         </div>

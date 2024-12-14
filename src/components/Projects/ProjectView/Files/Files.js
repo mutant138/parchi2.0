@@ -6,6 +6,7 @@ import {
   serverTimestamp,
   query,
   where,
+  doc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../../../firebase";
@@ -42,7 +43,8 @@ const Files = () => {
     setLoading(true);
     try {
       const ref = collection(db, collectionName);
-      const q = query(ref, where("companyId", "==", companyId));
+      const companyRef = doc(db, "companies", companyId);
+      const q = query(ref, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const data = querySnapshot.docs.map((doc) => ({
@@ -162,7 +164,7 @@ const Files = () => {
         <div className="flex space-x-3">
           <Link
             className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
-            to={"/projects/" + projectId}
+            to={"./../"}
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
           </Link>

@@ -12,7 +12,7 @@ function Sidebar({
   const [Products, setProducts] = useState(productList);
   const [searchTerm, setSearchTerm] = useState("");
   const filteredProducts = Products.filter((ele) =>
-    ele.itemName.toLowerCase().includes(searchTerm.toLowerCase())
+    ele.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ function Sidebar({
               }
             >
               <div className="">
-                <div className="font-bold">{product.itemName}</div>
+                <div className="font-bold">{product.name}</div>
                 {product.quantity !== 0 && (
                   <div className="border-2 rounded-lg flex justify-between w-20 text-lg mt-2">
                     <button
@@ -82,7 +82,7 @@ function Sidebar({
                 )}
               </div>
               <div className="text-end">
-                <div className="font-bold">₹ {product.unitPrice}</div>
+                <div className="font-bold">₹ {product.sellingPrice}</div>
                 <div className="text-sm">Discount : {product.discount}</div>
                 <div className="text-sm"> Tax ₹ {product.taxAmount}</div>
               </div>
