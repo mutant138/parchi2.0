@@ -56,6 +56,7 @@ import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
 import DeliveryChallan from "../DeliveryChallan/DeliveryChallan";
 import CreditNote from "../CreditNote/CreditNote";
+import VendorPO from "../VendorDashBoard/VendorPO";
 
 const Home = () => {
   const location = useLocation();
@@ -180,12 +181,16 @@ const Home = () => {
             ></Route>
             <Route path="/chats" element={<Chats />}></Route>
             <Route path="/po" element={<PO />}></Route>
-            <Route path="/create-po" element={<CreatePo />}></Route>     
+            <Route path="/create-po" element={<CreatePo />}></Route>
             <Route path="/reminder" element={<Reminder />}></Route>
             <Route path="/expense" element={<BookList />}></Route>
             <Route path="/expense/:id" element={<Expense />}></Route>
-            <Route path="/delivery-challan" element={<DeliveryChallan />}></Route>
-            <Route path="/credit-note" element={ <CreditNote />}></Route>
+            <Route
+              path="/delivery-challan"
+              element={<DeliveryChallan />}
+            ></Route>
+            <Route path="/credit-note" element={<CreditNote />}></Route>
+            <Route path="/vendors/po" element={<VendorPO />}></Route>
           </Routes>
           <Outlet />
         </div>
@@ -193,6 +198,5 @@ const Home = () => {
     </div>
   );
 };
-
 
 export default Home;

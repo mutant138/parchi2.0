@@ -22,6 +22,9 @@ const CreateQuotation = () => {
     userDetails.companies[userDetails.selectedCompanyIndex];
 
   const phoneNo = userDetails.phone;
+  const selectedDashboardUser = userDetails.selectedDashboard;
+
+  console.log("selectedDashboardUser", selectedDashboardUser);
 
   const [quotationDate, setQuotationDate] = useState(new Date());
   const [taxSelect, setTaxSelect] = useState("");
