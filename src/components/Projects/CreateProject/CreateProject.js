@@ -1,15 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { addDoc, collection, doc, Timestamp } from "firebase/firestore";
+import { addDoc, collection, doc, Timestamp, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 function CreateProject() {
   const userDetails = useSelector((state) => state.users);
-
-  const companyDetails =
-    userDetails.companies[userDetails.selectedCompanyIndex];
+  const companyDetails = userDetails.companies[userDetails.selectedCompanyIndex];
   const navigate = useNavigate();
 
   const [projectForm, setProjectForm] = useState({
@@ -17,34 +15,75 @@ function CreateProject() {
     location: "",
     description: "",
     name: "",
-    dueDate: "",
-    startDate: "",
+    dueDate: null,
+    startDate: null,
   });
+
   const [isMoreChecked, setIsMoreChecked] = useState(false);
-  async function onCreateProject() {
+  const [books, setBooks] = useState([]);
+  const [formData, setFormData] = useState({ book: { bookRef: { id: "" } } });
+
+  const onSelectBook = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      book: { bookRef: { id: e.target.value } },
+    }));
+  };
+
+  const handleInputChange = (field, value) => {
+    setProjectForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleDateChange = (field, dateValue) => {
+    setProjectForm((prev) => ({
+      ...prev,
+      [field]: Timestamp.fromDate(new Date(dateValue)),
+    }));
+  };
+
+  const handleSubmit = async () => {
     if (!projectForm.name) {
+      alert("Project name is required");
       return;
     }
+
     try {
-      const companyRef = await doc(db, "companies", companyDetails.companyId);
+      const companyRef = doc(db, "companies", companyDetails.companyId);
       const payload = {
         ...projectForm,
-        companyRef: companyRef,
+        companyRef,
         createdAt: Timestamp.fromDate(new Date()),
       };
+
       await addDoc(collection(db, "projects"), payload);
       alert("Successfully Created the Project");
       navigate("/projects");
     } catch (err) {
       console.error(err);
+      alert("Failed to create the project. Please try again.");
+    }
+  };
+
+  async function fetchBooks() {
+    try {
+      const bookRef = collection(db, "companies", companyDetails.companyId, "books");
+      const getBookData = await getDocs(bookRef);
+      const fetchBooks = getBookData.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setBooks(fetchBooks);
+    } catch (error) {
+      console.log("🚀 ~ fetchBooks ~ error:", error);
     }
   }
 
+  useEffect(() => {
+    fetchBooks();
+  }, [companyDetails.companyId]);
+
   return (
-    <div
-      className="p-5 pt-3 bg-gray-100"
-      style={{ width: "100%", height: "92vh" }}
-    >
+    <div className="p-5 pt-3 bg-gray-100" style={{ width: "100%", height: "92vh" }}>
       <header className="items-center my-2">
         <div className="flex space-x-3">
           <Link
@@ -52,7 +91,7 @@ function CreateProject() {
             to="/projects"
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
-          </Link>{" "}
+          </Link>
           <h1 className="text-2xl font-bold">Create Project</h1>
         </div>
       </header>
@@ -66,8 +105,9 @@ function CreateProject() {
               type="text"
               placeholder="Enter Project Name"
               className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
+              value={projectForm.name}
               onChange={(e) =>
-                setProjectForm((val) => ({ ...val, name: e.target.value }))
+                handleInputChange("name", e.target.value)
               }
               required
             />
@@ -80,24 +120,20 @@ function CreateProject() {
                 <input
                   type="date"
                   className="border p-1 rounded w-full mt-1"
+                  value={projectForm.startDate || ""}
                   onChange={(e) =>
-                    setProjectForm((val) => ({
-                      ...val,
-                      startDate: Timestamp.fromDate(new Date(e.target.value)),
-                    }))
+                    handleDateChange("startDate", e.target.value)
                   }
                 />
               </div>
               <div>
-                <label className=" text-gray-600">Due Date</label>
+                <label className="text-gray-600">Due Date</label>
                 <input
                   type="date"
                   className="border p-1 rounded w-full mt-1"
+                  value={projectForm.dueDate || ""}
                   onChange={(e) =>
-                    setProjectForm((val) => ({
-                      ...val,
-                      dueDate: Timestamp.fromDate(new Date(e.target.value)),
-                    }))
+                    handleDateChange("dueDate", e.target.value)
                   }
                 />
               </div>
@@ -111,7 +147,7 @@ function CreateProject() {
               <input
                 type="checkbox"
                 className="sr-only peer"
-                defaultChecked={isMoreChecked}
+                checked={isMoreChecked}
                 onChange={(e) => {
                   setIsMoreChecked(e.target.checked);
                 }}
@@ -125,13 +161,21 @@ function CreateProject() {
           <div className="bg-white p-4 rounded-lg">
             <div className="">
               <label className="text-lg text-gray-600">Bank/Book Details</label>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Enter Bank/Book Details"
-                  className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
-                />
-              </div>
+              <select
+                value={formData.book.bookRef?.id || ""}
+                onChange={onSelectBook}
+                className="border p-2 rounded w-full mt-1"
+              >
+                <option value="" disabled>
+                  Select Bank/Book
+                </option>
+                {books.length > 0 &&
+                  books.map((book, index) => (
+                    <option value={book.id} key={index}>
+                      {`${book.name} - ${book.bankName} - ${book.branch}`}
+                    </option>
+                  ))}
+              </select>
             </div>
             <div className="">
               <label className="text-lg text-gray-600">Location</label>
@@ -139,11 +183,9 @@ function CreateProject() {
                 type="text"
                 placeholder="Enter Location"
                 className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
+                value={projectForm.location}
                 onChange={(e) =>
-                  setProjectForm((val) => ({
-                    ...val,
-                    location: e.target.value,
-                  }))
+                  handleInputChange("location", e.target.value)
                 }
               />
             </div>
@@ -153,11 +195,9 @@ function CreateProject() {
                 type="text"
                 placeholder="Enter Description"
                 className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
+                value={projectForm.description}
                 onChange={(e) =>
-                  setProjectForm((val) => ({
-                    ...val,
-                    description: e.target.value,
-                  }))
+                  handleInputChange("description", e.target.value)
                 }
               />
             </div>
@@ -167,7 +207,7 @@ function CreateProject() {
           <div className="flex gap-2">
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onCreateProject}
+              onClick={handleSubmit}
             >
               <span className="text-lg">+</span> Create Project
             </button>
@@ -177,4 +217,5 @@ function CreateProject() {
     </div>
   );
 }
+
 export default CreateProject;
