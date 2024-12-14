@@ -37,7 +37,7 @@ const Approval = () => {
       <div className="flex space-x-3 mb-4">
         <Link
           className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
-          to={"/projects/" + projectId}
+          to={"./../"}
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>

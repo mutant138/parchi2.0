@@ -10,11 +10,25 @@ let initialState = {
   selectedCompanyIndex: 0,
   isLogin: false,
   selectedDashboard: "",
+  userAsOtherCompanies: {
+    customer: [],
+    vendor: [],
+    staff: [],
+  },
 };
 
 if (localStorage.getItem("user")) {
-  const { userId, name, email, phone, token, companies, selectedCompanyIndex } =
-    JSON.parse(localStorage.getItem("user"));
+  const {
+    userId,
+    name,
+    email,
+    phone,
+    token,
+    companies,
+    selectedCompanyIndex,
+    selectedDashboard,
+  } = JSON.parse(localStorage.getItem("user"));
+
   initialState = {
     userId,
     name,
@@ -24,7 +38,12 @@ if (localStorage.getItem("user")) {
     isLogin: true,
     selectedCompanyIndex,
     companies,
-    selectedDashboard: "",
+    selectedDashboard: selectedDashboard,
+    userAsOtherCompanies: {
+      customer: [],
+      vendor: [],
+      staff: [],
+    },
   };
 }
 
@@ -42,6 +61,7 @@ const userSlice = createSlice({
         companies,
         selectedCompanyIndex,
         selectedDashboard,
+        userAsOtherCompanies,
       } = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
       state.userId = userId;
@@ -52,7 +72,7 @@ const userSlice = createSlice({
       state.isLogin = true;
       state.companies = companies;
       state.selectedDashboard = selectedDashboard;
-
+      state.userAsOtherCompanies = userAsOtherCompanies;
       state.selectedCompanyIndex = selectedCompanyIndex;
     },
 
@@ -65,19 +85,26 @@ const userSlice = createSlice({
       state.token = "";
       state.isLogin = false;
       state.companies = [];
+      state.userAsOtherCompanies = {
+        customer: [],
+        vendor: [],
+        staff: [],
+      };
       state.selectedCompanyIndex = 0;
       state.selectedDashboard = "";
     },
 
     updateUserDetails: (state, action) => {
-      const { name, email, phone } = action.payload;
-      state.name = name;
-      state.email = email;
-      state.phone = phone;
-
+      const { name, email, phone, selectedCompanyIndex } = action.payload;
+      state.name = name ?? state.name;
+      state.email = email ?? state.email;
+      state.phone = phone ?? state.phone;
+      state.selectedCompanyIndex =
+        selectedCompanyIndex ?? state.selectedCompanyIndex;
       const updatedUser = { ...state, name, email, phone };
       localStorage.setItem("user", JSON.stringify(updatedUser));
     },
+
     updateCompanyDetails: (state, action) => {
       const { isCalendarMonth, name, userType, weekOff } = action.payload;
       const updatedCompanies = state.companies;
@@ -86,7 +113,6 @@ const userSlice = createSlice({
       state.companies[state.selectedCompanyIndex].name = name;
       state.companies[state.selectedCompanyIndex].userType = userType;
       state.companies[state.selectedCompanyIndex].weekOff = weekOff;
-
       updatedCompanies[state.selectedCompanyIndex] = {
         ...updatedCompanies[state.selectedCompanyIndex],
         isCalendarMonth,

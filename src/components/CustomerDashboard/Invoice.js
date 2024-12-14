@@ -17,6 +17,7 @@ function Invoice() {
 
   useEffect(() => {
     async function fetchCustomerCompanies() {
+      setLoading(true);
       try {
         const customerRef = collection(db, "customers");
         const q = query(customerRef, where("phone", "==", "1234567890"));
@@ -32,11 +33,14 @@ function Invoice() {
         setCompaniesId(getCompaniesId);
       } catch (error) {
         console.log("🚀 ~ fetchCustomerCompanies ~ error:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchCustomerCompanies();
   }, []);
   useEffect(() => {
+    setLoading(true);
     async function fetchInvoices() {
       try {
         const invoiceList = [];
@@ -68,6 +72,8 @@ function Invoice() {
         setInvoices(invoiceList);
       } catch (error) {
         console.log("🚀 ~ fetchInvoices ~ error:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchInvoices();

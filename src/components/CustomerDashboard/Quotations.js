@@ -1,82 +1,84 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdDownload } from "react-icons/io";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 
 function Quotations() {
   const [loading, setLoading] = useState(false);
-  const [Quotations, setQuotations] = useState([
-    {
-      id: "nblgUcPKNPWfbcmZsHEj",
-      tax: 0,
-      mode: "Cash",
-      terms: "",
-      dueDate: {
-        seconds: 1734151343,
-        nanoseconds: 875000000,
-      },
-      QuotationDate: {
-        seconds: 1734151343,
-        nanoseconds: 875000000,
-      },
-      book: {},
-      packagingCharges: 0,
-      products: [
-        {
-          name: "notebook",
-          sellingPriceTaxType: false,
-          tax: 5,
-          discountType: true,
-          productRef: {},
-          purchasePrice: 80,
-          discount: 20,
-          quantity: 1,
-          sellingPrice: 200,
-          purchasePriceTaxType: false,
-          description: "notes...",
-        },
-      ],
-      tcs: {
-        type_of_goods: "",
-        tax_value: 0,
-        tcs_amount: 0,
-        tax: "",
-        isTcsApplicable: false,
-      },
-      notes: "",
-      attachments: [],
-      customerDetails: {
-        name: "cust4",
-        phone: "123456779",
-        zipCode: "234567",
-        city: "xcvb",
-        gstNumber: "345678",
-        address: "asdfghjk",
-        customerRef: {},
-      },
-      total: 189,
-      subTotal: 180,
-      shippingCharges: 0,
-      createdBy: {
-        zipCode: "",
-        address: "",
-        companyRef: {},
-        name: "kayu",
-        phoneNo: "+911234567890",
-        city: "",
-      },
-      QuotationNo: "0001",
-      paymentStatus: "UnPaid",
-      tds: {
-        percentageValue: "",
-        tdsSection: "",
-        natureOfPayment: "",
-        isTdsApplicable: false,
-        percentage: 0,
-        tds_amount: 0,
-      },
-      discount: 0,
-    },
-  ]);
+  const [companiesId, setCompaniesId] = useState([]);
+  const [quotations, setQuotations] = useState([]);
 
+  useEffect(() => {
+    setLoading(true);
+
+    async function fetchCustomerCompanies() {
+      try {
+        const customerRef = collection(db, "customers");
+        const q = query(customerRef, where("phone", "==", "1234567890"));
+        const getData = await getDocs(q);
+        const getCompaniesId = getData.docs.map((doc) => {
+          const { name, companyRef } = doc.data();
+          return {
+            id: doc.id,
+            name,
+            companyId: companyRef.id,
+          };
+        });
+        setCompaniesId(getCompaniesId);
+      } catch (error) {
+        console.log("🚀 ~ fetchCustomerCompanies ~ error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCustomerCompanies();
+  }, []);
+  useEffect(() => {
+    async function fetchQuotations() {
+      setLoading(true);
+      try {
+        const quotationList = [];
+        for (const company of companiesId) {
+          console.log(company.companyId);
+
+          const quotationRef = collection(
+            db,
+            "companies",
+            company.companyId,
+            "quotations"
+          );
+          const q = query(
+            quotationRef,
+            where("customerDetails.phoneNumber", "==", "1234567890")
+          );
+          const getData = await getDocs(q);
+          const getAllQuotations = getData.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+            };
+          });
+          quotationList.push(...getAllQuotations);
+        }
+        console.log("🚀 ~ fetchQuotations ~ quotationList:", quotationList);
+
+        setQuotations(quotationList);
+      } catch (error) {
+        console.log("🚀 ~ fetchQuotations ~ error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchQuotations();
+  }, [companiesId]);
   return (
     <div className="w-full">
       <div
@@ -88,13 +90,13 @@ function Quotations() {
         </header>
         <div className="bg-white p-4 rounded-lg shadow mb-4">
           {loading ? (
-            <div className="text-center py-6">Loading Quotations...</div>
+            <div className="text-center py-6">Loading quotations...</div>
           ) : (
             <div className="overflow-y-auto" style={{ height: "70vh" }}>
               <table className="w-full border-collapse  h-28 text-center">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="border-b">
-                    <th className="p-4">Customer</th>
+                    <th className="p-4">company</th>
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
@@ -104,31 +106,30 @@ function Quotations() {
                   </tr>
                 </thead>
                 <tbody>
-                  {Quotations.length > 0 ? (
-                    Quotations.map((Quotation) => (
-                      <tr key={Quotation.id} className="border-b text-center">
+                  {quotations.length > 0 ? (
+                    quotations.map((quotation) => (
+                      <tr key={quotation.id} className="border-b text-center">
                         <td className="py-3">
-                          {Quotation.customerDetails?.name} <br />
+                          {quotation.createdBy?.name} <br />
                           <span className="text-gray-500">
-                            {Quotation.customerDetails.phone}
+                            {quotation.customerDetails.phone}
                           </span>
                         </td>
-                        <td className="py-3">{`₹ ${Quotation.total.toFixed(
+                        <td className="py-3">{`₹ ${quotation.total.toFixed(
                           2
                         )}`}</td>
-                        <td className="py-3">{Quotation.paymentStatus}</td>
-                        <td className="py-3">{Quotation.mode || "Online"}</td>
-                        <td className="py-3">{Quotation.QuotationNo}</td>
+                        <td className="py-3">{quotation.paymentStatus}</td>
+                        <td className="py-3">{quotation.mode || "Online"}</td>
+                        <td className="py-3">{quotation.quotationNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
-                              Quotation.QuotationDate.seconds &&
-                              typeof Quotation.QuotationDate.seconds ===
-                                "number"
+                              quotation.date.seconds &&
+                              typeof quotation.date.seconds === "number"
                             ) {
                               const date = new Date(
-                                Quotation.QuotationDate.seconds * 1000
+                                quotation.date.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =
@@ -160,7 +161,7 @@ function Quotations() {
                   ) : (
                     <tr>
                       <td colSpan="6" className="text-center py-4">
-                        No Quotations found
+                        No quotations found
                       </td>
                     </tr>
                   )}
