@@ -264,17 +264,23 @@ function ProjectView() {
               </div>
             )}
           </div>
-          <div>
-            <select
-              className="border-b-4 px-2 py-1 bg-transparent"
-              onChange={onChangeStatus}
-              defaultValue={project.status}
-            >
-              <option value="On-Going">On-Going</option>
-              <option value="Delay">Delay</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
+          {usersDetails.selectedDashboard === "" ? (
+            <div>
+              <select
+                className="border-b-4 px-2 py-1 bg-transparent"
+                onChange={onChangeStatus}
+                defaultValue={project.status}
+              >
+                <option value="On-Going">On-Going</option>
+                <option value="Delay">Delay</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+          ) : (
+            <div className="border-2 shadow-lg px-3 rounded-lg bg-blue-200">
+              {project.status}
+            </div>
+          )}
         </div>
 
         {!isEdit ? (

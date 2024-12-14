@@ -9,8 +9,10 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useSelector } from "react-redux";
 
 function Invoice() {
+  const userDetails = useSelector((state) => state.users);
   const [loading, setLoading] = useState(false);
   const [companiesId, setCompaniesId] = useState([]);
   const [invoices, setInvoices] = useState([]);
@@ -20,7 +22,7 @@ function Invoice() {
       setLoading(true);
       try {
         const customerRef = collection(db, "customers");
-        const q = query(customerRef, where("phone", "==", "1234567890"));
+        const q = query(customerRef, where("phone", "==", userDetails.phone));
         const getData = await getDocs(q);
         const getCompaniesId = getData.docs.map((doc) => {
           const { name, companyRef } = doc.data();
@@ -39,6 +41,7 @@ function Invoice() {
     }
     fetchCustomerCompanies();
   }, []);
+
   useEffect(() => {
     setLoading(true);
     async function fetchInvoices() {

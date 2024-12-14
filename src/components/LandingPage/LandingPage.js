@@ -96,7 +96,6 @@ const LandingPage = () => {
       try {
         const authResult = await confirmationResult.confirm(otp);
         const authUser = authResult.user;
-        console.log("🚀 ~ handleOtpSubmit ~ authUser:", authUser);
         const token = await authUser.getIdToken();
 
         let userDocRef = doc(db, "users", authUser.uid);
@@ -108,7 +107,8 @@ const LandingPage = () => {
             uid: authUser.uid,
             displayName: "",
             email: "",
-            phone: "+919876543210",
+            phone: phoneNumber,
+            phone_number: "+91" + phoneNumber,
             photoURL: "",
             createdAt: Timestamp.fromDate(new Date()),
           };
@@ -154,7 +154,7 @@ const LandingPage = () => {
           userId: user.uid,
           name: user.displayName || "",
           email: user.email || "",
-          phone: user.phone_number || "",
+          phone: user.phone || "",
           companies: companiesData || [],
           isLogin: true,
           selectedCompanyIndex: 0,

@@ -9,19 +9,20 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useSelector } from "react-redux";
 
 function Quotations() {
   const [loading, setLoading] = useState(false);
   const [companiesId, setCompaniesId] = useState([]);
   const [quotations, setQuotations] = useState([]);
+  const userDetails = useSelector((state) => state.users);
 
   useEffect(() => {
     setLoading(true);
-
     async function fetchCustomerCompanies() {
       try {
         const customerRef = collection(db, "customers");
-        const q = query(customerRef, where("phone", "==", "1234567890"));
+        const q = query(customerRef, where("phone", "==", userDetails.phone));
         const getData = await getDocs(q);
         const getCompaniesId = getData.docs.map((doc) => {
           const { name, companyRef } = doc.data();
@@ -40,6 +41,7 @@ function Quotations() {
     }
     fetchCustomerCompanies();
   }, []);
+
   useEffect(() => {
     async function fetchQuotations() {
       setLoading(true);
@@ -56,7 +58,7 @@ function Quotations() {
           );
           const q = query(
             quotationRef,
-            where("customerDetails.phoneNumber", "==", "1234567890")
+            where("customerDetails.phoneNumber", "==", userDetails.phone)
           );
           const getData = await getDocs(q);
           const getAllQuotations = getData.docs.map((doc) => {
@@ -68,8 +70,6 @@ function Quotations() {
           });
           quotationList.push(...getAllQuotations);
         }
-        console.log("🚀 ~ fetchQuotations ~ quotationList:", quotationList);
-
         setQuotations(quotationList);
       } catch (error) {
         console.log("🚀 ~ fetchQuotations ~ error:", error);
