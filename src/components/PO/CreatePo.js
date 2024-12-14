@@ -39,10 +39,11 @@ const CreatePo = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    book: {},
     discount: 0,
-    orderStatus: "Pending",
-    no: "",
+    paymentStatus: "UnPaid",
     notes: "",
+    poNo: "",
     packagingCharges: 0,
     subTotal: 0,
     tds: {},
@@ -52,8 +53,7 @@ const CreatePo = () => {
     attachments: [],
     tcs: {},
     terms: "",
-    warehouse: {},
-    signature: {},
+    mode: "Cash",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -133,7 +133,7 @@ const CreatePo = () => {
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching invoices:", error);
+        console.error("Error fetching po:", error);
       }
     };
 
@@ -389,33 +389,21 @@ const CreatePo = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "inventories",
+          "products",
           product.id
         );
         subTotal += product.totalAmount;
         items.push({
+          name: product.name,
+          description: product.description,
+          discount: product.discount,
+          discountType: product.discountType,
+          purchasePrice: product.purchasePrice,
+          purchasePriceTaxType: product.purchasePriceTaxType,
+          sellingPrice: product.sellingPrice,
+          sellingPriceTaxType: product.sellingPriceTaxType,
+          tax: product.tax,
           quantity: product.actionQty,
-          desc: "",
-          pricing: {
-            gstTax: product.gstTax,
-            purchasePrice: {
-              includingTax: true,
-              amount: product.purchasePrice,
-              taxSlab: product.taxSlab,
-            },
-            sellingPrice: {
-              amount: product.unitPrice,
-              taxAmount: product.totalAmount,
-              taxSlab: product.taxSlab,
-              includingTax: true,
-            },
-            discount: {
-              amount: product.discount,
-              fieldValue: product.fieldValue,
-              type: "Percentage",
-            },
-          },
-          name: product.itemName,
           productRef: productRef,
         });
       }
@@ -443,11 +431,13 @@ const CreatePo = () => {
         ...formData,
         tds,
         tcs,
-        date: Timestamp.fromDate(poDate),
+        poDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
-          address: {},
+          address: companyDetails.address ?? "",
+          city: companyDetails.city ?? "",
+          zipCode: companyDetails.zipCode ?? "",
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
@@ -456,12 +446,14 @@ const CreatePo = () => {
           formData.shippingCharges +
           formData.packagingCharges +
           total_Tax_Amount,
-        items: items,
+        products: items,
         vendorDetails: {
-          gstNumber: "",
+          gstNumber: selectedVendorData.gstNumber ?? "",
           vendorRef: vendorRef,
-          address: selectedVendorData.address,
-          phoneNumber: selectedVendorData.phone,
+          address: selectedVendorData.address ?? "",
+          city: selectedVendorData.city ?? "",
+          zipCode: selectedVendorData.zipCode ?? "",
+          phone: selectedVendorData.phone ?? "",
           name: selectedVendorData.name,
         },
       };
@@ -477,7 +469,7 @@ const CreatePo = () => {
         }
 
         const currentQuantity = products.find(
-          (val) => val.itemName === item.name
+          (val) => val.name === item.name
         ).quantity;
 
         if (currentQuantity <= 0) {
@@ -486,7 +478,7 @@ const CreatePo = () => {
         }
 
         await updateDoc(item.productRef, {
-          "stock.quantity": currentQuantity - item.quantity,
+          stock: currentQuantity - item.quantity,
         });
       }
 
@@ -643,7 +635,7 @@ const CreatePo = () => {
                       (product) =>
                         product.actionQty > 0 && (
                           <tr key={product.id}>
-                            <td className="px-4 py-2">{product.itemName}</td>
+                            <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
                             <td className="px-4 py-2">₹{product.discount}</td>
                             <td className="px-4 py-2">₹{product.netAmount}</td>
