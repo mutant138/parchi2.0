@@ -17,7 +17,7 @@ function App() {
           <Route path="/*" element={<Home />}></Route>
         )}
         {isAuthenticated && usersDetails.selectedDashboard === "customer" && (
-          <Route path="/*" element={<CustomerHome />}></Route>
+          <Route path="/customer/*" element={<CustomerHome />}></Route>
         )}
       </Routes>
     </div>

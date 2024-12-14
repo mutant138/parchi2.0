@@ -91,7 +91,7 @@ function Invoice({ invoice, bankDetails }) {
         });
         await Promise.all(updateInventoryPromises);
       }
-      navigate("/invoiceList");
+      navigate("/invoice");
     } catch (error) {
       console.error("Error deleting invoice:", error);
       alert("Failed to delete the invoice. Check the console for details.");

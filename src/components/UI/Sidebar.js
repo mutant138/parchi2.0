@@ -19,6 +19,7 @@ function SideBar() {
     vendor: ["POS", "Projects", "Quotation"],
     staff: [],
   };
+
   const constSideBarDetails = {
     sales: {
       // image: <LiaMoneyBillWaveSolid size={30} />,
@@ -30,7 +31,7 @@ function SideBar() {
         },
         {
           name: "Invoice",
-          path: "/invoiceList",
+          path: "/invoice",
         },
         {
           name: "Services",
@@ -84,11 +85,11 @@ function SideBar() {
         },
         {
           name: "Customers",
-          path: "/customer",
+          path: "/customers",
         },
         {
           name: "Vendors",
-          path: "/vendor",
+          path: "/vendors",
         },
         {
           name: "Documents",
@@ -119,6 +120,7 @@ function SideBar() {
       ],
     },
   };
+
   const [sideBarDetails, setSideBarDetails] = useState(constSideBarDetails);
   useEffect(() => {
     if (selectedDashboardUser === "") {
@@ -208,7 +210,14 @@ function SideBar() {
           >
             {sideBarDetails.sales.isExpend &&
               sideBarDetails.sales.items.map((item, index) => (
-                <Link key={index} to={item.path} className=" cursor-pointer">
+                <Link
+                  key={index}
+                  to={
+                    (selectedDashboardUser ? "/" + selectedDashboardUser : "") +
+                    item.path
+                  }
+                  className=" cursor-pointer"
+                >
                   <div
                     className={
                       "w-full py-2 px-3 border-t hover:bg-gray-300 hover:rounded-lg  " +
@@ -262,7 +271,14 @@ function SideBar() {
           >
             {sideBarDetails.manage.isExpend &&
               sideBarDetails.manage.items.map((item, index) => (
-                <Link key={index} to={item.path} className=" cursor-pointer">
+                <Link
+                  key={index}
+                  to={
+                    (selectedDashboardUser ? "/" + selectedDashboardUser : "") +
+                    item.path
+                  }
+                  className=" cursor-pointer"
+                >
                   <div
                     className={
                       "w-full py-2 px-3 border-t hover:bg-gray-300 hover:rounded-lg  " +
@@ -312,7 +328,14 @@ function SideBar() {
           >
             {sideBarDetails.more.isExpend &&
               sideBarDetails.more.items.map((item, index) => (
-                <Link key={index} to={item.path} className=" cursor-pointer">
+                <Link
+                  key={index}
+                  to={
+                    (selectedDashboardUser ? "/" + selectedDashboardUser : "") +
+                    item.path
+                  }
+                  className=" cursor-pointer"
+                >
                   <div
                     className={
                       "w-full py-2 px-3 border-t hover:bg-gray-300 hover:rounded-lg  " +

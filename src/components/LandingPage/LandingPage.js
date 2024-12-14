@@ -164,7 +164,7 @@ const LandingPage = () => {
 
         dispatch(setUserLogin(payload));
         alert("OTP verified successfully!");
-        navigate("/invoiceList");
+        navigate("/invoice");
         closeModal();
       } catch (error) {
         alert("Invalid OTP. Please try again.");
