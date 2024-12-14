@@ -20,7 +20,7 @@ function VendorHome() {
         </div>
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
           <Routes>
-            <Route path="vendor/po" element={<VendorPO />}></Route>
+            <Route path="/po" element={<VendorPO />}></Route>
             {/* <Route path="vendor/quotation" element={<Quotations />}></Route>
             <Route path="vendor/projects" element={<Projects />}></Route>
             <Route path="vendor/projects/:id" element={<ProjectView />} />
