@@ -35,6 +35,7 @@ const Navbar = () => {
     const { value } = e.target;
     const payload = { ...userDetails, selectedDashboard: value };
     dispatch(setUserLogin(payload));
+    navigate("/" + value);
   }
 
   const navigate = useNavigate();

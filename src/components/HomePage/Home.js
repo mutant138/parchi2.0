@@ -62,10 +62,10 @@ const Home = () => {
   const location = useLocation();
 
   const matchPathList = [
-    "/invoiceList/create-invoice",
+    "/invoice/create-invoice",
     "/projects/create-Project",
-    "/customer/:id",
-    "/vendor/:id",
+    "/customers/:id",
+    "/vendors/:id",
     "/staff-payout/staff/:id",
     "/create-po",
     "/services/create-service",
@@ -88,14 +88,14 @@ const Home = () => {
         {/* )} */}
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
           <Routes>
-            <Route path="/invoiceList" element={<InvoiceList />}></Route>
-            <Route path="/invoiceList/:id" element={<InvoiceView />}></Route>
+            <Route path="/invoice" element={<InvoiceList />}></Route>
+            <Route path="/invoice/:id" element={<InvoiceView />}></Route>
             <Route
-              path="/invoiceList/create-invoice"
+              path="/invoice/create-invoice"
               element={<SetInvoice />}
             ></Route>
             <Route
-              path="/invoiceList/:invoiceId/edit-invoice"
+              path="/invoice/:invoiceId/edit-invoice"
               element={<SetInvoice />}
             ></Route>
             <Route path="/quotation" element={<Quotation />}></Route>
@@ -122,10 +122,10 @@ const Home = () => {
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
             <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
-            <Route path="/customer" element={<CustomerList />}></Route>
-            <Route path="/customer/:id" element={<CustomerView />}></Route>
-            <Route path="/vendor" element={<VendorList />}></Route>
-            <Route path="/vendor/:id" element={<VendorView />}></Route>
+            <Route path="/customers" element={<CustomerList />}></Route>
+            <Route path="/customers/:id" element={<CustomerView />}></Route>
+            <Route path="/vendors" element={<VendorList />}></Route>
+            <Route path="/vendors/:id" element={<VendorView />}></Route>
             <Route path="/products" element={<ProductHome />}></Route>
             <Route path="/services-list" element={<ServicesList />}></Route>
             <Route path="/projects" element={<Projects />}></Route>
@@ -179,7 +179,6 @@ const Home = () => {
               path="/services/:id/edit-service"
               element={<EditService />}
             ></Route>
-            <Route path="/chats" element={<Chats />}></Route>
             <Route path="/po" element={<PO />}></Route>
             <Route path="/create-po" element={<CreatePo />}></Route>
             <Route path="/reminder" element={<Reminder />}></Route>
@@ -190,7 +189,7 @@ const Home = () => {
               element={<DeliveryChallan />}
             ></Route>
             <Route path="/credit-note" element={<CreditNote />}></Route>
-            <Route path="/vendors/po" element={<VendorPO />}></Route>
+            <Route path="/vendor/po" element={<VendorPO />}></Route>
           </Routes>
           <Outlet />
         </div>

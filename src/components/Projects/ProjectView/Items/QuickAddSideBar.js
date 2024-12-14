@@ -75,7 +75,13 @@ function QuickAddSideBar({ isOpen, onClose, isMaterialAdd }) {
         collection(db, "projects", projectId, "materials"),
         payloadMaterial
       );
-      const productDocRef = doc(db, "products", formData.barcode);
+      const productDocRef = doc(
+        db,
+        "companies",
+        companyId,
+        "products",
+        formData.barcode
+      );
       const docSnapshot = await getDoc(productDocRef);
       if (docSnapshot.exists()) {
         alert(
