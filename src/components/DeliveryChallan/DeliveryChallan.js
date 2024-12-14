@@ -82,9 +82,9 @@ function DeliveryChallan() {
 
       {/* Footer Summary */}
       <footer className="flex justify-between mt-4 bg-gray-100 p-4 rounded shadow">
-        <div><strong>Total Amount:</strong> ₹</div>
-        <div><strong>Paid Amount:</strong> ₹</div>
-        <div><strong>Pending Amount:</strong> ₹</div>
+        <div><strong>Total Amount:</strong> ₹450</div>
+        <div><strong>Paid Amount:</strong> ₹250</div>
+        <div><strong>Pending Amount:</strong> ₹200</div>
       </footer>
     </div>
   );
