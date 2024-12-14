@@ -86,10 +86,10 @@ function CreateApproval({ isOpen, projectId, onClose, newApprovalAdded }) {
 
   async function onCreateApproval() {
     try {
-      const storageRef = ref(storage, `files/${uploadedFile.name}`);
-      await uploadBytes(storageRef, uploadedFile);
-      const fileURL = await getDownloadURL(storageRef);
-      const fileField = typeOfFile === "Image" ? "image" : "pdfUrl";
+      // const storageRef = ref(storage, `files/${uploadedFile.name}`);
+      // await uploadBytes(storageRef, uploadedFile);
+      // const fileURL = await getDownloadURL(storageRef);
+      // const fileField = typeOfFile === "Image" ? "image" : "pdfUrl";
       const payload = {
         ...approvalForm,
         approvalBelongsTo: filter,
@@ -97,7 +97,7 @@ function CreateApproval({ isOpen, projectId, onClose, newApprovalAdded }) {
         createdAt: Timestamp.fromDate(new Date()),
         typeOfFile: typeOfFile,
       };
-      payload.file[fileField] = fileURL;
+      // payload.file[fileField] = fileURL;
       const approvalsRef = collection(db, `projects/${projectId}/approvals`);
       await addDoc(approvalsRef, payload);
       newApprovalAdded();

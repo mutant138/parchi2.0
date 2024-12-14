@@ -4,6 +4,9 @@ import SideBar from "../UI/Sidebar";
 import { Outlet, Route, Routes } from "react-router-dom";
 import VendorPO from "../VendorDashBoard/VendorPO";
 import Projects from "../VendorDashBoard/Projects";
+import Files from "../VendorDashBoard/Files";
+import Approval from "../CustomerDashboard/Approval";
+import ProjectView from "../VendorDashBoard/ProjectView";
 
 function VendorHome() {
   return (
@@ -19,6 +22,13 @@ function VendorHome() {
           <Routes>
             <Route path="/po" element={<VendorPO />}></Route>
             <Route path="/projects" element={<Projects />}></Route>
+            <Route path="/projects/:id" element={<ProjectView />} />
+
+            <Route path="/projects/:id/files" element={<Files />}></Route>
+            <Route
+              path="/projects/:id/approvals"
+              element={<Approval />}
+            ></Route>
           </Routes>
           <Outlet />
         </div>

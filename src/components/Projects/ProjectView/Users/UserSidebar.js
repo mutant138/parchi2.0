@@ -12,6 +12,7 @@ import { db } from "../../../../firebase";
 import { useSelector } from "react-redux";
 
 function UserSidebar({ isOpen, onClose, projectId, projectDetails, Refresh }) {
+  console.log("🚀 ~ UserSidebar ~ projectDetails:", projectDetails);
   const userDetails = useSelector((state) => state.users);
 
   const companyId =
@@ -115,24 +116,18 @@ function UserSidebar({ isOpen, onClose, projectId, projectDetails, Refresh }) {
         };
       }
       let phoneNum = [];
-      let projectMembers = [];
 
       selectedDataSet.forEach((fieldId) => {
         const ref = doc(db, field.collectionName, fieldId);
         const data = dataSet[activeNav].find((item) => fieldId === item.id);
         console.log("🚀 ~ selectedDataSet.forEach ~ data:", data);
         phoneNum.push(data?.phone);
-        projectMembers.push({
-          user_type: field.user_type,
-          phone_Number: data?.phone,
-          [field.refName]: ref,
-        });
+
         field.data.push(ref);
       });
 
       const payload = {
         phoneNum,
-        projectMembers,
         [field.name]: field.data,
       };
       await updateDoc(projectDocRef, payload);

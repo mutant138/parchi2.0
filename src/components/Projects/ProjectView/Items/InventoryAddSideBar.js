@@ -70,7 +70,7 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
         db,
         "companies",
         companyId,
-        "inventories",
+        "products",
         selectedItem.id
       );
       const currentStockQuantity = selectedItem.quantity;
@@ -101,7 +101,7 @@ function InventoryAddSideBar({ projectId, isOpen, onClose, isMaterialAdd }) {
       const materialRef = collection(projectRef, "materials");
       await addDoc(materialRef, payload);
       await updateDoc(inventoryRef, {
-        "stock.quantity": newStockQuantity,
+        quantity: newStockQuantity,
       });
 
       alert("Material added successfully!");
