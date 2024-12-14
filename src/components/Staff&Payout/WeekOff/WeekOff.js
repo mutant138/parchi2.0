@@ -123,7 +123,7 @@ const WeekOff = () => {
       <header className="flex justify-between items-center my-2">
         <div className="flex items-center">
           <Link
-            to="/staff-payout"
+            to={"./../"}
             className="flex items-center text-gray-700 py-1 px-4 rounded-full hover: transition duration-200"
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />

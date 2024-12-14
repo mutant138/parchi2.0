@@ -22,89 +22,14 @@ import { db } from "../../../firebase";
 import { TiMessages } from "react-icons/ti";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TbEdit } from "react-icons/tb";
+import { useSelector } from "react-redux";
 
 function ProjectView() {
   const { id } = useParams();
   const [filter, setFilter] = useState("All");
   const [project, setProject] = useState({});
   const [isEdit, setIsEdit] = useState(false);
-  const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({});
-
-  useEffect(() => {
-    if (project) {
-      setFormData({
-        name: project.name || "",
-        description: project.description || "",
-        startDate: project.startDate,
-        dueDate: project.dueDate,
-      });
-    }
-  }, [project]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleUpdate = async () => {
-    const projectDoc = doc(db, "projects", id);
-
-    const updatedData = {
-      ...formData,
-      startDate: formData.startDate
-        ? Timestamp.fromDate(new Date(formData.startDate))
-        : null,
-      dueDate: formData.dueDate
-        ? Timestamp.fromDate(new Date(formData.dueDate))
-        : null,
-    };
-
-    try {
-      await updateDoc(projectDoc, updatedData);
-      alert("Project updated successfully!");
-      setIsEdit(false);
-      fetchData();
-    } catch (error) {
-      console.error("Error updating project:", error);
-      alert("Failed to update the project.");
-    }
-  };
-  function DateFormate(timestamp, format = "dd/mm/yyyy") {
-    const milliseconds =
-      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
-    const date = new Date(milliseconds);
-    const getDate = String(date.getDate()).padStart(2, "0");
-    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
-    const getFullYear = date.getFullYear();
-
-    return format === "yyyy-mm-dd"
-      ? `${getFullYear}-${getMonth}-${getDate}`
-      : `${getDate}/${getMonth}/${getFullYear}`;
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    const getData = await getDoc(doc(db, "projects", id));
-    const data = getData.data();
-    const payload = {
-      ...data,
-      companyRef: data.companyRef.id,
-      createdAt: DateFormate(data.createdAt),
-      startDate: DateFormate(data.startDate, "yyyy-mm-dd"),
-      dueDate: DateFormate(data.dueDate, "yyyy-mm-dd"),
-      vendorRef: data?.vendorRef?.map((ref) => ref.id),
-      customerRef: data?.customerRef?.map((ref) => ref.id),
-      staffRef: data?.staffRef?.map((ref) => ref.id),
-    };
-
-    setProject(payload);
-  }
-  const manageProjectItems = [
+  const constManageProjectItems = [
     {
       name: "Users",
       icon: <RiUserAddLine />,
@@ -154,6 +79,108 @@ function ProjectView() {
       },
     },
   ];
+  const [manageProjectItems, setManageProjectItems] = useState([]);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({});
+  const usersDetails = useSelector((state) => state.users);
+
+  useEffect(() => {
+    if (project) {
+      setFormData({
+        name: project.name || "",
+        description: project.description || "",
+        startDate: project.startDate,
+        dueDate: project.dueDate,
+      });
+    }
+  }, [project]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleUpdate = async () => {
+    const projectDoc = doc(db, "projects", id);
+
+    const updatedData = {
+      ...formData,
+      startDate: formData.startDate
+        ? Timestamp.fromDate(new Date(formData.startDate))
+        : null,
+      dueDate: formData.dueDate
+        ? Timestamp.fromDate(new Date(formData.dueDate))
+        : null,
+    };
+
+    try {
+      await updateDoc(projectDoc, updatedData);
+      alert("Project updated successfully!");
+      setIsEdit(false);
+      fetchData();
+    } catch (error) {
+      console.error("Error updating project:", error);
+      alert("Failed to update the project.");
+    }
+  };
+
+  function DateFormate(timestamp, format = "dd/mm/yyyy") {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
+
+    return format === "yyyy-mm-dd"
+      ? `${getFullYear}-${getMonth}-${getDate}`
+      : `${getDate}/${getMonth}/${getFullYear}`;
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  async function fetchData() {
+    const getData = await getDoc(doc(db, "projects", id));
+    const data = getData.data();
+    const payload = {
+      ...data,
+      companyRef: data.companyRef.id,
+      createdAt: DateFormate(data.createdAt),
+      startDate: DateFormate(data.startDate, "yyyy-mm-dd"),
+      dueDate: DateFormate(data.dueDate, "yyyy-mm-dd"),
+      vendorRef: data?.vendorRef?.map((ref) => ref.id),
+      customerRef: data?.customerRef?.map((ref) => ref.id),
+      staffRef: data?.staffRef?.map((ref) => ref.id),
+    };
+
+    setProject(payload);
+  }
+
+  useEffect(() => {
+    if (usersDetails.selectedDashboard !== "") {
+      setManageProjectItems([
+        {
+          name: "Files",
+          icon: <BsFolderPlus />,
+          onClick: () => {
+            navigate("files");
+          },
+        },
+        {
+          name: "Approvals",
+          icon: <BsFileEarmarkCheck />,
+          onClick: () => {
+            navigate("approvals");
+          },
+        },
+      ]);
+    } else {
+      setManageProjectItems(constManageProjectItems);
+    }
+  }, [usersDetails.selectedDashboard]);
 
   async function onChangeStatus(e) {
     try {
@@ -237,17 +264,23 @@ function ProjectView() {
               </div>
             )}
           </div>
-          <div>
-            <select
-              className="border-b-4 px-2 py-1 bg-transparent"
-              onChange={onChangeStatus}
-              defaultValue={project.status}
-            >
-              <option value="On-Going">On-Going</option>
-              <option value="Delay">Delay</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
+          {usersDetails.selectedDashboard === "" ? (
+            <div>
+              <select
+                className="border-b-4 px-2 py-1 bg-transparent"
+                onChange={onChangeStatus}
+                defaultValue={project.status}
+              >
+                <option value="On-Going">On-Going</option>
+                <option value="Delay">Delay</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+          ) : (
+            <div className="border-2 shadow-lg px-3 rounded-lg bg-blue-200">
+              {project.status}
+            </div>
+          )}
         </div>
 
         {!isEdit ? (
@@ -274,37 +307,38 @@ function ProjectView() {
         )}
 
         <div className="grid justify-items-end">
-          {!isEdit ? (
-            <div className="flex space-x-3">
-              <button
-                className="px-4 py-1 bg-blue-500 text-white rounded-full flex items-center"
-                onClick={() => setIsEdit(true)}
-              >
-                <TbEdit /> &nbsp; Edit
-              </button>
-              <button
-                className="px-4 py-1 bg-red-500 text-white rounded-full flex items-center"
-                onClick={handleDelete}
-              >
-                <RiDeleteBin6Line />
-              </button>
-            </div>
-          ) : (
-            <div>
-              <button
-                className="px-4 py-1 bg-green-500 text-white rounded-full"
-                onClick={handleUpdate}
-              >
-                Save
-              </button>
-              <button
-                className="px-4 py-1 bg-gray-500 text-white rounded-full ml-2"
-                onClick={() => setIsEdit(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+          {usersDetails.selectedDashboard === "" &&
+            (!isEdit ? (
+              <div className="flex space-x-3">
+                <button
+                  className="px-4 py-1 bg-blue-500 text-white rounded-full flex items-center"
+                  onClick={() => setIsEdit(true)}
+                >
+                  <TbEdit /> &nbsp; Edit
+                </button>
+                <button
+                  className="px-4 py-1 bg-red-500 text-white rounded-full flex items-center"
+                  onClick={handleDelete}
+                >
+                  <RiDeleteBin6Line />
+                </button>
+              </div>
+            ) : (
+              <div>
+                <button
+                  className="px-4 py-1 bg-green-500 text-white rounded-full"
+                  onClick={handleUpdate}
+                >
+                  Save
+                </button>
+                <button
+                  className="px-4 py-1 bg-gray-500 text-white rounded-full ml-2"
+                  onClick={() => setIsEdit(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            ))}
         </div>
         <div className=" bg-white shadow rounded-lg mt-4">
           <div className="p-4">

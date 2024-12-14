@@ -2,12 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { addDoc, collection, doc, Timestamp, getDocs } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  Timestamp,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 
 function CreateProject() {
   const userDetails = useSelector((state) => state.users);
-  const companyDetails = userDetails.companies[userDetails.selectedCompanyIndex];
+  const companyDetails =
+    userDetails.companies[userDetails.selectedCompanyIndex];
   const navigate = useNavigate();
 
   const [projectForm, setProjectForm] = useState({
@@ -66,7 +73,12 @@ function CreateProject() {
 
   async function fetchBooks() {
     try {
-      const bookRef = collection(db, "companies", companyDetails.companyId, "books");
+      const bookRef = collection(
+        db,
+        "companies",
+        companyDetails.companyId,
+        "books"
+      );
       const getBookData = await getDocs(bookRef);
       const fetchBooks = getBookData.docs.map((doc) => ({
         id: doc.id,
@@ -83,12 +95,15 @@ function CreateProject() {
   }, [companyDetails.companyId]);
 
   return (
-    <div className="p-5 pt-3 bg-gray-100" style={{ width: "100%", height: "92vh" }}>
+    <div
+      className="p-5 pt-3 bg-gray-100"
+      style={{ width: "100%", height: "92vh" }}
+    >
       <header className="items-center my-2">
         <div className="flex space-x-3">
           <Link
             className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
-            to="/projects"
+            to={"./../"}
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
           </Link>
@@ -106,9 +121,7 @@ function CreateProject() {
               placeholder="Enter Project Name"
               className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
               value={projectForm.name}
-              onChange={(e) =>
-                handleInputChange("name", e.target.value)
-              }
+              onChange={(e) => handleInputChange("name", e.target.value)}
               required
             />
           </div>
@@ -132,9 +145,7 @@ function CreateProject() {
                   type="date"
                   className="border p-1 rounded w-full mt-1"
                   value={projectForm.dueDate || ""}
-                  onChange={(e) =>
-                    handleDateChange("dueDate", e.target.value)
-                  }
+                  onChange={(e) => handleDateChange("dueDate", e.target.value)}
                 />
               </div>
             </div>
@@ -184,9 +195,7 @@ function CreateProject() {
                 placeholder="Enter Location"
                 className="text-base text-gray-900 font-semibold border p-1 rounded w-full mt-1"
                 value={projectForm.location}
-                onChange={(e) =>
-                  handleInputChange("location", e.target.value)
-                }
+                onChange={(e) => handleInputChange("location", e.target.value)}
               />
             </div>
             <div className="my-5">

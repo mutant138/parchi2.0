@@ -1,82 +1,86 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdDownload } from "react-icons/io";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
+import { useSelector } from "react-redux";
 
 function Invoice() {
+  const userDetails = useSelector((state) => state.users);
   const [loading, setLoading] = useState(false);
-  const [invoices, setInvoices] = useState([
-    {
-      id: "nblgUcPKNPWfbcmZsHEj",
-      tax: 0,
-      mode: "Cash",
-      terms: "",
-      dueDate: {
-        seconds: 1734151343,
-        nanoseconds: 875000000,
-      },
-      invoiceDate: {
-        seconds: 1734151343,
-        nanoseconds: 875000000,
-      },
-      book: {},
-      packagingCharges: 0,
-      products: [
-        {
-          name: "notebook",
-          sellingPriceTaxType: false,
-          tax: 5,
-          discountType: true,
-          productRef: {},
-          purchasePrice: 80,
-          discount: 20,
-          quantity: 1,
-          sellingPrice: 200,
-          purchasePriceTaxType: false,
-          description: "notes...",
-        },
-      ],
-      tcs: {
-        type_of_goods: "",
-        tax_value: 0,
-        tcs_amount: 0,
-        tax: "",
-        isTcsApplicable: false,
-      },
-      notes: "",
-      attachments: [],
-      customerDetails: {
-        name: "cust4",
-        phone: "123456779",
-        zipCode: "234567",
-        city: "xcvb",
-        gstNumber: "345678",
-        address: "asdfghjk",
-        customerRef: {},
-      },
-      total: 189,
-      subTotal: 180,
-      shippingCharges: 0,
-      createdBy: {
-        zipCode: "",
-        address: "",
-        companyRef: {},
-        name: "kayu",
-        phoneNo: "+911234567890",
-        city: "",
-      },
-      invoiceNo: "0001",
-      paymentStatus: "UnPaid",
-      tds: {
-        percentageValue: "",
-        tdsSection: "",
-        natureOfPayment: "",
-        isTdsApplicable: false,
-        percentage: 0,
-        tds_amount: 0,
-      },
-      discount: 0,
-    },
-  ]);
+  const [companiesId, setCompaniesId] = useState([]);
+  const [invoices, setInvoices] = useState([]);
 
+  useEffect(() => {
+    async function fetchCustomerCompanies() {
+      setLoading(true);
+      try {
+        const customerRef = collection(db, "customers");
+        const q = query(customerRef, where("phone", "==", userDetails.phone));
+        const getData = await getDocs(q);
+        const getCompaniesId = getData.docs.map((doc) => {
+          const { name, companyRef } = doc.data();
+          return {
+            id: doc.id,
+            name,
+            companyId: companyRef.id,
+          };
+        });
+        setCompaniesId(getCompaniesId);
+      } catch (error) {
+        console.log("🚀 ~ fetchCustomerCompanies ~ error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCustomerCompanies();
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchInvoices() {
+      try {
+        const invoiceList = [];
+        for (const company of companiesId) {
+          console.log(company.companyId);
+
+          const invoiceRef = collection(
+            db,
+            "companies",
+            company.companyId,
+            "invoices"
+          );
+          const q = query(
+            invoiceRef,
+            where("customerDetails.phone", "==", "1234567890")
+          );
+          const getData = await getDocs(q);
+          const getAllInvoices = getData.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+            };
+          });
+          invoiceList.push(...getAllInvoices);
+        }
+        console.log("🚀 ~ fetchInvoices ~ invoiceList:", invoiceList);
+
+        setInvoices(invoiceList);
+      } catch (error) {
+        console.log("🚀 ~ fetchInvoices ~ error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchInvoices();
+  }, [companiesId]);
   return (
     <div className="w-full">
       <div
@@ -94,7 +98,7 @@ function Invoice() {
               <table className="w-full border-collapse  h-28 text-center">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="border-b">
-                    <th className="p-4">Customer</th>
+                    <th className="p-4">company</th>
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
@@ -108,7 +112,7 @@ function Invoice() {
                     invoices.map((invoice) => (
                       <tr key={invoice.id} className="border-b text-center">
                         <td className="py-3">
-                          {invoice.customerDetails?.name} <br />
+                          {invoice.createdBy?.name} <br />
                           <span className="text-gray-500">
                             {invoice.customerDetails.phone}
                           </span>

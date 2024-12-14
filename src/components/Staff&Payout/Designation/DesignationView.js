@@ -50,7 +50,7 @@ const DesignationView = () => {
       <header className="flex items-center space-x-3 my-2">
         <Link
           className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
-          to="/staff-payout/designations"
+          to={"./../"}
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>

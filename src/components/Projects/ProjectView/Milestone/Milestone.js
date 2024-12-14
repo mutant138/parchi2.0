@@ -6,7 +6,8 @@ import {
   addDoc,
   serverTimestamp,
   doc,
-  query, where
+  query,
+  where,
 } from "firebase/firestore";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
@@ -30,13 +31,19 @@ const Milestone = () => {
 
       setMilestones(milestonesData);
       const tasksQueryPromises = milestonesData.map((milestone) => {
-        const milestoneDocRef = doc(db, `projects/${projectId}/milestone/${milestone.id}`);
+        const milestoneDocRef = doc(
+          db,
+          `projects/${projectId}/milestone/${milestone.id}`
+        );
         console.log("Milestone Path:", milestoneDocRef);
         const tasksRef = collection(db, `projects/${projectId}/tasks`);
-        const tasksQuery = query(tasksRef, where("milestoneRef", "array-contains", milestoneDocRef));
+        const tasksQuery = query(
+          tasksRef,
+          where("milestoneRef", "array-contains", milestoneDocRef)
+        );
         return getDocs(tasksQuery);
       });
-  
+
       const tasksSnapshots = await Promise.all(tasksQueryPromises);
       console.log("Tasks Snapshot Size:", tasksSnapshots.size);
       const tasksData = tasksSnapshots.flatMap((snapshot) =>
@@ -49,8 +56,6 @@ const Milestone = () => {
       console.log(tasksData);
     };
     fetchMilestones();
-    
-
   }, [projectId]);
 
   const handleAddMilestone = (newMilestone) => {
@@ -63,7 +68,7 @@ const Milestone = () => {
         <div className="flex space-x-3">
           <Link
             className="flex items-center bg-gray-300 text-gray-700 py-1 px-4 rounded-full transform hover:bg-gray-400 hover:text-white transition duration-200 ease-in-out"
-            to={"/projects/" + projectId}
+            to={"./../"}
           >
             <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
           </Link>
