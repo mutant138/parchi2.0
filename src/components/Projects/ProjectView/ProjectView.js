@@ -46,8 +46,6 @@ function ProjectView() {
     }
   }, [project]);
 
-;
-
   const handleUpdate = async () => {
     const projectDoc = doc(db, "projects", id);
     const updatedData = {
@@ -58,7 +56,9 @@ function ProjectView() {
       dueDate: formData.dueDate
         ? Timestamp.fromDate(new Date(formData.dueDate))
         : null,
-      bankBookRef: selectedBankBook ? doc(db, "createProjects", selectedBankBook) : null,
+      bankBookRef: selectedBankBook
+        ? doc(db, "createProjects", selectedBankBook)
+        : null,
     };
 
     try {
@@ -108,7 +108,12 @@ function ProjectView() {
     setSelectedBankBook(data.bankBookRef?.id);
   }
   async function fetchBankBooks() {
-    const bankBookRef = collection(db, "companies",  userDetails?.companies[userDetails.selectedCompanyIndex]?.companyId, "books");
+    const bankBookRef = collection(
+      db,
+      "companies",
+      userDetails?.companies[userDetails.selectedCompanyIndex]?.companyId,
+      "books"
+    );
     const getBankBooks = await getDocs(bankBookRef);
     const bankBooksData = getBankBooks.docs.map((doc) => ({
       id: doc.id,
@@ -120,9 +125,8 @@ function ProjectView() {
   const handleBankBookChange = (e) => {
     setSelectedBankBook(e.target.value);
   };
-  
 
-  const [manageProjectItems, setManageProjectItems] = useState( [
+  const manageProjectItems = [
     {
       name: "Users",
       icon: <RiUserAddLine />,
@@ -171,7 +175,7 @@ function ProjectView() {
         navigate("items");
       },
     },
-  ]);
+  ];
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({});
@@ -192,30 +196,6 @@ function ProjectView() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  // const handleUpdate = async () => {
-  //   const projectDoc = doc(db, "projects", id);
-
-  //   const updatedData = {
-  //     ...formData,
-  //     startDate: formData.startDate
-  //       ? Timestamp.fromDate(new Date(formData.startDate))
-  //       : null,
-  //     dueDate: formData.dueDate
-  //       ? Timestamp.fromDate(new Date(formData.dueDate))
-  //       : null,
-  //   };
-
-  //   try {
-  //     await updateDoc(projectDoc, updatedData);
-  //     alert("Project updated successfully!");
-  //     setIsEdit(false);
-  //     fetchData();
-  //   } catch (error) {
-  //     console.error("Error updating project:", error);
-  //     alert("Failed to update the project.");
-  //   }
-  // };
 
   function DateFormate(timestamp, format = "dd/mm/yyyy") {
     const milliseconds =
@@ -250,29 +230,6 @@ function ProjectView() {
 
     setProject(payload);
   }
-
-  useEffect(() => {
-    if (usersDetails.selectedDashboard !== "") {
-      setManageProjectItems([
-        {
-          name: "Files",
-          icon: <BsFolderPlus />,
-          onClick: () => {
-            navigate("files");
-          },
-        },
-        {
-          name: "Approvals",
-          icon: <BsFileEarmarkCheck />,
-          onClick: () => {
-            navigate("approvals");
-          },
-        },
-      ]);
-    } else {
-      setManageProjectItems(constManageProjectItems);
-    }
-  }, [usersDetails.selectedDashboard]);
 
   async function onChangeStatus(e) {
     try {
@@ -357,103 +314,99 @@ function ProjectView() {
               </div>
             )}
           </div>
-          {usersDetails.selectedDashboard === "" ? (
-            <div>
-              <select
-                className="border-b-4 px-2 py-1 bg-transparent"
-                onChange={onChangeStatus}
-                defaultValue={project.status}
-              >
-                <option value="On-Going">On-Going</option>
-                <option value="Delay">Delay</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </div>
-          ) : (
-            <div className="border-2 shadow-lg px-3 rounded-lg bg-blue-200">
-              {project.status}
-            </div>
-          )}
-        </div>
 
-        {!isEdit ? (
-        <div className="bg-white p-4 rounded-lg shadow my-4">
-          <div className="border-b pb-3 h-8">{project.name}</div>
-          <div className="py-3">{project.description}</div>
-          {project?.bankBookRef ? (
-            <div className="py-3 text-gray-600">Bank Book: {project.book.name}</div>
-          ) : (
-            <div className="py-3 text-gray-600">No Bank Book</div>
-          )}
-        </div>
-      ) : (
-        <div className="bg-white p-4 rounded-lg shadow my-4">
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="border w-full px-2 py-1 rounded"
-          />
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="border w-full px-2 py-1 rounded mt-3"
-          />
-          <div className="py-3">
-            <label className="block text-sm font-medium text-gray-700">
-              Select Bank Book
-            </label>
+          <div>
             <select
-              value={selectedBankBook || ""}
-              onChange={handleBankBookChange}
-              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="border-b-4 px-2 py-1 bg-transparent"
+              onChange={onChangeStatus}
+              defaultValue={project.status}
             >
-              <option value="">Select Bank Book</option>
-              {bankBooks.map((book) => (
-                <option key={book.id} value={book.id}>
-                  {book.name}
-                </option>
-              ))}
+              <option value="On-Going">On-Going</option>
+              <option value="Delay">Delay</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
         </div>
-      )}
 
-        <div className="grid justify-items-end">
-          {usersDetails.selectedDashboard === "" &&
-            (!isEdit ? (
-              <div className="flex space-x-3">
-                <button
-                  className="px-4 py-1 bg-blue-500 text-white rounded-full flex items-center"
-                  onClick={() => setIsEdit(true)}
-                >
-                  <TbEdit /> &nbsp; Edit
-                </button>
-                <button
-                  className="px-4 py-1 bg-red-500 text-white rounded-full flex items-center"
-                  onClick={handleDelete}
-                >
-                  <RiDeleteBin6Line />
-                </button>
+        {!isEdit ? (
+          <div className="bg-white p-4 rounded-lg shadow my-4">
+            <div className="border-b pb-3 h-8">{project.name}</div>
+            <div className="py-3">{project.description}</div>
+            {project?.bankBookRef ? (
+              <div className="py-3 text-gray-600">
+                Bank Book: {project.book.name}
               </div>
             ) : (
-              <div>
-                <button
-                  className="px-4 py-1 bg-green-500 text-white rounded-full"
-                  onClick={handleUpdate}
-                >
-                  Save
-                </button>
-                <button
-                  className="px-4 py-1 bg-gray-500 text-white rounded-full ml-2"
-                  onClick={() => setIsEdit(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            ))}
+              <div className="py-3 text-gray-600">No Bank Book</div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white p-4 rounded-lg shadow my-4">
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="border w-full px-2 py-1 rounded"
+            />
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              className="border w-full px-2 py-1 rounded mt-3"
+            />
+            <div className="py-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Select Bank Book
+              </label>
+              <select
+                value={selectedBankBook || ""}
+                onChange={handleBankBookChange}
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="">Select Bank Book</option>
+                {bankBooks.map((book) => (
+                  <option key={book.id} value={book.id}>
+                    {book.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        <div className="grid justify-items-end">
+          {!isEdit ? (
+            <div className="flex space-x-3">
+              <button
+                className="px-4 py-1 bg-blue-500 text-white rounded-full flex items-center"
+                onClick={() => setIsEdit(true)}
+              >
+                <TbEdit /> &nbsp; Edit
+              </button>
+              <button
+                className="px-4 py-1 bg-red-500 text-white rounded-full flex items-center"
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          ) : (
+            <div>
+              <button
+                className="px-4 py-1 bg-green-500 text-white rounded-full"
+                onClick={handleUpdate}
+              >
+                Save
+              </button>
+              <button
+                className="px-4 py-1 bg-gray-500 text-white rounded-full ml-2"
+                onClick={() => setIsEdit(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
         <div className=" bg-white shadow rounded-lg mt-4">
           <div className="p-4">
