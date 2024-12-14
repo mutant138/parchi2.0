@@ -1,82 +1,78 @@
 import React, { useState, useEffect } from "react";
 import { IoMdDownload } from "react-icons/io";
 import { db } from "../../firebase";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  query,
-  where,
-  Timestamp,
-  getDoc,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 
 const VendorPO = () => {
   const [loading, setLoading] = useState(false);
-  const [companiesDetails, setCompaniesDetails] = useState([]);
-
+  const [companiesId, setCompaniesId] = useState([]);
+  const [po, setPo] = useState([]);
   const userDetails = useSelector((state) => state.users);
   const phone = userDetails.phone;
-  const companyDetails =
-    userDetails.companies[userDetails.selectedCompanyIndex];
 
-  const fetchVendorAndCompaniesData = async () => {
-    setLoading(true);
-    try {
-      const normalizedPhone = phone.startsWith("+91") ? phone.slice(3) : phone;
-      const vendorQuery = query(
-        collection(db, "vendors"),
-        where("phone", "==", normalizedPhone)
-      );
-      const vendorSnapshot = await getDocs(vendorQuery);
-
-      if (vendorSnapshot.empty) {
-        console.error("No vendor found with the provided phone number");
-        setCompaniesDetails([]);
-        setLoading(false);
-        return;
-      }
-
-      const companyRefs = vendorSnapshot.docs.map(
-        (doc) => doc.data().companyRef
-      );
-
-      const companiesData = await Promise.all(
-        companyRefs.map(async (companyRef) => {
-          const companyDoc = await getDoc(companyRef);
-          if (!companyDoc.exists()) {
-            return null;
-          }
-          const companyData = { ...companyDoc.data(), id: companyDoc.id };
-
-          const purchasesQuery = query(
-            collection(db, "companies", companyRef, "purchases"),
-            where("phone", "==", phone)
-          );
-          const purchasesSnapshot = await getDocs(purchasesQuery);
-
-          const purchases = purchasesSnapshot.docs.map((purchaseDoc) => ({
-            id: purchaseDoc.id,
-            ...purchaseDoc.data(),
-          }));
-
-          return { ...companyData, purchases };
-        })
-      );
-
-      setCompaniesDetails(companiesData);
-    } catch (error) {
-      console.error("Error fetching vendor and companies data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  console.log("companyDetails", companiesDetails);
   useEffect(() => {
-    fetchVendorAndCompaniesData();
-  }, [phone, companyDetails]);
+    async function fetchVendorCompanies() {
+      setLoading(true);
+      try {
+        const customerRef = collection(db, "vendors");
+        const q = query(customerRef, where("phone", "==", phone));
+        const getData = await getDocs(q);
+        const getCompaniesId = getData.docs.map((doc) => {
+          const { name, companyRef } = doc.data();
+          return {
+            id: doc.id,
+            name,
+            companyId: companyRef.id,
+          };
+        });
+        setCompaniesId(getCompaniesId);
+      } catch (error) {
+        console.log("🚀 ~ fetchVendorCompanies ~ error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchVendorCompanies();
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchPO() {
+      try {
+        const POList = [];
+        const phoneNo = phone.startsWith("+91") ? phone.slice(3) : phone;
+        for (const company of companiesId) {
+          console.log(company.companyId);
+
+          const poRef = collection(
+            db,
+            "companies",
+            company.companyId,
+            "purchases"
+          );
+          const q = query(poRef, where("vendorDetails.phone", "==", phoneNo));
+          const getData = await getDocs(q);
+          const getAllPO = getData.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+            };
+          });
+          POList.push(...getAllPO);
+        }
+        console.log("🚀 ~ fetchPO ~ POList:", POList);
+
+        setPo(POList);
+      } catch (error) {
+        console.log("🚀 ~ fetchPO ~ error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPO();
+  }, [companiesId]);
 
   return (
     <div className="w-full">
@@ -105,27 +101,27 @@ const VendorPO = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {companiesDetails.length > 0 ? (
-                    companiesDetails.map((po) => (
-                      <tr key={po.id} className="border-b text-center">
+                  {po.length > 0 ? (
+                    po.map((p) => (
+                      <tr key={p.id} className="border-b text-center">
                         <td className="py-3">
-                          {po.customerDetails?.name} <br />
+                          {p.createdBy?.name} <br />
                           <span className="text-gray-500">
-                            {po.customerDetails.phone}
+                            {p.vendorDetails.phone}
                           </span>
                         </td>
-                        <td className="py-3">{`₹ ${po.total.toFixed(2)}`}</td>
-                        <td className="py-3">{po.paymentStatus}</td>
-                        <td className="py-3">{po.mode || "Online"}</td>
-                        <td className="py-3">{po.poNo}</td>
+                        <td className="py-3">{`₹ ${p.total.toFixed(2)}`}</td>
+                        <td className="py-3">{p.paymentStatus}</td>
+                        <td className="py-3">{p.mode || "Online"}</td>
+                        <td className="py-3">{p.poNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
-                              po.poDate.seconds &&
-                              typeof po.poDate.seconds === "number"
+                              p.poDate.seconds &&
+                              typeof p.poDate.seconds === "number"
                             ) {
-                              const date = new Date(po.poDate.seconds * 1000);
+                              const date = new Date(p.poDate.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
