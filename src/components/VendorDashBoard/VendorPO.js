@@ -52,7 +52,7 @@ const VendorPO = () => {
           const companyData = { ...companyDoc.data(), id: companyDoc.id };
 
           const purchasesQuery = query(
-            collection(companyRef, "purchases"),
+            collection(db, "companies", companyRef, "purchases"),
             where("phone", "==", phone)
           );
           const purchasesSnapshot = await getDocs(purchasesQuery);
