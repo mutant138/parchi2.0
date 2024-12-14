@@ -100,7 +100,7 @@ const Navbar = () => {
               >
                 <option value="">default</option>
                 <option value="customer">customer</option>
-                <option value="">vendor</option>
+                <option value="vendor">vendor</option>
                 {/* <option value="staff">staff</option> */}
               </select>
             </div>
