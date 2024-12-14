@@ -133,7 +133,7 @@ function CreateProject() {
                 <input
                   type="date"
                   className="border p-1 rounded w-full mt-1"
-                  value={projectForm.startDate || ""}
+                  defaultValue={projectForm.startDate || ""}
                   onChange={(e) =>
                     handleDateChange("startDate", e.target.value)
                   }
@@ -144,7 +144,7 @@ function CreateProject() {
                 <input
                   type="date"
                   className="border p-1 rounded w-full mt-1"
-                  value={projectForm.dueDate || ""}
+                  defaultValue={projectForm.dueDate || ""}
                   onChange={(e) => handleDateChange("dueDate", e.target.value)}
                 />
               </div>

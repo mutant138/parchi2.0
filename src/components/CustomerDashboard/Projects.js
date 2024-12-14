@@ -18,14 +18,17 @@ function Projects() {
         const customerRef = collection(db, "customers");
         const q = query(customerRef, where("phone", "==", userDetails.phone));
         const getData = await getDocs(q);
+        let projectsData = [];
         const getCompaniesId = getData.docs.map((doc) => {
           const { name, companyRef } = doc.data();
+          projectsData.push(...fetchProject(companyRef.id));
           return {
             id: doc.id,
             name,
             companyId: companyRef.id,
           };
         });
+        setProjectsList(projectsData);
         setCompaniesId(getCompaniesId);
       } catch (error) {
         console.log("🚀 ~ fetchCustomerCompanies ~ error:", error);
@@ -33,40 +36,41 @@ function Projects() {
         setLoading(false);
       }
     }
-    fetchCustomerCompanies();
-  }, []);
-  useEffect(() => {
-    async function fetchProject(companyId) {
-      try {
-        const companyRef = doc(db, "companies", companyId);
-        const projectRef = collection(db, "projects");
-        const q = query(projectRef, where("companyRef", "==", companyRef));
-        const querySnapshot = await getDocs(q);
-        const projectsData = querySnapshot.docs.map((doc) => {
-          const { projectMembers, companyRef, createdAt, ...rest } = doc.data();
-          return {
-            ...rest,
-            projectId: doc.id,
-            companyRef: companyRef.id,
-            createdAt: DateFormate(createdAt),
-            startDate: DateFormate(rest.startDate),
-            dueDate: DateFormate(rest.dueDate),
-            vendorRef: rest?.vendorRef?.map((ref) => ref.id),
-            customerRef: rest?.customerRef?.map((ref) => ref.id),
-            staffRef: rest?.staffRef?.map((ref) => ref.id),
-          };
-        });
-        setProjectsList(projectsData);
-
-        // return projectsData;
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+    // fetchCustomerCompanies();
     fetchProject();
-  }, [companiesId]);
+  }, []);
+  async function fetchProject() {
+    try {
+      // const companyRef = doc(db, "companies", companyId);
+      const projectRef = collection(db, "projects");
+      const q = query(
+        projectRef,
+        where("phoneNum", "array-contains", userDetails.phone)
+      );
+      const querySnapshot = await getDocs(q);
+
+      const projectsData = querySnapshot.docs.map((doc) => {
+        const { projectMembers, companyRef, createdAt, ...rest } = doc.data();
+        return {
+          ...rest,
+          projectId: doc.id,
+          companyRef: companyRef.id,
+          createdAt: DateFormate(createdAt),
+          startDate: DateFormate(rest.startDate),
+          dueDate: DateFormate(rest.dueDate),
+          vendorRef: rest?.vendorRef?.map((ref) => ref.id),
+          customerRef: rest?.customerRef?.map((ref) => ref.id),
+          staffRef: rest?.staffRef?.map((ref) => ref.id),
+        };
+      });
+      console.log("projectsData", projectsData);
+      setProjectsList(projectsData);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function DateFormate(timestamp) {
     const milliseconds =

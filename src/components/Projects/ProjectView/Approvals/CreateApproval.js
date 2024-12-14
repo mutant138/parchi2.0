@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   query,
   Timestamp,
@@ -44,7 +45,8 @@ function CreateApproval({ isOpen, projectId, onClose, newApprovalAdded }) {
   const fetchData = async (collectionName, setData) => {
     try {
       const ref = collection(db, collectionName);
-      const q = query(ref, where("companyId", "==", companyId));
+      const companyRef = doc(db, "companies", companyId);
+      const q = query(ref, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const data = querySnapshot.docs.map((doc) => ({
