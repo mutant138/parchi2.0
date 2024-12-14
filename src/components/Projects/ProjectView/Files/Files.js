@@ -6,6 +6,7 @@ import {
   serverTimestamp,
   query,
   where,
+  doc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../../../firebase";
@@ -42,7 +43,8 @@ const Files = () => {
     setLoading(true);
     try {
       const ref = collection(db, collectionName);
-      const q = query(ref, where("companyId", "==", companyId));
+      const companyRef = doc(db, "companies", companyId);
+      const q = query(ref, where("companyRef", "==", companyRef));
       const querySnapshot = await getDocs(q);
 
       const data = querySnapshot.docs.map((doc) => ({
