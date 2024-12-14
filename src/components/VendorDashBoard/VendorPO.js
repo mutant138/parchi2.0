@@ -1,81 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMdDownload } from "react-icons/io";
+import { db } from "../../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+  getDoc,
+} from "firebase/firestore";
+import { useSelector } from "react-redux";
 
 const VendorPO = () => {
   const [loading, setLoading] = useState(false);
-  const [po, setPo] = useState([
-    {
-      id: "nblgUcPKNPWfbcmZsHEj",
-      tax: 0,
-      mode: "Cash",
-      terms: "",
-      dueDate: {
-        seconds: 1734151343,
-        nanoseconds: 875000000,
-      },
-      poDate: {
-        seconds: 1734151343,
-        nanoseconds: 875000000,
-      },
-      book: {},
-      packagingCharges: 0,
-      products: [
-        {
-          name: "notebook",
-          sellingPriceTaxType: false,
-          tax: 5,
-          discountType: true,
-          productRef: {},
-          purchasePrice: 80,
-          discount: 20,
-          quantity: 1,
-          sellingPrice: 200,
-          purchasePriceTaxType: false,
-          description: "notes...",
-        },
-      ],
-      tcs: {
-        type_of_goods: "",
-        tax_value: 0,
-        tcs_amount: 0,
-        tax: "",
-        isTcsApplicable: false,
-      },
-      notes: "",
-      attachments: [],
-      customerDetails: {
-        name: "cust4",
-        phone: "123456779",
-        zipCode: "234567",
-        city: "xcvb",
-        gstNumber: "345678",
-        address: "asdfghjk",
-        customerRef: {},
-      },
-      total: 189,
-      subTotal: 180,
-      shippingCharges: 0,
-      createdBy: {
-        zipCode: "",
-        address: "",
-        companyRef: {},
-        name: "kayu",
-        phoneNo: "+911234567890",
-        city: "",
-      },
-      poNo: "0001",
-      paymentStatus: "UnPaid",
-      tds: {
-        percentageValue: "",
-        tdsSection: "",
-        natureOfPayment: "",
-        isTdsApplicable: false,
-        percentage: 0,
-        tds_amount: 0,
-      },
-      discount: 0,
-    },
-  ]);
+  const [companiesDetails, setCompaniesDetails] = useState([]);
+
+  const userDetails = useSelector((state) => state.users);
+  const phone = userDetails.phone;
+  const companyDetails =
+    userDetails.companies[userDetails.selectedCompanyIndex];
+
+  const fetchVendorAndCompaniesData = async () => {
+    setLoading(true);
+    try {
+      const normalizedPhone = phone.startsWith("+91") ? phone.slice(3) : phone;
+      const vendorQuery = query(
+        collection(db, "vendors"),
+        where("phone", "==", normalizedPhone)
+      );
+      const vendorSnapshot = await getDocs(vendorQuery);
+
+      if (vendorSnapshot.empty) {
+        console.error("No vendor found with the provided phone number");
+        setCompaniesDetails([]);
+        setLoading(false);
+        return;
+      }
+
+      const companyRefs = vendorSnapshot.docs.map(
+        (doc) => doc.data().companyRef
+      );
+
+      const companiesData = await Promise.all(
+        companyRefs.map(async (companyRef) => {
+          const companyDoc = await getDoc(companyRef);
+          if (!companyDoc.exists()) {
+            return null;
+          }
+          const companyData = { ...companyDoc.data(), id: companyDoc.id };
+
+          const purchasesQuery = query(
+            collection(companyRef, "purchases"),
+            where("phone", "==", phone)
+          );
+          const purchasesSnapshot = await getDocs(purchasesQuery);
+
+          const purchases = purchasesSnapshot.docs.map((purchaseDoc) => ({
+            id: purchaseDoc.id,
+            ...purchaseDoc.data(),
+          }));
+
+          return { ...companyData, purchases };
+        })
+      );
+
+      setCompaniesDetails(companiesData);
+    } catch (error) {
+      console.error("Error fetching vendor and companies data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  console.log("companyDetails", companiesDetails);
+  useEffect(() => {
+    fetchVendorAndCompaniesData();
+  }, [phone, companyDetails]);
 
   return (
     <div className="w-full">
@@ -94,7 +95,7 @@ const VendorPO = () => {
               <table className="w-full border-collapse  h-28 text-center">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="border-b">
-                    <th className="p-4">Customer</th>
+                    <th className="p-4">Company Name</th>
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
@@ -104,8 +105,8 @@ const VendorPO = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {po.length > 0 ? (
-                    po.map((po) => (
+                  {companiesDetails.length > 0 ? (
+                    companiesDetails.map((po) => (
                       <tr key={po.id} className="border-b text-center">
                         <td className="py-3">
                           {po.customerDetails?.name} <br />

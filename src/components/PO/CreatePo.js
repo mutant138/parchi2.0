@@ -78,35 +78,49 @@ const CreatePo = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        const companyRef = doc(db, "companies", companyDetails.companyId);
         const productRef = collection(
           db,
           "companies",
           companyDetails.companyId,
-          "inventories"
+          "products"
         );
-        const querySnapshot = await getDocs(productRef);
+        const q = query(productRef, where("companyRef", "==", companyRef));
+        const querySnapshot = await getDocs(q);
+
         const productsData = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          const purchasePrice = data.pricing.purchasePrice?.amount;
-          const netAmount =
-            +data.pricing.sellingPrice?.amount -
-            (+data.pricing.discount?.amount || 0);
-          const taxRate = data.pricing.gstTax || 0;
-          const sgst = taxRate / 2;
-          const cgst = taxRate / 2;
-          const taxAmount = purchasePrice * (taxRate / 100);
-          const sgstAmount = purchasePrice * (sgst / 100);
-          const cgstAmount = purchasePrice * (cgst / 100);
+          let discount = +data.discount || 0;
+
+          if (data.discountType) {
+            discount = (+data.sellingPrice / 100) * data.discount;
+          }
+          const netAmount = +data.sellingPrice - discount;
+          const taxRate = data.tax || 0;
+          let sgst = 0;
+          let cgst = 0;
+          let taxAmount = 0;
+          let sgstAmount = 0;
+          let cgstAmount = 0;
+
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
 
           return {
             id: doc.id,
-            itemName: data.itemName || "N/A",
-            quantity: data.stock?.quantity ?? 0,
-            unitPrice: data.pricing.sellingPrice?.amount ?? 0,
-            purchasePrice: purchasePrice,
-            discount: data.pricing.discount?.amount ?? 0,
-            gstTax: data.pricing.gstTax,
-            fieldValue: data.pricing.discount?.fieldValue ?? 0,
+            description: data.description ?? "",
+            name: data.name ?? "N/A",
+            quantity: data.stock ?? 0,
+            sellingPrice: data.sellingPrice ?? 0,
+            sellingPriceTaxType: data.sellingPriceTaxType,
+            purchasePrice: data.purchasePrice ?? 0,
+            purchasePriceTaxType: data.purchasePriceTaxType,
+            discount: discount ?? 0,
+            discountType: data.discountType,
+            tax: data.tax,
             actionQty: 0,
             totalAmount: 0,
             netAmount: netAmount,
@@ -115,22 +129,20 @@ const CreatePo = () => {
             sgstAmount,
             cgstAmount,
             taxAmount,
-            taxSlab: data.pricing.sellingPrice?.taxSlab,
           };
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching pos:", error);
+        console.error("Error fetching invoices:", error);
       }
     };
 
     async function vendorDetails() {
       try {
         const vendorsRef = collection(db, "vendors");
-        const q = query(
-          vendorsRef,
-          where("companyId", "==", companyDetails.companyId)
-        );
+
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(vendorsRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
         const VendorData = company.docs.map((doc) => ({
           vendorId: doc.id,
