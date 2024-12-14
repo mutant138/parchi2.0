@@ -3,7 +3,7 @@ import { IoMdDownload } from "react-icons/io";
 
 function Quotations() {
   const [loading, setLoading] = useState(false);
-  const [invoices, setInvoices] = useState([
+  const [Quotations, setQuotations] = useState([
     {
       id: "nblgUcPKNPWfbcmZsHEj",
       tax: 0,
@@ -13,7 +13,7 @@ function Quotations() {
         seconds: 1734151343,
         nanoseconds: 875000000,
       },
-      invoiceDate: {
+      QuotationDate: {
         seconds: 1734151343,
         nanoseconds: 875000000,
       },
@@ -63,7 +63,7 @@ function Quotations() {
         phoneNo: "+911234567890",
         city: "",
       },
-      invoiceNo: "0001",
+      QuotationNo: "0001",
       paymentStatus: "UnPaid",
       tds: {
         percentageValue: "",
@@ -84,11 +84,11 @@ function Quotations() {
         style={{ height: "92vh" }}
       >
         <header className="flex items-center justify-between mb-3">
-          <h1 className="text-2xl font-bold">Invoices</h1>
+          <h1 className="text-2xl font-bold">Quotations</h1>
         </header>
         <div className="bg-white p-4 rounded-lg shadow mb-4">
           {loading ? (
-            <div className="text-center py-6">Loading invoices...</div>
+            <div className="text-center py-6">Loading Quotations...</div>
           ) : (
             <div className="overflow-y-auto" style={{ height: "70vh" }}>
               <table className="w-full border-collapse  h-28 text-center">
@@ -98,36 +98,37 @@ function Quotations() {
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
-                    <th className="p-4">Invoice NO</th>
+                    <th className="p-4">Quotation NO</th>
                     <th className="p-4">Date / Updated Time</th>
                     <th className="p-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.length > 0 ? (
-                    invoices.map((invoice) => (
-                      <tr key={invoice.id} className="border-b text-center">
+                  {Quotations.length > 0 ? (
+                    Quotations.map((Quotation) => (
+                      <tr key={Quotation.id} className="border-b text-center">
                         <td className="py-3">
-                          {invoice.customerDetails?.name} <br />
+                          {Quotation.customerDetails?.name} <br />
                           <span className="text-gray-500">
-                            {invoice.customerDetails.phone}
+                            {Quotation.customerDetails.phone}
                           </span>
                         </td>
-                        <td className="py-3">{`₹ ${invoice.total.toFixed(
+                        <td className="py-3">{`₹ ${Quotation.total.toFixed(
                           2
                         )}`}</td>
-                        <td className="py-3">{invoice.paymentStatus}</td>
-                        <td className="py-3">{invoice.mode || "Online"}</td>
-                        <td className="py-3">{invoice.invoiceNo}</td>
+                        <td className="py-3">{Quotation.paymentStatus}</td>
+                        <td className="py-3">{Quotation.mode || "Online"}</td>
+                        <td className="py-3">{Quotation.QuotationNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
-                              invoice.invoiceDate.seconds &&
-                              typeof invoice.invoiceDate.seconds === "number"
+                              Quotation.QuotationDate.seconds &&
+                              typeof Quotation.QuotationDate.seconds ===
+                                "number"
                             ) {
                               const date = new Date(
-                                invoice.invoiceDate.seconds * 1000
+                                Quotation.QuotationDate.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =
@@ -159,7 +160,7 @@ function Quotations() {
                   ) : (
                     <tr>
                       <td colSpan="6" className="text-center py-4">
-                        No invoices found
+                        No Quotations found
                       </td>
                     </tr>
                   )}

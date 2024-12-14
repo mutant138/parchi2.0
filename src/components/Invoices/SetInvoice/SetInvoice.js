@@ -597,6 +597,7 @@ const SetInvoice = () => {
   function onSelectBook(e) {
     const { value } = e.target;
     const data = books.find((ele) => ele.id === value);
+    console.log("🚀 ~ onSelectBook ~ data:", data);
     const bookRef = doc(
       db,
       "companies",
@@ -876,7 +877,7 @@ const SetInvoice = () => {
                     </option>
                     {books.length > 0 &&
                       books.map((book, index) => (
-                        <option value={book.bookRef?.id} key={index}>
+                        <option value={book.id} key={index}>
                           {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
