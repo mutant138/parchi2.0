@@ -32,6 +32,7 @@ function Invoice({ invoice, bankDetails }) {
       setTotalDiscount(discount);
     }
   }, [invoice]);
+
   const handleDownloadPdf = () => {
     if (!invoice.id) {
       return;
@@ -45,6 +46,7 @@ function Invoice({ invoice, bankDetails }) {
       y: 0,
     });
   };
+
   const handleDelete = async () => {
     try {
       if (!invoice.id || !companyId) {
@@ -52,7 +54,6 @@ function Invoice({ invoice, bankDetails }) {
         return;
       }
 
-      // Ref to the invoice document
       const invoiceDocRef = doc(
         db,
         "companies",

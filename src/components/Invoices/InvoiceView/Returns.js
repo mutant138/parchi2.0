@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../../firebase";
-import { addDoc, collection, Timestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  increment,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-function Returns({ invoice }) {
+function Returns({ invoice, refresh }) {
   const { id } = useParams();
 
   const [products, setProducts] = useState([]);
   const [isAllReturnsChecked, setIsAllReturnsChecked] = useState(false);
+
   useEffect(() => {
     setProducts(invoice.products);
   }, [invoice]);
@@ -24,7 +31,7 @@ function Returns({ invoice }) {
           product.actionQty = 0;
         }
         if (op === "+") {
-          if (product.quantity > product.actionQty) {
+          if (product.quantity - product.returnQty > product.actionQty) {
             ++product.actionQty;
           }
         } else {
@@ -59,21 +66,6 @@ function Returns({ invoice }) {
           product.actionQty = 0;
         }
       }
-      // if (product.productRef.id === productId) {
-      //   if (!product.actionQty) {
-      //     product.actionQty = 0;
-      //   }
-      //   if (op === "+") {
-      //     if (product.quantity > product.actionQty) {
-      //       ++product.actionQty;
-      //     }
-      //   } else {
-      //     if (0 < product.actionQty) {
-      //       --product.actionQty;
-      //     }
-      //   }
-
-      // }
       return product;
     });
     if (isAll && value) {
@@ -86,10 +78,14 @@ function Returns({ invoice }) {
 
   async function onSubmit() {
     try {
+      let isUpdated = false;
+      let UpdateProduct = [];
       for (const product of products) {
         if (!product.actionQty) {
+          UpdateProduct.push(product);
           continue;
         }
+        isUpdated = true;
         const payload = {
           createdAt: Timestamp.fromDate(new Date()),
           name: product.name,
@@ -97,12 +93,26 @@ function Returns({ invoice }) {
           amount: product.totalAmount,
           productRef: product.productRef,
         };
+
         await addDoc(
           collection(db, "companies", companyId, "invoices", id, "returns"),
           payload
         );
-      }
 
+        await updateDoc(product.productRef, {
+          stock: increment(product.actionQty),
+        });
+        UpdateProduct.push({
+          ...product,
+          quantity: product.quantity - product.actionQty,
+          actionQty: 0,
+        });
+      }
+      if (!isUpdated) {
+        alert("select Product Quantity");
+        return;
+      }
+      setProducts(UpdateProduct);
       alert("successfully return the Product");
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);
@@ -122,10 +132,15 @@ function Returns({ invoice }) {
           >
             Submit
           </button>
-          <button className="bg-gray-400 text-white rounded-full py-1 px-3">
+
+          <button
+            className="bg-gray-400 text-white rounded-full py-1 px-3"
+            onClick={() => setProducts(invoice.products)}
+          >
             Cancel
           </button>
         </div>
+
         <div className="bg-white">
           <div className="mb-4">
             <table className="min-w-full text-center text-gray-500 font-semibold">
@@ -171,14 +186,16 @@ function Returns({ invoice }) {
                         />
                       </td>
                       <td className="px-1 py-2">{product.name}</td>
-                      <td className="px-1 py-2">{product.quantity}</td>
+                      <td className="px-1 py-2">
+                        {product.quantity - product.returnQty}
+                      </td>
                       <td className="px-1 py-2">₹{product.sellingPrice}</td>
                       <td className="px-1 py-2">₹{product.discount}</td>
                       <td className="px-1 py-2">₹{product.netAmount}</td>
                       <td className="px-1 py-2">
                         {product.sellingPriceTaxType ? "Yes" : "No"}
                       </td>
-                      <td className="px-1 py-2">₹{product.totalAmount}</td>
+                      <td className="px-1 py-2">₹{product.totalAmount || 0}</td>
                       <td className="px-1 py-2">
                         <div className="flex justify-center -items-center">
                           {product.actionQty >= 1 && (
@@ -199,7 +216,9 @@ function Returns({ invoice }) {
                             onClick={() =>
                               handleActionQty("+", product.productRef.id)
                             }
-                            disabled={product.quantity === 0}
+                            disabled={
+                              product.quantity - product.returnQty === 0
+                            }
                           >
                             +
                           </button>

@@ -4,7 +4,15 @@ import Returns from "./Returns";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useSelector } from "react-redux";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import jsPDF from "jspdf";
 import ReturnsHistory from "./ReturnsHistory";
@@ -29,6 +37,17 @@ function InvoiceView() {
         ...resData,
         products: resData.products.map((item) => {
           let discount = +item.discount || 0;
+          item.returnQty = 0;
+          if (returnData.length > 0) {
+            const returnProductQty = returnData.reduce((acc, cur) => {
+              if (cur.productRef.id === item.productRef.id) {
+                acc += cur.quantity;
+              }
+              return acc;
+            }, 0);
+
+            item.returnQty = returnProductQty || 0;
+          }
           if (item.discountType) {
             discount = (+item.sellingPrice / 100) * item.discount;
           }
@@ -56,8 +75,8 @@ function InvoiceView() {
         id,
         "returns"
       );
-
-      const getDataDocs = await getDocs(returnsRef);
+      const q = query(returnsRef, orderBy("createdAt", "desc"));
+      const getDataDocs = await getDocs(q);
 
       const getData = getDataDocs.docs.map((doc) => {
         const { createdAt, ...data } = doc.data();
@@ -67,7 +86,6 @@ function InvoiceView() {
           createdAt: DateFormate(createdAt),
         };
       });
-      console.log("🚀 ~ getData ~ getData:", getData);
       setReturnData(getData);
     } catch (error) {
       console.log("🚀 ~ fetchReturnData ~ error:", error);
@@ -75,9 +93,12 @@ function InvoiceView() {
   }
 
   useEffect(() => {
-    fetchInvoices();
     fetchReturnData();
   }, [companyId]);
+
+  useEffect(() => {
+    fetchInvoices();
+  }, [returnData]);
 
   function DateFormate(timestamp) {
     const milliseconds =
@@ -89,6 +110,7 @@ function InvoiceView() {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
   return (
     <div className="px-5 pb-5 bg-gray-100" style={{ width: "100%" }}>
       <header className="flex items-center space-x-3 my-2 ">
@@ -152,7 +174,7 @@ function InvoiceView() {
         )}
         {activeTab === "ReturnsHistory" && (
           <div>
-            <ReturnsHistory products={returnData} />
+            <ReturnsHistory products={returnData} refresh={fetchReturnData} />
           </div>
         )}
       </div>
