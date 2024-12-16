@@ -154,7 +154,7 @@ function Items() {
                 {itemsData.length > 0 ? (
                   itemsData.map((item) => (
                     <div
-                      className={`border-2 shadow cursor-pointer rounded-lg p-3 mt-3 cursor-pointer`}
+                      className={`border-2 shadow rounded-lg p-3 mt-3 cursor-pointer`}
                       key={item.id}
                       onClick={() => {
                         setViewItemData(item);
