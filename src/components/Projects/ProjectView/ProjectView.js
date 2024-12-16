@@ -155,7 +155,18 @@ function ProjectView() {
         navigate("chats");
       },
     },
-    { name: "Payments", icon: <IoWalletOutline /> },
+    {
+      name: "Payments",
+      icon: <IoWalletOutline />,
+      onClick: () => {
+        if (!project.book.id) {
+          alert("Please select a bank book before proceeding to payments.");
+        } else {
+          navigate("payments");
+        }
+      },
+    },
+
     {
       name: "Items",
       icon: <HiOutlineShoppingCart />,
