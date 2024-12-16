@@ -21,12 +21,12 @@ function Invoice({ invoice, bankDetails }) {
   const invoiceRef = useRef();
 
   useEffect(() => {
-    if (invoice.items) {
-      const tax = invoice?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.sellingPrice.taxSlab;
+    if (invoice.products) {
+      const tax = invoice?.products.reduce((acc, cur) => {
+        return acc + cur?.tax;
       }, 0);
-      const discount = invoice?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.discount.amount;
+      const discount = invoice?.products.reduce((acc, cur) => {
+        return acc + cur?.discount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
@@ -67,28 +67,31 @@ function Invoice({ invoice, bankDetails }) {
       if (!confirmDelete) return;
       await deleteDoc(invoiceDocRef);
 
-      if (invoice.items && invoice.items.length > 0) {
-        const updateInventoryPromises = invoice.items.map((inventoryItem) => {
-          if (
-            !inventoryItem.productRef ||
-            typeof inventoryItem.quantity !== "number"
-          ) {
-            console.error("Invalid inventory item:", inventoryItem);
-            return Promise.resolve();
+      if (invoice.products && invoice.products.length > 0) {
+        const updateInventoryPromises = invoice.products.map(
+          (inventoryItem) => {
+            console.log("inventoryitem", inventoryItem);
+            if (
+              !inventoryItem.productRef ||
+              typeof inventoryItem.quantity !== "number"
+            ) {
+              console.error("Invalid inventory item:", inventoryItem);
+              return Promise.resolve();
+            }
+
+            const inventoryDocRef = doc(
+              db,
+              "companies",
+              companyId,
+              "products",
+              inventoryItem.productRef.id
+            );
+
+            return updateDoc(inventoryDocRef, {
+              stock: increment(inventoryItem.quantity),
+            });
           }
-
-          const inventoryDocRef = doc(
-            db,
-            "companies",
-            companyId,
-            "products",
-            inventoryItem.productRef.id
-          );
-
-          return updateDoc(inventoryDocRef, {
-            "stock.quantity": increment(inventoryItem.quantity),
-          });
-        });
+        );
         await Promise.all(updateInventoryPromises);
       }
       navigate("/invoice");
@@ -111,7 +114,7 @@ function Invoice({ invoice, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-
+  console.log("invoice", invoice?.products);
   return (
     <div className="">
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
@@ -163,12 +166,12 @@ function Invoice({ invoice, bankDetails }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(invoice?.date)}</div>
+            <div>Date: {DateFormate(invoice?.invoiceDate)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {invoice?.items?.length > 0 &&
-            invoice.items.map((ele, index) => (
+          {invoice?.products?.length > 0 &&
+            invoice?.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -176,9 +179,9 @@ function Invoice({ invoice, bankDetails }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele.pricing.sellingPrice.amount}</div>
-                  <div>Tax :{ele.pricing.sellingPrice.taxSlab}</div>
-                  <div>Discount :{ele.pricing.discount.amount}</div>
+                  <div>Price: ₹ {ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}</div>
+                  <div>Discount :{ele?.discount}</div>
                 </div>
               </div>
             ))}

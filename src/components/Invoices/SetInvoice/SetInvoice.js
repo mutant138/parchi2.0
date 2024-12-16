@@ -64,6 +64,10 @@ const SetInvoice = () => {
     tcs: {},
     terms: "",
     mode: "Cash",
+    extraDiscount: {
+      amount: 0,
+      type: "percentage",
+    },
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -413,7 +417,7 @@ const SetInvoice = () => {
       0
     );
 
-    let totalAmount =
+    const totalAmount =
       totalTaxableAmount +
       totalSgstAmount_2_5 +
       totalCgstAmount_2_5 +
@@ -422,7 +426,6 @@ const SetInvoice = () => {
       totalSgstAmount_9 +
       totalCgstAmount_9;
 
-    // Set state with the new values
     setProducts(products);
     setTotalAmounts({
       totalTaxableAmount,
@@ -531,6 +534,7 @@ const SetInvoice = () => {
           +totalAmounts.totalAmount +
           formData.shippingCharges +
           formData.packagingCharges +
+          formData.extraDiscount?.amount +
           total_Tax_Amount,
         products: items,
         customerDetails: {
@@ -704,7 +708,6 @@ const SetInvoice = () => {
                   onChange={(e) => {
                     setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
-                  required
                 />
               </div>
               <div>
@@ -1064,7 +1067,42 @@ const SetInvoice = () => {
               </div>
             </div>
             <div className="flex justify-end items-center mt-4 border-t pt-4 bg-gray-50 p-4 ">
-              <div className="flex flex-col justify-between">
+              <div className="flex justify-between">
+                <div className="flex space-x-3 items-center">
+                  <div className=""> Extra Discount: </div>
+                  <div>
+                    <input
+                      type="number"
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount?.amount}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: {
+                            ...val.extraDiscount,
+                            amount: +e.target.value,
+                          },
+                        }));
+                      }}
+                    />
+                    <select
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount?.type || "percentage"}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: {
+                            ...val.extraDiscount,
+                            type: e.target.value,
+                          },
+                        }));
+                      }}
+                    >
+                      <option value="percentage">%</option>
+                      <option value="fixed">Fixed</option>
+                    </select>
+                  </div>
+                </div>
                 <div className=" p-6" style={{ width: "600px" }}>
                   {formData.shippingCharges > 0 && (
                     <div className="flex justify-between text-gray-700 mb-2">
@@ -1133,6 +1171,19 @@ const SetInvoice = () => {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
+                  {formData?.extraDiscount?.amount > 0 && (
+                    <div className="flex justify-between text-gray-700 mb-2">
+                      <span>Extra Discount Amount</span>
+                      <span>
+                        ₹{" "}
+                        {formData.extraDiscount.type === "percentage"
+                          ? (+totalAmounts.totalAmount *
+                              formData?.extraDiscount?.amount) /
+                            100
+                          : formData?.extraDiscount?.amount}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex justify-between font-bold text-xl mb-2">
                     <span>Total Amount</span>
@@ -1142,6 +1193,7 @@ const SetInvoice = () => {
                         totalAmounts.totalAmount +
                         formData.shippingCharges +
                         formData.packagingCharges +
+                        formData.extraDiscount?.amount +
                         total_Tax_Amount
                       ).toFixed(2)}
                     </span>
@@ -1158,7 +1210,13 @@ const SetInvoice = () => {
             </button> */}
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onSetInvoice}
+              onClick={() => {
+                {
+                  products.length > 0 && isProductSelected
+                    ? onSetInvoice()
+                    : alert("Please select items to proceed.");
+                }
+              }}
             >
               <span className="text-lg">+</span> {invoiceId ? "Edit" : "Create"}{" "}
               Invoice
