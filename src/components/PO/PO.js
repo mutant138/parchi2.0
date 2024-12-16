@@ -212,19 +212,19 @@ function PO() {
                           </select>
                         </td>
                         <td className="py-3 ">{po.paymentMode || "Online"}</td>
-                        <td className="py-3 ">{po.no}</td>
+                        <td className="py-3 ">{po.poNo}</td>
 
                         <td className="py-3 ">
                           {(() => {
                             if (
-                              po.date &&
-                              typeof po.date.seconds === "number"
+                              po.poDate.seconds &&
+                              typeof po.poDate.seconds === "number"
                             ) {
-                              const poDate = new Date(po.date.seconds * 1000);
+                              const date = new Date(po.poDate.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
-                                poDate.setHours(0, 0, 0, 0);
+                                date.setHours(0, 0, 0, 0);
                               const daysDiff = Math.floor(
                                 timeDiff / (1000 * 60 * 60 * 24)
                               );

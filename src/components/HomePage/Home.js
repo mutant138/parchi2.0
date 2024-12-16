@@ -57,6 +57,7 @@ import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
 import DeliveryChallan from "../DeliveryChallan/DeliveryChallan";
 import CreditNote from "../CreditNote/CreditNote";
 import VendorPO from "../VendorDashBoard/VendorPO";
+import Payment from "../Projects/ProjectView/Payment/Payment";
 
 const Home = () => {
   const location = useLocation();
@@ -145,6 +146,7 @@ const Home = () => {
               path="/projects/:id/approvals"
               element={<Approval />}
             ></Route>
+            <Route path="/projects/:id/payments" element={<Payment />}></Route>
             <Route path="/projects/:id/items" element={<Items />}></Route>
             <Route path="/projects/:id/chats" element={<Chats />}></Route>
             <Route path="/staff-payout" element={<StaffPayout />}></Route>

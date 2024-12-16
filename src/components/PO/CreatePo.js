@@ -199,7 +199,7 @@ const CreatePo = () => {
         setPrePOList(noList);
         setFormData((val) => ({
           ...val,
-          no: String(noList.length + 1).padStart(4, 0),
+          poNo: String(noList.length + 1).padStart(4, 0),
         }));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -571,12 +571,12 @@ const CreatePo = () => {
               <div>
                 <label className="text-sm text-gray-600">
                   PO No.{" "}
-                  {prePOList.includes(formData.no) && (
+                  {prePOList.includes(formData.poNo) && (
                     <span className="text-red-800 text-xs">
                       "Already PO No. exist"{" "}
                     </span>
                   )}
-                  {Number(formData.no) === 0 && (
+                  {Number(formData.poNo) === 0 && (
                     <span className="text-red-800 text-xs">
                       "Kindly Enter valid PO No."{" "}
                     </span>
@@ -586,12 +586,12 @@ const CreatePo = () => {
                   type="text"
                   placeholder="Enter PO No."
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.no}
+                  value={formData.poNo}
                   onChange={(e) => {
                     const { value } = e.target;
                     setFormData((val) => ({
                       ...val,
-                      no: value,
+                      poNo: value,
                     }));
                   }}
                 />
