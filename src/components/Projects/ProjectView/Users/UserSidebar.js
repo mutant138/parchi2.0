@@ -115,11 +115,15 @@ function UserSidebar({ isOpen, onClose, projectId, projectDetails, Refresh }) {
           data: [],
         };
       }
+
+      // previousSelectedDataSet.customers.map(ele=>)
       let phoneNum = [];
 
       selectedDataSet.forEach((fieldId) => {
         const ref = doc(db, field.collectionName, fieldId);
+
         const data = dataSet[activeNav].find((item) => fieldId === item.id);
+
         console.log("🚀 ~ selectedDataSet.forEach ~ data:", data);
         phoneNum.push(data?.phone);
 

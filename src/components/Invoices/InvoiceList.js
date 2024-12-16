@@ -23,6 +23,7 @@ const InvoiceList = () => {
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchInvoices = async () => {
       setLoading(true);
@@ -100,6 +101,7 @@ const InvoiceList = () => {
     (sum, invoice) => sum + invoice.total,
     0
   );
+
   const paidAmount = filteredInvoices
     .filter((invoice) => invoice.paymentStatus === "Paid")
     .reduce((sum, invoice) => sum + invoice.total, 0);

@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { FiCoffee } from "react-icons/fi";
+import React from "react";
 import { GrDocumentUser } from "react-icons/gr";
 import { HiOutlineClipboardList } from "react-icons/hi";
 import { IoMdTime } from "react-icons/io";
-import { MdAddCard, MdDateRange } from "react-icons/md";
 import {
   RiShieldUserLine,
   RiUserAddLine,
@@ -34,12 +32,12 @@ function StaffPayout() {
         navigate("attendance");
       },
     },
-    {
-      icon: <MdAddCard />,
-      name: "Payouts",
-      totalLabelName: "Total Staff",
-      onClick: () => {},
-    },
+    // {
+    //   icon: <MdAddCard />,
+    //   name: "Payouts",
+    //   totalLabelName: "Total Staff",
+    //   onClick: () => {},
+    // },
     {
       icon: <GrDocumentUser />,
       name: "Designations",
@@ -72,18 +70,18 @@ function StaffPayout() {
         navigate("roles");
       },
     },
-    {
-      icon: <FiCoffee />,
-      name: "Breaks",
-      totalLabelName: "Total Projects",
-      onClick: () => {},
-    },
-    {
-      icon: <MdDateRange />,
-      name: "Holidays",
-      totalLabelName: "Total Staff",
-      onClick: () => {},
-    },
+    // {
+    //   icon: <FiCoffee />,
+    //   name: "Breaks",
+    //   totalLabelName: "Total Projects",
+    //   onClick: () => {},
+    // },
+    // {
+    //   icon: <MdDateRange />,
+    //   name: "Holidays",
+    //   totalLabelName: "Total Staff",
+    //   onClick: () => {},
+    // },
     {
       icon: <HiOutlineClipboardList />,
       name: "Assets",

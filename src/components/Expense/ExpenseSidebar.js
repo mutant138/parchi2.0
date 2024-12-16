@@ -318,7 +318,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
             </div>
           </div>
           <div>
-            <div>Recept</div>
+            <div>Receipt</div>
             <div>
               <input
                 type="file"
