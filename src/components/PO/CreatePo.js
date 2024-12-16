@@ -272,10 +272,12 @@ const CreatePo = () => {
         if (op === "+") {
           if (product.quantity > product.actionQty) {
             ++product.actionQty;
+            ++product.quantity;
           }
         } else {
           if (0 < product.actionQty) {
             --product.actionQty;
+            --product.quantity;
           }
         }
         product.actionQty = Math.max(product.actionQty, 0);
