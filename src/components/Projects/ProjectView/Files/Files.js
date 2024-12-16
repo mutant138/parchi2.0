@@ -85,20 +85,20 @@ const Files = () => {
     e.preventDefault();
 
     try {
-      if (!formData.file) {
-        alert("Please upload a file!");
-        return;
-      }
+      // if (!formData.file) {
+      //   alert("Please upload a file!");
+      //   return;
+      // }
 
-      const storageRef = ref(storage, `files/${formData.file.name}`);
-      await uploadBytes(storageRef, formData.file);
-      const fileURL = await getDownloadURL(storageRef);
+      // const storageRef = ref(storage, `files/${formData.file.name}`);
+      // await uploadBytes(storageRef, formData.file);
+      // const fileURL = await getDownloadURL(storageRef);
 
       const filesRef = collection(db, "projects", projectId, "files");
       await addDoc(filesRef, {
         name: formData.name,
         customerOrVendorRef: formData.customerOrVendorRef,
-        fileURL,
+        // fileURL,
         phoneNumber: formData.phoneNumber,
         createdAt: serverTimestamp(),
       });
@@ -307,10 +307,10 @@ const Files = () => {
                 <input
                   type="file"
                   className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
-                  onChange={(e) =>
-                    setFormData({ ...formData, file: e.target.files[0] })
-                  }
-                  required
+                  // onChange={(e) =>
+                  //   setFormData({ ...formData, file: e.target.files[0] })
+                  // }
+                  
                 />
               </div>
               <button
