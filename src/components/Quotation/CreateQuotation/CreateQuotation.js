@@ -448,24 +448,24 @@ const CreateQuotation = () => {
         payload
       );
 
-      for (const item of items) {
-        if (item.quantity === 0) {
-          continue;
-        }
+      // for (const item of items) {
+      //   if (item.quantity === 0) {
+      //     continue;
+      //   }
 
-        const currentQuantity = products.find(
-          (val) => val.name === item.name
-        ).quantity;
+      //   const currentQuantity = products.find(
+      //     (val) => val.name === item.name
+      //   ).quantity;
 
-        if (currentQuantity <= 0) {
-          alert("Product is out of stock!");
-          throw new Error("Product is out of stock!");
-        }
+      //   if (currentQuantity <= 0) {
+      //     alert("Product is out of stock!");
+      //     throw new Error("Product is out of stock!");
+      //   }
 
-        await updateDoc(item.productRef, {
-          "stock.quantity": currentQuantity - item.quantity,
-        });
-      }
+      //   await updateDoc(item.productRef, {
+      //     "stock.quantity": currentQuantity - item.quantity,
+      //   });
+      // }
 
       alert("Successfully Created the Quotation");
       navigate("/quotation");

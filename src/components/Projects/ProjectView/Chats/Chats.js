@@ -36,16 +36,18 @@ const Chats = () => {
         const projectDoc = await getDoc(doc(db, "projects", projectId));
         if (projectDoc.exists()) {
           const projectData = projectDoc.data();
+          const customerRefs = Array.isArray(projectData.customerRef) ? projectData.customerRef : [];
+          const vendorRefs = Array.isArray(projectData.vendorRef) ? projectData.vendorRef : [];
 
           const customerDetails = await Promise.all(
-            projectData.customerRef.map(async (ref) => {
+            customerRefs.map(async (ref) => {
               const customerDoc = await getDoc(ref);
               return { id: customerDoc.id, ...customerDoc.data() };
             })
           );
 
           const vendorDetails = await Promise.all(
-            projectData.vendorRef.map(async (ref) => {
+           vendorRefs.map(async (ref) => {
               const vendorDoc = await getDoc(ref);
               return { id: vendorDoc.id, ...vendorDoc.data() };
             })
