@@ -159,7 +159,7 @@ function ProjectView() {
       name: "Payments",
       icon: <IoWalletOutline />,
       onClick: () => {
-        if (!project.book.id) {
+        if (!project?.book?.id) {
           alert("Please select a bank book before proceeding to payments.");
         } else {
           navigate("payments");
@@ -304,7 +304,7 @@ function ProjectView() {
             <div className="py-3 border-b">
               Description: {project.description || "-"}
             </div>
-            {project?.bankBookRef ? (
+            {project?.book?.name ? (
               <div className="py-3 text-gray-600">
                 Bank Book: {project.book.name}
               </div>
