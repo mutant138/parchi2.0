@@ -309,12 +309,17 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
             </select>
           </div>
           <div>
-            <label className="text-sm block font-semibold">Month Duration</label>
+            <label className="text-sm block font-semibold">
+              Month Duration
+            </label>
             <select
               className="w-full border border-gray-300 p-2 rounded-lg"
               value={formData.monthDuration}
               onChange={(e) =>
-                setFormData((val) => ({ ...val, monthDuration: e.target.value }))
+                setFormData((val) => ({
+                  ...val,
+                  monthDuration: +e.target.value,
+                }))
               }
             >
               <option value="1">1 Month</option>

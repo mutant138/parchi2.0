@@ -4,9 +4,18 @@ import Returns from "./Returns";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useSelector } from "react-redux";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import jsPDF from "jspdf";
+import ReturnsHistory from "./ReturnsHistory";
 
 function InvoiceView() {
   const { id } = useParams();
@@ -14,6 +23,7 @@ function InvoiceView() {
   const [invoice, setInvoice] = useState({});
   const userDetails = useSelector((state) => state.users);
   const [bankDetails, setBankDetails] = useState({});
+  const [returnData, setReturnData] = useState([]);
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
@@ -21,10 +31,29 @@ function InvoiceView() {
   const fetchInvoices = async () => {
     try {
       const invoiceRef = doc(db, "companies", companyId, "invoices", id);
-      const resData = await getDoc(invoiceRef);
+      const resData = (await getDoc(invoiceRef)).data();
       const invoicesData = {
-        id: resData.id,
-        ...resData.data(),
+        id,
+        ...resData,
+        products: resData.products.map((item) => {
+          let discount = +item.discount || 0;
+          item.returnQty = 0;
+          if (returnData.length > 0) {
+            const returnProductQty = returnData.reduce((acc, cur) => {
+              if (cur.productRef.id === item.productRef.id) {
+                acc += cur.quantity;
+              }
+              return acc;
+            }, 0);
+
+            item.returnQty = returnProductQty || 0;
+          }
+          if (item.discountType) {
+            discount = (+item.sellingPrice / 100) * item.discount;
+          }
+          item.netAmount = +item.sellingPrice - discount;
+          return item;
+        }),
       };
       if (invoicesData.book.bookRef) {
         const bankData = (await getDoc(invoicesData.book.bookRef)).data();
@@ -35,9 +64,52 @@ function InvoiceView() {
       console.error("Error fetching invoices:", error);
     }
   };
+
+  async function fetchReturnData() {
+    try {
+      const returnsRef = collection(
+        db,
+        "companies",
+        companyId,
+        "invoices",
+        id,
+        "returns"
+      );
+      const q = query(returnsRef, orderBy("createdAt", "desc"));
+      const getDataDocs = await getDocs(q);
+
+      const getData = getDataDocs.docs.map((doc) => {
+        const { createdAt, ...data } = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: DateFormate(createdAt),
+        };
+      });
+      setReturnData(getData);
+    } catch (error) {
+      console.log("🚀 ~ fetchReturnData ~ error:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchReturnData();
+  }, [companyId]);
+
   useEffect(() => {
     fetchInvoices();
-  }, [companyId]);
+  }, [returnData]);
+
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
+
+    return `${getDate}/${getMonth}/${getFullYear}`;
+  }
 
   return (
     <div className="px-5 pb-5 bg-gray-100" style={{ width: "100%" }}>
@@ -75,6 +147,17 @@ function InvoiceView() {
           >
             Returns
           </button>
+          <button
+            className={
+              "px-4 py-1" +
+              (activeTab === "ReturnsHistory"
+                ? " bg-blue-700 text-white rounded-full"
+                : "")
+            }
+            onClick={() => setActiveTab("ReturnsHistory")}
+          >
+            ReturnsHistory
+          </button>
         </nav>
       </div>
       <hr />
@@ -86,7 +169,12 @@ function InvoiceView() {
         )}
         {activeTab === "Returns" && (
           <div>
-            <Returns />
+            <Returns invoice={invoice} />
+          </div>
+        )}
+        {activeTab === "ReturnsHistory" && (
+          <div>
+            <ReturnsHistory products={returnData} refresh={fetchReturnData} />
           </div>
         )}
       </div>
