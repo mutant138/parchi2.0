@@ -32,36 +32,21 @@ function ProjectView() {
   const [project, setProject] = useState({});
   const [isEdit, setIsEdit] = useState(false);
   const [bankBooks, setBankBooks] = useState([]);
-  const [selectedBankBook, setSelectedBankBook] = useState(null);
   const userDetails = useSelector((state) => state.users);
 
-  useEffect(() => {
-    if (project) {
-      setFormData({
-        name: project.name || "",
-        description: project.description || "",
-        startDate: project.startDate,
-        dueDate: project.dueDate,
-      });
-    }
-  }, [project]);
-
   const handleUpdate = async () => {
-    const projectDoc = doc(db, "projects", id);
-    const updatedData = {
-      ...formData,
-      startDate: formData.startDate
-        ? Timestamp.fromDate(new Date(formData.startDate))
-        : null,
-      dueDate: formData.dueDate
-        ? Timestamp.fromDate(new Date(formData.dueDate))
-        : null,
-      bankBookRef: selectedBankBook
-        ? doc(db, "createProjects", selectedBankBook)
-        : null,
-    };
-
     try {
+      const projectDoc = doc(db, "projects", id);
+      const updatedData = {
+        ...formData,
+        startDate: formData.startDate
+          ? Timestamp.fromDate(new Date(formData.startDate))
+          : null,
+        dueDate: formData.dueDate
+          ? Timestamp.fromDate(new Date(formData.dueDate))
+          : null,
+        book: formData.book ?? null,
+      };
       await updateDoc(projectDoc, updatedData);
       alert("Project updated successfully!");
       setIsEdit(false);
@@ -102,11 +87,18 @@ function ProjectView() {
       vendorRef: data?.vendorRef?.map((ref) => ref.id),
       customerRef: data?.customerRef?.map((ref) => ref.id),
       staffRef: data?.staffRef?.map((ref) => ref.id),
+      book: data?.book,
     };
-
+    setFormData({
+      name: payload.name || "",
+      description: payload.description || "",
+      startDate: payload.startDate,
+      dueDate: payload.dueDate,
+      book: payload.book,
+    });
     setProject(payload);
-    setSelectedBankBook(data.bankBookRef?.id);
   }
+
   async function fetchBankBooks() {
     const bankBookRef = collection(
       db,
@@ -121,10 +113,6 @@ function ProjectView() {
     }));
     setBankBooks(bankBooksData);
   }
-
-  const handleBankBookChange = (e) => {
-    setSelectedBankBook(e.target.value);
-  };
 
   const manageProjectItems = [
     {
@@ -179,57 +167,11 @@ function ProjectView() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({});
-  const usersDetails = useSelector((state) => state.users);
-
-  useEffect(() => {
-    if (project) {
-      setFormData({
-        name: project.name || "",
-        description: project.description || "",
-        startDate: project.startDate,
-        dueDate: project.dueDate,
-      });
-    }
-  }, [project]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  function DateFormate(timestamp, format = "dd/mm/yyyy") {
-    const milliseconds =
-      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
-    const date = new Date(milliseconds);
-    const getDate = String(date.getDate()).padStart(2, "0");
-    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
-    const getFullYear = date.getFullYear();
-
-    return format === "yyyy-mm-dd"
-      ? `${getFullYear}-${getMonth}-${getDate}`
-      : `${getDate}/${getMonth}/${getFullYear}`;
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    const getData = await getDoc(doc(db, "projects", id));
-    const data = getData.data();
-    const payload = {
-      ...data,
-      companyRef: data.companyRef.id,
-      createdAt: DateFormate(data.createdAt),
-      startDate: DateFormate(data.startDate, "yyyy-mm-dd"),
-      dueDate: DateFormate(data.dueDate, "yyyy-mm-dd"),
-      vendorRef: data?.vendorRef?.map((ref) => ref.id),
-      customerRef: data?.customerRef?.map((ref) => ref.id),
-      staffRef: data?.staffRef?.map((ref) => ref.id),
-    };
-
-    setProject(payload);
-  }
 
   async function onChangeStatus(e) {
     try {
@@ -254,6 +196,23 @@ function ProjectView() {
     } catch (error) {
       console.log("🚀 ~ onHandleDeleteVendor ~ error:", error);
     }
+  }
+
+  function onSelectBook(e) {
+    const { value } = e.target;
+    const bankName = bankBooks.find((ele) => ele.id === value).name;
+    const payload = {
+      bookRef: doc(
+        db,
+        "companies",
+        userDetails?.companies[userDetails.selectedCompanyIndex]?.companyId,
+        "books",
+        value
+      ),
+      id: value,
+      name: bankName,
+    };
+    setFormData((val) => ({ ...val, book: payload }));
   }
   return (
     <div className="w-full" style={{ width: "100%" }}>
@@ -330,8 +289,10 @@ function ProjectView() {
 
         {!isEdit ? (
           <div className="bg-white p-4 rounded-lg shadow my-4">
-            <div className="border-b pb-3 h-8">{project.name}</div>
-            <div className="py-3">{project.description}</div>
+            <div className="border-b pb-3 h-8">Name: {project.name}</div>
+            <div className="py-3 border-b">
+              Description: {project.description || "-"}
+            </div>
             {project?.bankBookRef ? (
               <div className="py-3 text-gray-600">
                 Bank Book: {project.book.name}
@@ -360,8 +321,8 @@ function ProjectView() {
                 Select Bank Book
               </label>
               <select
-                value={selectedBankBook || ""}
-                onChange={handleBankBookChange}
+                value={formData.book?.id || ""}
+                onChange={onSelectBook}
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
                 <option value="">Select Bank Book</option>
