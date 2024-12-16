@@ -704,7 +704,6 @@ const SetInvoice = () => {
                   onChange={(e) => {
                     setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
-                  required
                 />
               </div>
               <div>
@@ -1158,7 +1157,13 @@ const SetInvoice = () => {
             </button> */}
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onSetInvoice}
+              onClick={() => {
+                {
+                  products.length > 0 && isProductSelected
+                    ? onSetInvoice()
+                    : alert("Please select items to proceed.");
+                }
+              }}
             >
               <span className="text-lg">+</span> {invoiceId ? "Edit" : "Create"}{" "}
               Invoice

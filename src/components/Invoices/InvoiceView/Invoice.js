@@ -166,7 +166,7 @@ function Invoice({ invoice, bankDetails }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(invoice?.date)}</div>
+            <div>Date: {DateFormate(invoice?.invoiceDate)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
