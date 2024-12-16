@@ -28,9 +28,9 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
       taxSlab: 0,
       taxAmount: 0,
     },
+    monthDuration: "1", // New field for month duration
   });
 
-  // Reset form for creating a new service
   function ResetForm() {
     setFormData({
       serviceName: "",
@@ -54,6 +54,7 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
         taxSlab: 0,
         taxAmount: 0,
       },
+      monthDuration: "1", // Reset month duration
     });
   }
 
@@ -69,13 +70,13 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
         },
         description: service.description,
         tax: service.tax,
+        monthDuration: service.monthDuration || "1", // Populate existing duration or default
       });
     } else {
       ResetForm();
     }
   }, [service]);
 
-  // Create or update the service
   const onCreateService = async (e) => {
     e.preventDefault();
     try {
@@ -137,6 +138,7 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
       console.error("Error creating or updating product:", error);
     }
   };
+
   return (
     <div
       className={`fixed inset-0 z-50 flex justify-end bg-black bg-opacity-25 transition-opacity ${
@@ -304,6 +306,21 @@ const CreateServiceList = ({ isOpen, onClose, refresh, service }) => {
               <option value={12}>12 %</option>
               <option value={18}>18 %</option>
               <option value={28}>28 %</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm block font-semibold">Month Duration</label>
+            <select
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              value={formData.monthDuration}
+              onChange={(e) =>
+                setFormData((val) => ({ ...val, monthDuration: e.target.value }))
+              }
+            >
+              <option value="1">1 Month</option>
+              <option value="3">3 Months</option>
+              <option value="6">6 Months</option>
+              <option value="12">12 Months</option>
             </select>
           </div>
           <div>
