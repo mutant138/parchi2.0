@@ -10,14 +10,14 @@ import {
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-function Returns({ invoice, refresh }) {
+function Returns({ invoice }) {
   const { id } = useParams();
 
   const [products, setProducts] = useState([]);
   const [isAllReturnsChecked, setIsAllReturnsChecked] = useState(false);
 
   useEffect(() => {
-    setProducts(invoice.products);
+    setProducts([...invoice.products]);
   }, [invoice]);
 
   const userDetails = useSelector((state) => state.users);
@@ -106,6 +106,7 @@ function Returns({ invoice, refresh }) {
           ...product,
           quantity: product.quantity - product.actionQty,
           actionQty: 0,
+          totalAmount: 0,
         });
       }
       if (!isUpdated) {
@@ -135,7 +136,16 @@ function Returns({ invoice, refresh }) {
 
           <button
             className="bg-gray-400 text-white rounded-full py-1 px-3"
-            onClick={() => setProducts(invoice.products)}
+            onClick={() => {
+              setProducts((val) =>
+                val.map((item) => {
+                  item.actionQty = 0;
+                  item.amount = 0;
+                  item.totalAmount = 0;
+                  return item;
+                })
+              );
+            }}
           >
             Cancel
           </button>
