@@ -439,6 +439,22 @@ const SetInvoice = () => {
     });
   }
 
+  const calculateTotal = () => {
+    const discountAmount =
+      formData.extraDiscount.type === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
+        : formData.extraDiscount.amount || 0;
+
+    const total =
+      totalAmounts.totalAmount +
+      formData.shippingCharges +
+      formData.packagingCharges +
+      total_Tax_Amount -
+      discountAmount;
+
+    return total.toFixed(2);
+  };
+
   function total_TCS_TDS_Amount() {
     const totalQty = products.reduce((acc, cur) => {
       return acc + cur.actionQty;
@@ -530,12 +546,7 @@ const SetInvoice = () => {
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
-        total:
-          +totalAmounts.totalAmount +
-          formData.shippingCharges +
-          formData.packagingCharges +
-          formData.extraDiscount?.amount +
-          total_Tax_Amount,
+        total: +calculateTotal(),
         products: items,
         customerDetails: {
           gstNumber: selectedCustomerData.gstNumber ?? "",
@@ -1074,13 +1085,13 @@ const SetInvoice = () => {
                     <input
                       type="number"
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.amount}
+                      value={formData?.extraDiscount?.amount || ""}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
                           extraDiscount: {
                             ...val.extraDiscount,
-                            amount: +e.target.value,
+                            amount: +e.target.value || 0,
                           },
                         }));
                       }}
@@ -1184,19 +1195,9 @@ const SetInvoice = () => {
                       </span>
                     </div>
                   )}
-
                   <div className="flex justify-between font-bold text-xl mb-2">
                     <span>Total Amount</span>
-                    <span>
-                      ₹{" "}
-                      {(
-                        totalAmounts.totalAmount +
-                        formData.shippingCharges +
-                        formData.packagingCharges +
-                        formData.extraDiscount?.amount +
-                        total_Tax_Amount
-                      ).toFixed(2)}
-                    </span>
+                    <span>₹ {calculateTotal()}</span>
                   </div>
                 </div>
               </div>
