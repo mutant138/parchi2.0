@@ -534,6 +534,7 @@ const SetInvoice = () => {
           +totalAmounts.totalAmount +
           formData.shippingCharges +
           formData.packagingCharges +
+          formData.extraDiscount?.amount +
           total_Tax_Amount,
         products: items,
         customerDetails: {
