@@ -58,6 +58,7 @@ import DeliveryChallan from "../DeliveryChallan/DeliveryChallan";
 import CreditNote from "../CreditNote/CreditNote";
 import VendorPO from "../VendorDashBoard/VendorPO";
 import Payment from "../Projects/ProjectView/Payment/Payment";
+import CreateDeliveryChallan from "../DeliveryChallan/CreateDeliveryChallan";
 
 const Home = () => {
   const location = useLocation();
@@ -192,6 +193,10 @@ const Home = () => {
             ></Route>
             <Route path="/credit-note" element={<CreditNote />}></Route>
             <Route path="/vendor/po" element={<VendorPO />}></Route>
+            <Route
+              path="/delivery-challan/create-challan"
+              element={<CreateDeliveryChallan />}
+            ></Route>
           </Routes>
           <Outlet />
         </div>
