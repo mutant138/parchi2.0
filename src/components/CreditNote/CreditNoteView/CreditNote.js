@@ -6,41 +6,41 @@ import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
-import Template1 from "../Templates/Template1";
-import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
+import Template from "../Templates/Template";
+import { doc, deleteDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-function Invoice({ invoice, bankDetails }) {
+const CreditNote = ({ creditNote }) => {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
-  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [isCreditNoteOpen, setIsCreditNoteOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
-  console.log("invoice", invoice);
-  const invoiceRef = useRef();
+
+  const creditNoteRef = useRef();
 
   useEffect(() => {
-    if (invoice.products) {
-      const tax = invoice?.products.reduce((acc, cur) => {
+    if (creditNote.products) {
+      const tax = creditNote?.products.reduce((acc, cur) => {
         return acc + cur?.tax;
       }, 0);
-      const discount = invoice?.products.reduce((acc, cur) => {
+      const discount = creditNote?.products.reduce((acc, cur) => {
         return acc + cur?.discount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
     }
-  }, [invoice]);
+  }, [creditNote]);
 
   const handleDownloadPdf = () => {
-    if (!invoice.id) {
+    if (!creditNote.id) {
       return;
     }
     const doc = new jsPDF("p", "pt", "a4");
-    doc.html(invoiceRef.current, {
+    doc.html(creditNoteRef.current, {
       callback: function (doc) {
-        doc.save(`${invoice.customerDetails.name}'s invoice.pdf`);
+        doc.save(`${creditNote.customerDetails.name}'s creditNote.pdf`);
       },
       x: 0,
       y: 0,
@@ -49,56 +49,28 @@ function Invoice({ invoice, bankDetails }) {
 
   const handleDelete = async () => {
     try {
-      if (!invoice.id || !companyId) {
-        alert("Invoice ID or Company ID is missing.");
+      if (!creditNote.id || !companyId) {
+        alert("creditNote ID or Company ID is missing.");
         return;
       }
 
-      const invoiceDocRef = doc(
+      const creditNoteDocRef = doc(
         db,
         "companies",
         companyId,
-        "invoices",
-        invoice.id
+        "creditnote",
+        creditNote.id
       );
 
       const confirmDelete = window.confirm(
-        "Are you sure you want to delete this invoice?"
+        "Are you sure you want to delete this CreditNote?"
       );
       if (!confirmDelete) return;
-      await deleteDoc(invoiceDocRef);
-
-      if (invoice.products && invoice.products.length > 0) {
-        const updateInventoryPromises = invoice.products.map(
-          (inventoryItem) => {
-            console.log("inventoryitem", inventoryItem);
-            if (
-              !inventoryItem.productRef ||
-              typeof inventoryItem.quantity !== "number"
-            ) {
-              console.error("Invalid inventory item:", inventoryItem);
-              return Promise.resolve();
-            }
-
-            const inventoryDocRef = doc(
-              db,
-              "companies",
-              companyId,
-              "products",
-              inventoryItem.productRef.id
-            );
-
-            return updateDoc(inventoryDocRef, {
-              stock: increment(inventoryItem.quantity),
-            });
-          }
-        );
-        await Promise.all(updateInventoryPromises);
-      }
-      navigate("/invoice");
+      await deleteDoc(creditNoteDocRef);
+      navigate("/credit-note");
     } catch (error) {
-      console.error("Error deleting invoice:", error);
-      alert("Failed to delete the invoice. Check the console for details.");
+      console.error("Error deleting creditNote:", error);
+      alert("Failed to delete the creditNote. Check the console for details.");
     }
   };
 
@@ -115,7 +87,7 @@ function Invoice({ invoice, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-  console.log("invoice", invoice?.products);
+  console.log("creditNote", creditNote?.products);
   return (
     <div className="">
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
@@ -124,7 +96,7 @@ function Invoice({ invoice, bankDetails }) {
             className={
               "px-4 py-1 bg-blue-300 text-white rounded-full flex items-center"
             }
-            onClick={() => setIsInvoiceOpen(true)}
+            onClick={() => setIsCreditNoteOpen(true)}
           >
             <FaRegEye /> &nbsp; View
           </button>
@@ -132,7 +104,7 @@ function Invoice({ invoice, bankDetails }) {
             className={
               "px-4 py-1 bg-red-300 text-white rounded-full flex items-center"
             }
-            onClick={() => navigate("edit-invoice")}
+            onClick={() => navigate("edit-creditnote")}
           >
             <TbEdit /> &nbsp; Edit
           </button>
@@ -145,7 +117,7 @@ function Invoice({ invoice, bankDetails }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {invoice.paymentStatus !== "Paid" && (
+        {creditNote.paymentStatus !== "Paid" && (
           <div className="text-end">
             <button
               className={"px-4 py-1 text-red-700 text-2xl"}
@@ -167,12 +139,12 @@ function Invoice({ invoice, bankDetails }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(invoice?.invoiceDate)}</div>
+            <div>Date: {DateFormate(creditNote?.creditNoteDate)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {invoice?.products?.length > 0 &&
-            invoice?.products.map((ele, index) => (
+          {creditNote?.products?.length > 0 &&
+            creditNote?.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -187,54 +159,54 @@ function Invoice({ invoice, bankDetails }) {
               </div>
             ))}
           <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹{invoice.subTotal}</div>
+            <div>subTotal: ₹{creditNote.subTotal}</div>
             <div>Tax: {totalTax}%</div>
             <div>
-              {invoice.extraDiscount?.amount > 0 && (
+              {creditNote.extraDiscount?.amount > 0 && (
                 <>
                   Extra Discount:{" "}
-                  {invoice?.extraDiscount?.type === "percentage"
-                    ? `${invoice.extraDiscount.amount}%`
-                    : `₹${invoice.extraDiscount.amount}`}{" "}
+                  {creditNote?.extraDiscount?.type === "percentage"
+                    ? `${creditNote.extraDiscount.amount}%`
+                    : `₹${creditNote.extraDiscount.amount}`}{" "}
                 </>
               )}
             </div>
             <div>
               {" "}
-              {invoice.packagingCharges > 0 && (
-                <>Packaging Charges: ₹{invoice.packagingCharges}</>
+              {creditNote.packagingCharges > 0 && (
+                <>Packaging Charges: ₹{creditNote.packagingCharges}</>
               )}
             </div>
             <div>
               {" "}
-              {invoice.shippingCharges > 0 && (
-                <>Shipping Charges: ₹{invoice.shippingCharges} </>
+              {creditNote.shippingCharges > 0 && (
+                <>Shipping Charges: ₹{creditNote.shippingCharges} </>
               )}{" "}
             </div>
           </div>
           <div className="flex space-x-3 justify-end font-bold text-lg">
             <div>Total:</div>
-            <div>₹ {invoice.total}</div>
+            <div>₹ {creditNote.total}</div>
           </div>
           <div className="bg-gray-100  rounded-lg">
             <div className="p-2">
               <div>Notes</div>
-              <div className="font-bold">{invoice.notes || "No Data"}</div>
+              <div className="font-bold">{creditNote.notes || "No Data"}</div>
             </div>
             <hr />
             <div className="p-2">
               <div>Terms And Conditions</div>
-              <div className="font-bold">{invoice.terms || "No Data"}</div>
+              <div className="font-bold">{creditNote.terms || "No Data"}</div>
             </div>
           </div>
         </div>
       </div>
 
-      {invoice.id && (
+      {creditNote.id && (
         <div
           className="fixed inset-0 z-20 "
-          onClick={() => setIsInvoiceOpen(false)}
-          style={{ display: isInvoiceOpen ? "block" : "none" }}
+          onClick={() => setIsCreditNoteOpen(false)}
+          style={{ display: isCreditNoteOpen ? "block" : "none" }}
         >
           <div
             className="fixed inset-0 flex pt-10 justify-center z-20 "
@@ -245,7 +217,7 @@ function Invoice({ invoice, bankDetails }) {
                 <div className="flex justify-end border-b-2 py-2">
                   <div
                     className="relative text-2xl text-red-700 group px-2 cursor-pointer"
-                    onClick={() => setIsInvoiceOpen(false)}
+                    onClick={() => setIsCreditNoteOpen(false)}
                   >
                     <IoMdClose />
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-8 px-1 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 z-200">
@@ -253,10 +225,10 @@ function Invoice({ invoice, bankDetails }) {
                     </div>
                   </div>
                 </div>
-                <Template1
-                  ref={invoiceRef}
-                  invoiceData={invoice}
-                  bankDetails={bankDetails}
+                <Template
+                  ref={creditNoteRef}
+                  creditNoteData={creditNote}
+                  //   bankDetails={bankDetails}
                 />
               </div>
             </div>
@@ -265,6 +237,6 @@ function Invoice({ invoice, bankDetails }) {
       )}
     </div>
   );
-}
+};
 
-export default Invoice;
+export default CreditNote;

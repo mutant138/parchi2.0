@@ -86,7 +86,7 @@ function QuotationView({ quotation }) {
           );
 
           return updateDoc(inventoryDocRef, {
-            "stock.quantity": increment(inventoryItem.quantity),
+            stock: increment(inventoryItem.quantity),
           });
         });
         await Promise.all(updateInventoryPromises);
