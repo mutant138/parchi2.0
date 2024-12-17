@@ -55,10 +55,12 @@ import EditService from "../Services/CreateService/EditService";
 import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
 import DeliveryChallan from "../DeliveryChallan/DeliveryChallan";
-import CreditNote from "../CreditNote/CreditNote";
 import VendorPO from "../VendorDashBoard/VendorPO";
 import Payment from "../Projects/ProjectView/Payment/Payment";
 import CreateDeliveryChallan from "../DeliveryChallan/CreateDeliveryChallan";
+import CreditNoteList from "../CreditNote/CreditNoteList";
+import CreditNoteView from "../CreditNote/CreditNoteView/CreditNoteView";
+import SetCreditNote from "../CreditNote/SetCreditNote/SetCreditNote";
 
 const Home = () => {
   const location = useLocation();
@@ -191,7 +193,16 @@ const Home = () => {
               path="/delivery-challan"
               element={<DeliveryChallan />}
             ></Route>
-            <Route path="/credit-note" element={<CreditNote />}></Route>
+            <Route path="/credit-note" element={<CreditNoteList />}></Route>
+            <Route path="/credit-note/:id" element={<CreditNoteView />}></Route>
+            <Route
+              path="/credit-note/create-creditnote"
+              element={<SetCreditNote />}
+            ></Route>
+            <Route
+              path="/credit-note/:creditnoteId/edit-creditnote"
+              element={<SetCreditNote />}
+            ></Route>
             <Route path="/vendor/po" element={<VendorPO />}></Route>
             <Route
               path="/delivery-challan/create-challan"

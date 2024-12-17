@@ -79,14 +79,10 @@ function Expense() {
       setLoading(true);
       try {
         const ref = collection(db, collectionName);
-        let q;
 
-        if (collectionName !== "staff") {
-          q = query(ref, where("companyId", "==", companyId));
-        } else {
-          const companyRef = doc(db, "companies", companyId);
-          q = query(ref, where("companyRef", "==", companyRef));
-        }
+        const companyRef = doc(db, "companies", companyId);
+        const q = query(ref, where("companyRef", "==", companyRef));
+
         const querySnapshot = await getDocs(q);
 
         const data = querySnapshot.docs.map((doc) => ({

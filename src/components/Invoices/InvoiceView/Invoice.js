@@ -18,7 +18,7 @@ function Invoice({ invoice, bankDetails }) {
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
-
+  console.log("invoice", invoice);
   const invoiceRef = useRef();
 
   useEffect(() => {
@@ -269,16 +269,37 @@ function Invoice({ invoice, bankDetails }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele?.sellingPrice}</div>
-                  <div>Tax :{ele?.tax}</div>
-                  <div>Discount :{ele?.discount}</div>
+                  <div>Price: ₹{ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}%</div>
+                  <div>Discount :₹{ele?.discount}</div>
                 </div>
               </div>
             ))}
           <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹ {invoice.subTotal}</div>
-            <div>Discount: {totalDiscount}</div>
-            <div>Tax: {totalTax}</div>
+            <div>subTotal: ₹{invoice.subTotal}</div>
+            <div>Tax: {totalTax}%</div>
+            <div>
+              {invoice.extraDiscount?.amount > 0 && (
+                <>
+                  Extra Discount:{" "}
+                  {invoice?.extraDiscount?.type === "percentage"
+                    ? `${invoice.extraDiscount.amount}%`
+                    : `₹${invoice.extraDiscount.amount}`}{" "}
+                </>
+              )}
+            </div>
+            <div>
+              {" "}
+              {invoice.packagingCharges > 0 && (
+                <>Packaging Charges: ₹{invoice.packagingCharges}</>
+              )}
+            </div>
+            <div>
+              {" "}
+              {invoice.shippingCharges > 0 && (
+                <>Shipping Charges: ₹{invoice.shippingCharges} </>
+              )}{" "}
+            </div>
           </div>
           <div className="flex space-x-3 justify-end font-bold text-lg">
             <div>Total:</div>
