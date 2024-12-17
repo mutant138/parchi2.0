@@ -96,10 +96,10 @@ const CreditNoteView = () => {
         </Link>
         <h1 className="text-2xl font-bold">{creditNote.creditnoteNo}</h1>
       </header>
-      <hr />
+
       <div>
         <nav className="flex space-x-4 mt-3 mb-3">
-          <button
+          {/* <button
             className={
               "px-4 py-1" +
               (activeTab === "CreditNote"
@@ -109,7 +109,7 @@ const CreditNoteView = () => {
             onClick={() => setActiveTab("CreditNote")}
           >
             CreditNote View
-          </button>
+          </button> */}
           {/* <button
             className={
               "px-4 py-1" +

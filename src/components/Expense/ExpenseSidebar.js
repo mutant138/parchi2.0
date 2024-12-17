@@ -165,13 +165,14 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
         </div>
         <div className="space-y-2">
           <div>
-            <div>Date</div>
+            <div>Date *</div>
             <div>
               <input
                 type="date"
                 placeholder="Date"
                 className="w-full p-2 border-2 rounded-lg focus:outline-none"
                 value={DateFormate(formData.date)}
+                required
                 onChange={(e) => {
                   setFormData((val) => ({
                     ...val,
@@ -182,12 +183,13 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
             </div>
           </div>
           <div>
-            <div>Amount</div>
+            <div>Amount *</div>
             <div>
               <input
                 type="Number"
                 placeholder="Amount"
                 className="w-full p-2 border-2 rounded-lg focus:outline-none"
+                required
                 onChange={(e) => {
                   setFormData((val) => ({
                     ...val,
@@ -253,6 +255,7 @@ function ExpenseSidebar({ isModalOpen, onClose, userDataSet, refresh }) {
               <select
                 className="w-full p-2 border-2 rounded-lg focus:outline-none"
                 value={formData.toWhom.userRef.id || ""}
+                required
                 onChange={onHandleSelectUser}
               >
                 <option disabled value="">
