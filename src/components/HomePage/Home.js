@@ -53,7 +53,7 @@ import DesignationView from "../Staff&Payout/Designation/DesignationView";
 import WeekOff from "../Staff&Payout/WeekOff/WeekOff";
 import EditService from "../Services/CreateService/EditService";
 import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
-import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
+import SetQuotation from "../Quotation/SetQuotation/SetQuotation";
 import VendorPO from "../VendorDashBoard/VendorPO";
 import Payment from "../Projects/ProjectView/Payment/Payment";
 import CreditNoteList from "../CreditNote/CreditNoteList";
@@ -110,7 +110,7 @@ const Home = () => {
             ></Route>
             <Route
               path="/quotation/create-quotation"
-              element={<CreateQuotation />}
+              element={<SetQuotation />}
             ></Route>
 
             <Route

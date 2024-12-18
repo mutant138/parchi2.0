@@ -12,21 +12,26 @@ import {
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../firebase";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
+import { setAllCustomersDetails } from "../../../store/CustomerSlice";
 
-const CreateQuotation = () => {
+const SetQuotation = () => {
   const { quotationId } = useParams();
 
   const userDetails = useSelector((state) => state.users);
+  const customersDetails = useSelector((state) => state.customers).data;
+  const dispatch = useDispatch();
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
+
   const phoneNo = userDetails.phone;
 
-  // console.log("selectedDashboardUser", selectedDashboardUser);
-
-  const [quotationDate, setQuotationDate] = useState(new Date());
+  const [quotationDate, setQuotationDate] = useState(
+    Timestamp.fromDate(new Date())
+  );
+  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -35,15 +40,16 @@ const CreateQuotation = () => {
     tcs: [],
   });
   const [isProductSelected, setIsProductSelected] = useState(false);
-  // const [books, setBooks] = useState([]);
 
   const [products, setProducts] = useState([]);
   const [preQuotationList, setPreQuotationList] = useState([]);
+  const [books, setBooks] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    book: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -75,15 +81,180 @@ const CreateQuotation = () => {
     totalAmount: 0,
   });
 
-  const [customersData, setCustomersData] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState({
     name: "",
   });
-
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   useEffect(() => {
+    function addActionQty() {
+      if (
+        formData?.products?.length === 0 ||
+        products.length === 0 ||
+        !quotationId
+      ) {
+        return;
+      }
+      setIsProductSelected(true);
+      let productData = products;
+      for (let ele of formData.products) {
+        productData = products.map((pro) => {
+          if (pro.id === ele.productRef.id) {
+            pro.actionQty = ele.quantity;
+            pro.quantity += ele.quantity;
+            pro.totalAmount = ele.quantity * pro.netAmount;
+          }
+          return pro;
+        });
+      }
+      setProducts(productData);
+      calculateProduct(productData);
+    }
+    addActionQty();
+    if (quotationId) {
+      fetchQuotationNumbers();
+    }
+  }, [formData.products]);
+
+  const fetchQuotationNumbers = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(db, "companies", companyDetails.companyId, "quotations")
+      );
+      const noList = querySnapshot.docs.map((doc) => doc.data().quotationNo);
+      if (quotationId) {
+        setPreQuotationList(
+          noList.filter((ele) => ele !== formData.quotationNo)
+        );
+      } else {
+        setPreQuotationList(noList);
+        setFormData((val) => ({
+          ...val,
+          quotationNo: String(noList.length + 1).padStart(4, 0),
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  function onSelect_TDS_TCS(e) {
+    const taxId = e.target.value;
+    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
+    setSelectedTaxDetails(taxDetails);
+  }
+
+  useEffect(() => {
+    async function fetchQuotationData() {
+      if (!quotationId) {
+        return;
+      }
+      try {
+        const docRef = doc(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "quotations",
+          quotationId
+        );
+        const getData = (await getDoc(docRef)).data();
+
+        setQuotationDate(getData.quotationDate);
+        setDueDate(getData.dueDate);
+        const customerData = (
+          await getDoc(getData.customerDetails.customerRef)
+        ).data();
+        handleSelectCustomer({
+          id: getData.customerDetails.customerRef.id,
+          ...customerData,
+        });
+        setFormData(getData);
+      } catch (error) {
+        console.log("🚀 ~ fetchQuotationData ~ error:", error);
+      }
+    }
+
+    async function customerDetails() {
+      if (customersDetails.length !== 0) {
+        return;
+      }
+
+      try {
+        const customersRef = collection(db, "customers");
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(customersRef, where("companyRef", "==", companyRef));
+        const company = await getDocs(q);
+        const customersData = company.docs.map((doc) => {
+          const { createdAt, companyRef, ...data } = doc.data();
+          return {
+            id: doc.id,
+            createdAt: JSON.stringify(createdAt),
+            companyRef: JSON.stringify(companyRef),
+            ...data,
+          };
+        });
+        dispatch(setAllCustomersDetails(customersData));
+        setSuggestions(customersData);
+      } catch (error) {
+        console.log("🚀 ~ customerDetails ~ error:", error);
+      }
+    }
+
+    async function fetchTax() {
+      try {
+        const tdsRef = collection(db, "tds");
+        const tdsQuerySnapshot = await getDocs(tdsRef);
+        const tdsData = tdsQuerySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            natureOfPayment: data.payment_nature,
+            percentage: data.percentage,
+            percentageValue: data.percentage_value,
+            tdsSection: data.tds_section,
+          };
+        });
+        const tcsRef = collection(db, "tcs_tax");
+        const tcsQuerySnapshot = await getDocs(tcsRef);
+        const tcsData = tcsQuerySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            tax: data.tax,
+            tax_value: data.tax_value,
+            type_of_goods: data.type_of_goods,
+          };
+        });
+
+        setTaxTypeOptions({
+          tds: tdsData,
+          tcs: tcsData,
+        });
+      } catch (error) {
+        console.log("🚀 ~ fetchTDC ~ error:", error);
+      }
+    }
+
+    // async function fetchBooks() {
+    //   try {
+    //     const bookRef = collection(
+    //       db,
+    //       "companies",
+    //       companyDetails.companyId,
+    //       "books"
+    //     );
+    //     const getBookData = await getDocs(bookRef);
+    //     const fetchBooks = getBookData.docs.map((doc) => ({
+    //       id: doc.id,
+    //       ...doc.data(),
+    //     }));
+    //     setBooks(fetchBooks);
+    //   } catch (error) {
+    //     console.log("🚀 ~ fetchBooks ~ error:", error);
+    //   }
+    // }
+
     const fetchProducts = async () => {
       try {
         const companyRef = doc(db, "companies", companyDetails.companyId);
@@ -141,119 +312,32 @@ const CreateQuotation = () => {
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching invoices:", error);
+        console.error("Error fetching quotation:", error);
       }
     };
 
-    async function customerDetails() {
-      try {
-        const customersRef = collection(db, "customers");
-        const q = query(
-          customersRef,
-          where(
-            "companyRef",
-            "==",
-            doc(db, "companies", companyDetails.companyId)
-          )
-        );
-        const company = await getDocs(q);
-        const customerData = company.docs.map((doc) => ({
-          customerId: doc.id,
-          ...doc.data(),
-        }));
-        setCustomersData(customerData);
-        setSuggestions(customerData);
-      } catch (error) {
-        console.log("🚀 ~ customerDetails ~ error:", error);
-      }
-    }
-    async function fetchTax() {
-      try {
-        const tdsRef = collection(db, "tds");
-        const tdsQuerySnapshot = await getDocs(tdsRef);
-        const tdsData = tdsQuerySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            natureOfPayment: data.payment_nature,
-            percentage: data.percentage,
-            percentageValue: data.percentage_value,
-            tdsSection: data.tds_section,
-          };
-        });
-        const tcsRef = collection(db, "tcs_tax");
-        const tcsQuerySnapshot = await getDocs(tcsRef);
-        const tcsData = tcsQuerySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            tax: data.tax,
-            tax_value: data.tax_value,
-            type_of_goods: data.type_of_goods,
-          };
-        });
-
-        setTaxTypeOptions({
-          tds: tdsData,
-          tcs: tcsData,
-        });
-      } catch (error) {
-        console.log("🚀 ~ fetchTDC ~ error:", error);
-      }
+    if (!quotationId) {
+      fetchQuotationNumbers();
     }
 
-    const fetchQuotationNumbers = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "quotations")
-        );
-
-        const noList = querySnapshot.docs.map((doc) => doc.data().quotationNo);
-        setPreQuotationList(noList);
-        setFormData((val) => ({
-          ...val,
-          quotationNo: String(noList.length + 1).padStart(4, 0),
-        }));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    fetchProducts();
     // fetchBooks();
-    fetchQuotationNumbers();
+    fetchQuotationData();
     fetchTax();
     customerDetails();
-    fetchProducts();
   }, [companyDetails]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setSelectedCustomerData({ name: e.target.value });
+    setSelectedCustomerData({ name: value });
     if (value) {
-      const filteredSuggestions = customersData.filter((item) =>
+      const filteredSuggestions = customersDetails.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
       setIsDropdownVisible(true);
     } else {
-      setSuggestions(customersData);
+      setSuggestions(customersDetails);
     }
   };
 
@@ -266,6 +350,7 @@ const CreateQuotation = () => {
     let countOfSelect = 0;
     let updatedProducts = products.map((product) => {
       if (product.id === productId) {
+        // Update action quantity
         if (op === "+") {
           if (product.quantity > product.actionQty) {
             ++product.actionQty;
@@ -275,26 +360,35 @@ const CreateQuotation = () => {
             --product.actionQty;
           }
         }
-        product.actionQty = Math.max(product.actionQty, 0);
+        product.actionQty = Math.max(product.actionQty, 0); // Prevent negative quantity
+        // Calculate total amount for each product based on quantity
         product.totalAmount = product.netAmount * product.actionQty;
       }
       if (product.actionQty !== 0) ++countOfSelect;
       return product;
     });
     setIsProductSelected(countOfSelect > 0);
-    const totalTaxableAmount = updatedProducts.reduce(
-      (sum, product) => sum + product.netAmount * product.actionQty,
-      0
-    );
+    calculateProduct(updatedProducts);
+    // Calculate totals based on updated quantities
+  }
+  function calculateProduct(products) {
+    const totalTaxableAmount = products.reduce((sum, product) => {
+      const cal =
+        sum + (product.netAmount - product.taxAmount) * product.actionQty;
+      if (!product.sellingPriceTaxType) {
+        return sum + product.netAmount * product.actionQty;
+      }
+      return cal;
+    }, 0);
 
-    const totalSgstAmount_2_5 = updatedProducts.reduce(
+    const totalSgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.sgst === 2.5
           ? sum + product.sgstAmount * product.actionQty
           : sum,
       0
     );
-    const totalCgstAmount_2_5 = updatedProducts.reduce(
+    const totalCgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.cgst === 2.5
           ? sum + product.cgstAmount * product.actionQty
@@ -302,23 +396,24 @@ const CreateQuotation = () => {
       0
     );
 
-    const totalSgstAmount_6 = updatedProducts.reduce(
+    const totalSgstAmount_6 = products.reduce(
       (sum, product) =>
         product.sgst === 6 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_6 = updatedProducts.reduce(
+    const totalCgstAmount_6 = products.reduce(
       (sum, product) =>
         product.cgst === 6 ? sum + product.cgstAmount * product.actionQty : sum,
       0
     );
 
-    const totalSgstAmount_9 = updatedProducts.reduce(
+    const totalSgstAmount_9 = products.reduce(
       (sum, product) =>
         product.sgst === 9 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_9 = updatedProducts.reduce(
+
+    const totalCgstAmount_9 = products.reduce(
       (sum, product) =>
         product.cgst === 9 ? sum + product.cgstAmount * product.actionQty : sum,
       0
@@ -333,7 +428,7 @@ const CreateQuotation = () => {
       totalSgstAmount_9 +
       totalCgstAmount_9;
 
-    setProducts(updatedProducts);
+    setProducts(products);
     setTotalAmounts({
       totalTaxableAmount,
       totalSgstAmount_2_5,
@@ -345,6 +440,22 @@ const CreateQuotation = () => {
       totalAmount,
     });
   }
+
+  const calculateTotal = () => {
+    const discountAmount =
+      formData.extraDiscount.type === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
+        : formData.extraDiscount.amount || 0;
+
+    const total =
+      totalAmounts.totalAmount +
+      formData.shippingCharges +
+      formData.packagingCharges +
+      total_Tax_Amount -
+      (isProductSelected ? discountAmount : 0);
+
+    return total.toFixed(2);
+  };
 
   function total_TCS_TDS_Amount() {
     const totalQty = products.reduce((acc, cur) => {
@@ -366,12 +477,12 @@ const CreateQuotation = () => {
     total_TCS_TDS_Amount();
   }, [products, selectedTaxDetails]);
 
-  async function onCreateQuotation() {
+  async function OnSetQuotation() {
     try {
-      if (!selectedCustomerData.customerId) {
+      if (!selectedCustomerData.id) {
         return;
       }
-      const customerRef = doc(db, "customers", selectedCustomerData.customerId);
+      const customerRef = doc(db, "customers", selectedCustomerData.id);
       const companyRef = doc(db, "companies", companyDetails.companyId);
       let subTotal = 0;
       const items = [];
@@ -401,6 +512,7 @@ const CreateQuotation = () => {
           productRef: productRef,
         });
       }
+
       let tcs = {
         isTcsApplicable: Boolean(taxSelect === "tcs"),
         tax: taxSelect === "tcs" ? selectedTaxDetails.tax : "",
@@ -425,86 +537,104 @@ const CreateQuotation = () => {
         ...formData,
         tds,
         tcs,
-        date: Timestamp.fromDate(quotationDate),
+        quotationDate,
+        dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
-          address: {},
+          address: companyDetails.address ?? "",
+          city: companyDetails.city ?? "",
+          zipCode: companyDetails.zipCode ?? "",
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
-        total:
-          +totalAmounts.totalAmount +
-          formData.shippingCharges +
-          formData.packagingCharges +
-          total_Tax_Amount,
-        items: items,
+        total: +calculateTotal(),
+        products: items,
         customerDetails: {
-          gstNumber: "",
-          custRef: customerRef,
-          address: selectedCustomerData.address,
-          phoneNumber: selectedCustomerData.phone,
+          gstNumber: selectedCustomerData.gstNumber ?? "",
+          customerRef: customerRef,
+          address: selectedCustomerData.address ?? "",
+          city: selectedCustomerData.city ?? "",
+          zipCode: selectedCustomerData.zipCode ?? "",
+          phone: selectedCustomerData.phone ?? "",
           name: selectedCustomerData.name,
         },
       };
 
-      await addDoc(
-        collection(db, "companies", companyDetails.companyId, "quotations"),
-        payload
+      if (quotationId) {
+        await updateDoc(
+          doc(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "quotations",
+            quotationId
+          ),
+          payload
+        );
+      } else {
+        await addDoc(
+          collection(db, "companies", companyDetails.companyId, "quotations"),
+          payload
+        );
+      }
+
+      for (const item of items) {
+        if (item.quantity === 0) {
+          continue;
+        }
+
+        const currentQuantity = products.find(
+          (val) => val.name === item.name
+        ).quantity;
+
+        if (currentQuantity <= 0) {
+          alert("Product is out of stock!");
+          throw new Error("Product is out of stock!");
+        }
+
+        // await updateDoc(item.productRef, {
+        //   stock: currentQuantity - item.quantity,
+        // });
+      }
+
+      alert(
+        "Successfully " +
+          (quotationId ? "Updated" : "Created") +
+          " the quotation"
       );
-
-      // for (const item of items) {
-      //   if (item.quantity === 0) {
-      //     continue;
-      //   }
-
-      //   const currentQuantity = products.find(
-      //     (val) => val.name === item.name
-      //   ).quantity;
-
-      //   if (currentQuantity <= 0) {
-      //     alert("Product is out of stock!");
-      //     throw new Error("Product is out of stock!");
-      //   }
-
-      //   await updateDoc(item.productRef, {
-      //     "stock.quantity": currentQuantity - item.quantity,
-      //   });
-      // }
-
-      alert("Successfully Created the Quotation");
       navigate("/quotation");
     } catch (err) {
       console.error(err);
     }
   }
-  // function onSelectBook(e) {
-  //   const { value } = e.target;
-  //   const data = books.find((ele) => ele.id === value);
-  //   const bookRef = doc(
-  //     db,
-  //     "companies",
-  //     companyDetails.companyId,
-  //     "books",
-  //     value
-  //   );
-  //   setFormData((val) => ({
-  //     ...val,
-  //     book: { id: value, name: data.name, bookRef },
-  //   }));
-  // }
-  function onSelect_TDS_TCS(e) {
-    const taxId = e.target.value;
-    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
-    setSelectedTaxDetails(taxDetails);
-  }
 
-  function setCurrentDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
+
+    return `${getFullYear}-${getMonth}-${getDate}`;
   }
+  //   function onSelectBook(e) {
+  //     const { value } = e.target;
+  //     const data = books.find((ele) => ele.id === value);
+  //     console.log("🚀 ~ onSelectBook ~ data:", data);
+  //     const bookRef = doc(
+  //       db,
+  //       "companies",
+  //       companyDetails.companyId,
+  //       "books",
+  //       value
+  //     );
+  //     setFormData((val) => ({
+  //       ...val,
+  //       book: { name: data.name, bookRef },
+  //     }));
+  //   }
 
   return (
     <div
@@ -518,14 +648,18 @@ const CreateQuotation = () => {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">Create Quotation</h1>
+        <h1 className="text-2xl font-bold">
+          {quotationId ? "Edit" : "Create"} Quotation
+        </h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex gap-8 mb-6">
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Customer Details</h2>
             <div className="bg-blue-50 p-4 rounded-lg">
-              <label className="text-sm text-gray-600">Select Customer</label>
+              <label className="text-sm text-gray-600">
+                Select Customer <span className="text-red-500">*</span>{" "}
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -535,17 +669,18 @@ const CreateQuotation = () => {
                   onChange={handleInputChange}
                   onFocus={() => setIsDropdownVisible(true)}
                   onBlur={() => {
-                    if (!selectedCustomerData.customerId) {
+                    if (!selectedCustomerData.id) {
                       setSelectedCustomerData({ name: "" });
                     }
                     setIsDropdownVisible(false);
                   }}
+                  required
                 />
                 {isDropdownVisible && suggestions.length > 0 && (
                   <div className="absolute z-20 bg-white border border-gray-300 rounded-lg shadow-md max-h-60 overflow-y-auto w-full">
                     {suggestions.map((item) => (
                       <div
-                        key={item.customerId}
+                        key={item.id}
                         onMouseDown={() => handleSelectCustomer(item)}
                         className="flex flex-col px-4 py-3 text-gray-800 hover:bg-blue-50 cursor-pointer transition-all duration-150 ease-in-out"
                       >
@@ -566,35 +701,53 @@ const CreateQuotation = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
-                <label className="text-sm text-gray-600">Quotation Date</label>
+                <label className="text-sm text-gray-600">
+                  quotation Date <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="date"
-                  value={setCurrentDate(quotationDate)}
+                  value={DateFormate(quotationDate)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setQuotationDate(new Date(e.target.value));
+                    setQuotationDate(
+                      Timestamp.fromDate(new Date(e.target.value))
+                    );
+                  }}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  Due Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={DateFormate(dueDate)}
+                  className="border p-1 rounded w-full mt-1"
+                  onChange={(e) => {
+                    setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                 />
               </div>
               <div>
                 <label className="text-sm text-gray-600">
-                  Quotation No.{" "}
+                  quotation No. <span className="text-red-500">*</span>
                   {preQuotationList.includes(formData.quotationNo) && (
                     <span className="text-red-800 text-xs">
-                      "Already Quotation No. exist"{" "}
+                      "Already quotation No. exist"{" "}
                     </span>
                   )}
                   {Number(formData.quotationNo) == 0 && (
                     <span className="text-red-800 text-xs">
-                      "Kindly Enter valid Quotation No."{" "}
+                      "Kindly Enter valid quotation No."{" "}
                     </span>
                   )}
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter Quotation No. "
+                  placeholder="Enter quotation No. "
                   className="border p-1 rounded w-full mt-1"
                   value={formData.quotationNo}
                   onChange={(e) => {
@@ -604,6 +757,7 @@ const CreateQuotation = () => {
                       quotationNo: value,
                     }));
                   }}
+                  required
                 />
               </div>
             </div>
@@ -635,6 +789,7 @@ const CreateQuotation = () => {
                     <th className="px-4 py-2">Unit Price</th>
                     <th className="px-4 py-2">Discount</th>
                     <th className="px-4 py-2">Net Amount</th>
+                    <th className="px-2 py-2">Is Tax Included</th>
                     <th className="px-4 py-2">Total Amount</th>
                     <th className="px-4 py-2">Action</th>
                   </tr>
@@ -652,6 +807,9 @@ const CreateQuotation = () => {
                             </td>
                             <td className="px-4 py-2">₹{product.discount}</td>
                             <td className="px-4 py-2">₹{product.netAmount}</td>
+                            <td className="px-2 py-2">
+                              {product.sellingPriceTaxType ? "Yes" : "No"}
+                            </td>
                             <td className="px-4 py-2">
                               ₹{product.totalAmount}
                             </td>
@@ -734,7 +892,7 @@ const CreateQuotation = () => {
                 {/* <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
-                    defaultValue=""
+                    value={formData.book.bookRef?.id || ""}
                     onChange={onSelectBook}
                     className="border p-2 rounded w-full"
                   >
@@ -742,8 +900,8 @@ const CreateQuotation = () => {
                       Select Bank/Book
                     </option>
                     {books.length > 0 &&
-                      books.map((book) => (
-                        <option value={book.id} key={book.id}>
+                      books.map((book, index) => (
+                        <option value={book.id} key={index}>
                           {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
@@ -762,9 +920,21 @@ const CreateQuotation = () => {
                   </select>
                 </div>
                 <div className="w-full ">
+                  <div>Attach Files</div>
+
+                  <input
+                    type="file"
+                    className="flex h-10 w-full rounded-md border border-input
+                  bg-white px-3 py-2 text-sm text-gray-400 file:border-0
+                  file:bg-transparent file:text-gray-600 file:text-sm
+                  file:font-medium"
+                  />
+                </div>
+                <div className="w-full ">
                   <div>Shipping Charges</div>
                   <input
                     type="number"
+                    value={formData.shippingCharges || ""}
                     placeholder="Shipping Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -779,6 +949,7 @@ const CreateQuotation = () => {
                   <div>Packaging Charges</div>
                   <input
                     type="number"
+                    value={formData.packagingCharges || ""}
                     placeholder="Packaging Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -790,20 +961,10 @@ const CreateQuotation = () => {
                   />
                 </div>
                 <div className="w-full ">
-                  <div>Attach Files</div>
-
-                  <input
-                    type="file"
-                    className="flex h-10 w-full rounded-md border border-input
-                  bg-white px-3 py-2 text-sm text-gray-400 file:border-0
-                  file:bg-transparent file:text-gray-600 file:text-sm
-                  file:font-medium"
-                  />
-                </div>
-                <div className="w-full ">
                   <div>Notes</div>
                   <input
                     type="text"
+                    value={formData.notes}
                     placeholder="Notes"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -818,6 +979,7 @@ const CreateQuotation = () => {
                   <div>Terms</div>
                   <textarea
                     type="text"
+                    value={formData.terms}
                     className="border p-2 rounded w-full max-h-16 min-h-16"
                     onChange={(e) => {
                       setFormData((val) => ({
@@ -827,7 +989,7 @@ const CreateQuotation = () => {
                     }}
                   />
                 </div>
-                <div className="w-full flex justify-between items-center">
+                <div className="w-full flex justify-between items-center mt-5 space-x-3">
                   <div>TDS</div>
                   <div>
                     <label className="relative inline-block w-14 h-8">
@@ -864,9 +1026,10 @@ const CreateQuotation = () => {
                       <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
                     </label>
                   </div>
-                  <div>
+                  <div className="w-full">
                     <select
                       className="border p-2 rounded w-full"
+                      value={formData.mode}
                       onChange={(e) =>
                         setFormData((val) => ({ ...val, mode: e.target.value }))
                       }
@@ -925,30 +1088,43 @@ const CreateQuotation = () => {
               </div>
             </div>
             <div className="flex justify-end items-center mt-4 border-t pt-4 bg-gray-50 p-4 ">
-              {/* <div className="flex items-center gap-2">
-                <label className="text-gray-600">
-                  Apply discount (%) to all items?
-                </label>
-                <input
-                  type="text"
-                  className="border border-green-500 p-1 rounded w-16"
-                  placeholder="%"
-                  onChange={(e) =>
-                    setFormData((val) => ({ ...val, discount: e.target.value }))
-                  }
-                />
-              </div> */}
-
-              <div className="flex flex-col justify-between">
-                <div className=" p-6" style={{ width: "600px" }}>
-                  {/* <div className="flex items-center mb-4">
-                    <label className="mr-2">Extra Discount</label>
+              <div className="flex justify-between">
+                <div className="flex space-x-3 items-center">
+                  <div className=""> Extra Discount: </div>
+                  <div>
                     <input
-                      type="text"
-                      placeholder="%"
-                      className="border p-1 rounded w-16 text-center"
+                      type="number"
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount?.amount || ""}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: {
+                            ...val.extraDiscount,
+                            amount: +e.target.value || 0,
+                          },
+                        }));
+                      }}
                     />
-                  </div> */}
+                    <select
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount?.type || "percentage"}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: {
+                            ...val.extraDiscount,
+                            type: e.target.value,
+                          },
+                        }));
+                      }}
+                    >
+                      <option value="percentage">%</option>
+                      <option value="fixed">Fixed</option>
+                    </select>
+                  </div>
+                </div>
+                <div className=" p-6" style={{ width: "600px" }}>
                   {formData.shippingCharges > 0 && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>Shipping Charges</span>
@@ -1016,18 +1192,22 @@ const CreateQuotation = () => {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
-
+                  {formData?.extraDiscount?.amount > 0 && isProductSelected && (
+                    <div className="flex justify-between text-gray-700 mb-2">
+                      <span>Extra Discount Amount</span>
+                      <span>
+                        ₹{" "}
+                        {formData.extraDiscount.type === "percentage"
+                          ? (+totalAmounts.totalAmount *
+                              formData?.extraDiscount?.amount) /
+                            100
+                          : formData?.extraDiscount?.amount}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-xl mb-2">
                     <span>Total Amount</span>
-                    <span>
-                      ₹{" "}
-                      {(
-                        totalAmounts.totalAmount +
-                        formData.shippingCharges +
-                        formData.packagingCharges +
-                        total_Tax_Amount
-                      ).toFixed(2)}
-                    </span>
+                    <span>₹ {calculateTotal()}</span>
                   </div>
                 </div>
               </div>
@@ -1041,9 +1221,16 @@ const CreateQuotation = () => {
             </button> */}
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onCreateQuotation}
+              onClick={() => {
+                {
+                  products.length > 0 && isProductSelected
+                    ? OnSetQuotation()
+                    : alert("Please select items to proceed.");
+                }
+              }}
             >
-              <span className="text-lg">+</span> Create Quotation
+              <span className="text-lg">+</span>{" "}
+              {quotationId ? "Edit" : "Create"} quotation
             </button>
           </div>
         </div>
@@ -1052,4 +1239,4 @@ const CreateQuotation = () => {
   );
 };
 
-export default CreateQuotation;
+export default SetQuotation;
