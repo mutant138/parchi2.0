@@ -28,10 +28,10 @@ const SetQuotation = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [quotationDate, setQuotationDate] = useState(
+  const [date, setDate] = useState(
     Timestamp.fromDate(new Date())
   );
-  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
+
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -160,8 +160,8 @@ const SetQuotation = () => {
         );
         const getData = (await getDoc(docRef)).data();
 
-        setQuotationDate(getData.quotationDate);
-        setDueDate(getData.dueDate);
+        setDate(getData.date);
+    
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -537,8 +537,7 @@ const SetQuotation = () => {
         ...formData,
         tds,
         tcs,
-        quotationDate,
-        dueDate,
+        date,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -701,36 +700,24 @@ const SetQuotation = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
                   quotation Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(quotationDate)}
+                  value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setQuotationDate(
+                    setDate(
                       Timestamp.fromDate(new Date(e.target.value))
                     );
                   }}
                   required
                 />
               </div>
-              <div>
-                <label className="text-sm text-gray-600">
-                  Due Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  value={DateFormate(dueDate)}
-                  className="border p-1 rounded w-full mt-1"
-                  onChange={(e) => {
-                    setDueDate(Timestamp.fromDate(new Date(e.target.value)));
-                  }}
-                />
-              </div>
+         
               <div>
                 <label className="text-sm text-gray-600">
                   quotation No. <span className="text-red-500">*</span>

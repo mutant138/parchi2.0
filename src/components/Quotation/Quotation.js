@@ -84,6 +84,7 @@ function Quotation() {
     (sum, quotation) => sum + quotation.total,
     0
   );
+
   const paidAmount = filteredQuotations
     .filter((quotation) => quotation.paymentStatus === "Paid")
     .reduce((sum, quotation) => sum + quotation.total, 0);
@@ -190,7 +191,7 @@ function Quotation() {
                         <td className=" py-3">
                           {quotation.customerDetails?.name} <br />
                           <span className="text-gray-500">
-                            {quotation.customerDetails.phoneNumber}
+                            {quotation.customerDetails.phone}
                           </span>
                         </td>
                         <td className="py-3">{`₹ ${quotation.total.toFixed(
