@@ -4,7 +4,7 @@ import { FaRegEye } from "react-icons/fa";
 import { IoMdDownload } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 
 function PO() {
@@ -15,7 +15,7 @@ function PO() {
     userDetails.companies[userDetails.selectedCompanyIndex];
 
   const selectedDashboardUser = userDetails.selectedDashboard;
-
+  const navigate = useNavigate();
   console.log("selectedDashboardUser", selectedDashboardUser);
   const [POList, setPOList] = useState([]);
 
@@ -107,7 +107,7 @@ function PO() {
           <h1 className="text-2xl font-bold">PO</h1>
           <Link
             className="bg-blue-500 text-white py-1 px-2 rounded"
-            to="/create-po"
+            to="create-po"
           >
             + New PO
           </Link>
@@ -181,13 +181,16 @@ function PO() {
                     <th className="p-4">Mode</th>
                     <th className="p-4">PO No.</th>
                     <th className="p-4">Date / Updated Time</th>
-                    <th className="p-4">Actions</th>
+                    {/* <th className="p-4">Actions</th> */}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPO.length > 0 ? (
                     filteredPO.map((po) => (
-                      <tr key={po.id} className="border-b ">
+                      <tr key={po.id} className="border-b cursor-pointer "   
+                      onClick={(e) => {
+                        navigate(po.id);
+                      }}>
                         <td className="py-3 ">
                           {po.vendorDetails?.name} <br />
                           <span className="text-gray-500">
@@ -211,7 +214,7 @@ function PO() {
                             <option value="Received">Received</option>
                           </select>
                         </td>
-                        <td className="py-3 ">{po.paymentMode || "Online"}</td>
+                        <td className="py-3 ">{po.mode || "Online"}</td>
                         <td className="py-3 ">{po.poNo}</td>
 
                         <td className="py-3 ">
@@ -238,7 +241,7 @@ function PO() {
                           })()}
                         </td>
 
-                        <td className="py-3 space-x-3">
+                        {/* <td className="py-3 space-x-3">
                           <button className="relative group text-green-500 hover:text-green-700 text-xl">
                             <FaRegEye />
                             <div className="absolute left-1/2 transform -translate-x-1/2 top-5 px-2 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
@@ -251,7 +254,7 @@ function PO() {
                               Download
                             </div>
                           </button>
-                        </td>
+                        </td> */}
                       </tr>
                     ))
                   ) : (

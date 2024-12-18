@@ -43,7 +43,7 @@ import POS from "../POS/POS";
 import POSViewHome from "../POS/POSView/POSViewHome";
 import CreatePOS from "../POS/CreatePOS/CreatePOS";
 import ProFormaInvoice from "../ProFormaInvoice/ProFormaInvoice";
-import CreateProFormaInvoice from "../ProFormaInvoice/CreateProFormaInvoice/CreateProFormaInvoice";
+// import CreateProFormaInvoice from "../ProFormaInvoice/CreateProFormaInvoice/CreateProFormaInvoice";
 import ProFormaView from "../ProFormaInvoice/ProFormaInvoiceView/ProFormaView";
 import Reminder from "../Reminder/Reminder";
 import Designation from "../Staff&Payout/Designation/Designation";
@@ -62,6 +62,8 @@ import SetCreditNote from "../CreditNote/SetCreditNote/SetCreditNote";
 import DeliveryChallanList from "../DeliveryChallan/DeliveryChallanList";
 import DeliveryChallanView from "../DeliveryChallan/DeliveryChallanView/DeliveryChallanView";
 import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliveryChallan";
+import PoView from "../PO/PoView/PoView";
+import SetPO from "../PO/SetPO/SetPO";
 
 const Home = () => {
   const location = useLocation();
@@ -124,10 +126,7 @@ const Home = () => {
               path="/pro-forma-invoice/:id"
               element={<ProFormaView />}
             ></Route>
-            <Route
-              path="/pro-forma-invoice/create-invoice"
-              element={<CreateProFormaInvoice />}
-            ></Route>
+
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
             <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
@@ -190,6 +189,19 @@ const Home = () => {
               element={<EditService />}
             ></Route>
             <Route path="/po" element={<PO />}></Route>
+           
+            <Route
+              path="/po/:id"
+              element={<PoView />}
+            ></Route>
+            <Route
+              path="/po/create-po"
+              element={<SetPO />}
+            ></Route>
+            <Route
+              path="/po/:poId/edit-po"
+              element={<SetPO />}
+            ></Route>
             <Route path="/create-po" element={<CreatePo />}></Route>
             <Route path="/reminder" element={<Reminder />}></Route>
             <Route path="/expense" element={<BookList />}></Route>
