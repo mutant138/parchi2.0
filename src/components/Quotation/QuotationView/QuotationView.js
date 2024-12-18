@@ -21,17 +21,18 @@ function QuotationView({ quotation }) {
   const quotationRef = useRef();
 
   useEffect(() => {
-    if (quotation.items) {
-      const tax = quotation?.items.reduce((acc, cur) => {
-        return acc + cur.sellingPrice.taxSlab;
+    if (quotation.products) {
+      const tax = quotation?.products.reduce((acc, cur) => {
+        return acc + cur?.tax;
       }, 0);
-      const discount = quotation?.items.reduce((acc, cur) => {
-        return acc + cur.discount;
+      const discount = quotation?.products.reduce((acc, cur) => {
+        return acc + cur?.discount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
     }
   }, [quotation]);
+
   const handleDownloadPdf = () => {
     if (!quotation.id) {
       return;
@@ -45,19 +46,19 @@ function QuotationView({ quotation }) {
       y: 0,
     });
   };
+
   const handleDelete = async () => {
     try {
       if (!quotation.id || !companyId) {
-        alert("Quotation ID or Company ID is missing.");
+        alert("quotation ID or Company ID is missing.");
         return;
       }
 
-      // Ref to the quotation document
       const quotationDocRef = doc(
         db,
         "companies",
         companyId,
-        "quotations",
+        "quotation",
         quotation.id
       );
 
@@ -66,32 +67,7 @@ function QuotationView({ quotation }) {
       );
       if (!confirmDelete) return;
       await deleteDoc(quotationDocRef);
-
-      if (quotation.items && quotation.items.length > 0) {
-        const updateInventoryPromises = quotation.items.map((inventoryItem) => {
-          if (
-            !inventoryItem.productRef ||
-            typeof inventoryItem.quantity !== "number"
-          ) {
-            console.error("Invalid inventory item:", inventoryItem);
-            return Promise.resolve();
-          }
-
-          const inventoryDocRef = doc(
-            db,
-            "companies",
-            companyId,
-            "inventories",
-            inventoryItem.productRef.id
-          );
-
-          return updateDoc(inventoryDocRef, {
-            stock: increment(inventoryItem.quantity),
-          });
-        });
-        await Promise.all(updateInventoryPromises);
-      }
-      navigate("/quotationList");
+      navigate("/delivery-challan");
     } catch (error) {
       console.error("Error deleting quotation:", error);
       alert("Failed to delete the quotation. Check the console for details.");
@@ -111,7 +87,7 @@ function QuotationView({ quotation }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-
+  console.log("quotation", quotation?.products);
   return (
     <div className="">
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
@@ -128,6 +104,7 @@ function QuotationView({ quotation }) {
             className={
               "px-4 py-1 bg-red-300 text-white rounded-full flex items-center"
             }
+            onClick={() => navigate("edit-quotation")}
           >
             <TbEdit /> &nbsp; Edit
           </button>
@@ -162,12 +139,12 @@ function QuotationView({ quotation }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(quotation?.date)}</div>
+            <div>Date: {DateFormate(quotation?.quotationDate)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {quotation?.items?.length > 0 &&
-            quotation.items.map((ele, index) => (
+          {quotation?.products?.length > 0 &&
+            quotation?.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -175,16 +152,37 @@ function QuotationView({ quotation }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele.sellingPrice}</div>
-                  <div>Tax :{ele.tax}</div>
-                  <div>Discount :{ele.discount}</div>
+                  <div>Price: ₹{ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}%</div>
+                  <div>Discount :₹{ele?.discount}</div>
                 </div>
               </div>
             ))}
           <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹ {quotation.subTotal}</div>
-            <div>Discount: {totalDiscount}</div>
-            <div>Tax: {totalTax}</div>
+            <div>subTotal: ₹{quotation.subTotal}</div>
+            <div>Tax: {totalTax}%</div>
+            <div>
+              {quotation.extraDiscount?.amount > 0 && (
+                <>
+                  Extra Discount:{" "}
+                  {quotation?.extraDiscount?.type === "percentage"
+                    ? `${quotation.extraDiscount.amount}%`
+                    : `₹${quotation.extraDiscount.amount}`}{" "}
+                </>
+              )}
+            </div>
+            <div>
+              {" "}
+              {quotation.packagingCharges > 0 && (
+                <>Packaging Charges: ₹{quotation.packagingCharges}</>
+              )}
+            </div>
+            <div>
+              {" "}
+              {quotation.shippingCharges > 0 && (
+                <>Shipping Charges: ₹{quotation.shippingCharges} </>
+              )}{" "}
+            </div>
           </div>
           <div className="flex space-x-3 justify-end font-bold text-lg">
             <div>Total:</div>
@@ -227,7 +225,11 @@ function QuotationView({ quotation }) {
                     </div>
                   </div>
                 </div>
-                {/* <Template1 ref={quotationRef} invoiceData={quotation} /> */}
+                <Template1
+                  ref={quotationRef}
+                  quotationData={quotation}
+                  //   bankDetails={bankDetails}
+                />
               </div>
             </div>
           </div>

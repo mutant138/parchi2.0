@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import QuotationView from "./QuotationView";
-import Returns from "./Returns";
 
 function QuotationViewHome() {
   const { id } = useParams();
@@ -47,7 +46,7 @@ function QuotationViewHome() {
       <hr />
       <div>
         <nav className="flex space-x-4 mt-3 mb-3">
-          <button
+          {/* <button
             className={
               "px-4 py-1" +
               (activeTab === "Quotation"
@@ -57,8 +56,8 @@ function QuotationViewHome() {
             onClick={() => setActiveTab("Quotation")}
           >
             Quotation View
-          </button>
-          <button
+          </button> */}
+          {/* <button
             className={
               "px-4 py-1" +
               (activeTab === "Returns"
@@ -68,21 +67,21 @@ function QuotationViewHome() {
             onClick={() => setActiveTab("Returns")}
           >
             Returns
-          </button>
+          </button> */}
         </nav>
       </div>
-      <hr />
+      {/* <hr /> */}
       <div className="w-full">
         {activeTab === "Quotation" && (
           <div>
             <QuotationView quotation={quotation} />
           </div>
         )}
-        {activeTab === "Returns" && (
+        {/* {activeTab === "Returns" && (
           <div>
             <Returns />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
