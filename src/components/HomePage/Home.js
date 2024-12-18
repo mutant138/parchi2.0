@@ -54,13 +54,14 @@ import WeekOff from "../Staff&Payout/WeekOff/WeekOff";
 import EditService from "../Services/CreateService/EditService";
 import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 import CreateQuotation from "../Quotation/CreateQuotation/CreateQuotation";
-import DeliveryChallan from "../DeliveryChallan/DeliveryChallan";
 import VendorPO from "../VendorDashBoard/VendorPO";
 import Payment from "../Projects/ProjectView/Payment/Payment";
-import CreateDeliveryChallan from "../DeliveryChallan/CreateDeliveryChallan";
 import CreditNoteList from "../CreditNote/CreditNoteList";
 import CreditNoteView from "../CreditNote/CreditNoteView/CreditNoteView";
 import SetCreditNote from "../CreditNote/SetCreditNote/SetCreditNote";
+import DeliveryChallanList from "../DeliveryChallan/DeliveryChallanList";
+import DeliveryChallanView from "../DeliveryChallan/DeliveryChallanView/DeliveryChallanView";
+import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliveryChallan";
 
 const Home = () => {
   const location = useLocation();
@@ -111,6 +112,7 @@ const Home = () => {
               path="/quotation/create-quotation"
               element={<CreateQuotation />}
             ></Route>
+
             <Route
               path="/pro-forma-invoice"
               element={<ProFormaInvoice />}
@@ -191,7 +193,19 @@ const Home = () => {
             <Route path="/expense/:id" element={<Expense />}></Route>
             <Route
               path="/delivery-challan"
-              element={<DeliveryChallan />}
+              element={<DeliveryChallanList />}
+            ></Route>
+            <Route
+              path="/delivery-challan/:id"
+              element={<DeliveryChallanView />}
+            ></Route>
+            <Route
+              path="/delivery-challan/create-deliverychallan"
+              element={<SetDeliveryChallan />}
+            ></Route>
+            <Route
+              path="/delivery-challan/:deliverychallanId/edit-deliverychallan"
+              element={<SetDeliveryChallan />}
             ></Route>
             <Route path="/credit-note" element={<CreditNoteList />}></Route>
             <Route path="/credit-note/:id" element={<CreditNoteView />}></Route>
@@ -204,10 +218,6 @@ const Home = () => {
               element={<SetCreditNote />}
             ></Route>
             <Route path="/vendor/po" element={<VendorPO />}></Route>
-            <Route
-              path="/delivery-challan/create-challan"
-              element={<CreateDeliveryChallan />}
-            ></Route>
           </Routes>
           <Outlet />
         </div>
