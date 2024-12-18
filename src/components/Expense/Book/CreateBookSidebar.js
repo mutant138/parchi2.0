@@ -71,7 +71,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
         </div>
         <div>
           <div>
-            <label className="block font-semibold">Book Name</label>
+            <label className="block font-semibold">Book Name *</label>
             <input
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
@@ -83,7 +83,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
             />
           </div>
           <div>
-            <label className="block font-semibold">Opening Balance</label>
+            <label className="block font-semibold">Opening Balance *</label>
             <input
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
@@ -98,7 +98,7 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
             />
           </div>
           <div>
-            <label className="block font-semibold">Bank Name</label>
+            <label className="block font-semibold">Bank Name *</label>
             <input
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
@@ -118,7 +118,6 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="Bank Account"
-              required
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
@@ -140,7 +139,6 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="Confirm Bank Account"
-              required
               onChange={(e) => setConfirmAccount(e.target.value)}
             />
           </div>
@@ -150,7 +148,6 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="Bank IFSC Code"
-              required
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
@@ -165,7 +162,6 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="Branch Name"
-              required
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,
@@ -182,7 +178,6 @@ function CreateBookSidebar({ onClose, isOpen, refresh }) {
               type="text"
               className="w-full border border-gray-300 p-2 rounded-md"
               placeholder="UPI"
-              required
               onChange={(e) =>
                 setFormData((val) => ({
                   ...val,

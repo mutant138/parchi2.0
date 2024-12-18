@@ -17,8 +17,8 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
 import { setAllCustomersDetails } from "../../../store/CustomerSlice";
 
-const SetInvoice = () => {
-  const { invoiceId } = useParams();
+const SetCreditNote = () => {
+  const { creditnoteId } = useParams();
 
   const userDetails = useSelector((state) => state.users);
   const customersDetails = useSelector((state) => state.customers).data;
@@ -28,7 +28,7 @@ const SetInvoice = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [invoiceDate, setInvoiceDate] = useState(
+  const [creditNoteDate, setCreditNoteDate] = useState(
     Timestamp.fromDate(new Date())
   );
   const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
@@ -42,7 +42,7 @@ const SetInvoice = () => {
   const [isProductSelected, setIsProductSelected] = useState(false);
 
   const [products, setProducts] = useState([]);
-  const [preInvoiceList, setPreInvoiceList] = useState([]);
+  const [preCreditNoteList, setPreCreditNoteList] = useState([]);
   const [books, setBooks] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -53,7 +53,7 @@ const SetInvoice = () => {
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
-    invoiceNo: "",
+    creditnoteNo: "",
     packagingCharges: 0,
     subTotal: 0,
     tds: {},
@@ -92,7 +92,7 @@ const SetInvoice = () => {
       if (
         formData?.products?.length === 0 ||
         products.length === 0 ||
-        !invoiceId
+        !creditnoteId
       ) {
         return;
       }
@@ -112,24 +112,26 @@ const SetInvoice = () => {
       calculateProduct(productData);
     }
     addActionQty();
-    if (invoiceId) {
-      fetchInvoiceNumbers();
+    if (creditnoteId) {
+      fetchCreditNoteNumbers();
     }
   }, [formData.products]);
 
-  const fetchInvoiceNumbers = async () => {
+  const fetchCreditNoteNumbers = async () => {
     try {
       const querySnapshot = await getDocs(
-        collection(db, "companies", companyDetails.companyId, "invoices")
+        collection(db, "companies", companyDetails.companyId, "creditnote")
       );
-      const noList = querySnapshot.docs.map((doc) => doc.data().invoiceNo);
-      if (invoiceId) {
-        setPreInvoiceList(noList.filter((ele) => ele !== formData.invoiceNo));
+      const noList = querySnapshot.docs.map((doc) => doc.data().creditnoteNo);
+      if (creditnoteId) {
+        setPreCreditNoteList(
+          noList.filter((ele) => ele !== formData.creditnoteNo)
+        );
       } else {
-        setPreInvoiceList(noList);
+        setPreCreditNoteList(noList);
         setFormData((val) => ({
           ...val,
-          invoiceNo: String(noList.length + 1).padStart(4, 0),
+          creditnoteNo: String(noList.length + 1).padStart(4, 0),
         }));
       }
     } catch (error) {
@@ -144,8 +146,8 @@ const SetInvoice = () => {
   }
 
   useEffect(() => {
-    async function fetchInvoiceData() {
-      if (!invoiceId) {
+    async function fetchCreditNoteData() {
+      if (!creditnoteId) {
         return;
       }
       try {
@@ -153,12 +155,12 @@ const SetInvoice = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "invoices",
-          invoiceId
+          "creditnote",
+          creditnoteId
         );
         const getData = (await getDoc(docRef)).data();
 
-        setInvoiceDate(getData.invoiceDate);
+        setCreditNoteDate(getData.creditNoteDate);
         setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
@@ -169,7 +171,7 @@ const SetInvoice = () => {
         });
         setFormData(getData);
       } catch (error) {
-        console.log("🚀 ~ fetchInvoiceData ~ error:", error);
+        console.log("🚀 ~ fetchCreditNoteData ~ error:", error);
       }
     }
 
@@ -234,24 +236,24 @@ const SetInvoice = () => {
       }
     }
 
-    async function fetchBooks() {
-      try {
-        const bookRef = collection(
-          db,
-          "companies",
-          companyDetails.companyId,
-          "books"
-        );
-        const getBookData = await getDocs(bookRef);
-        const fetchBooks = getBookData.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBooks(fetchBooks);
-      } catch (error) {
-        console.log("🚀 ~ fetchBooks ~ error:", error);
-      }
-    }
+    // async function fetchBooks() {
+    //   try {
+    //     const bookRef = collection(
+    //       db,
+    //       "companies",
+    //       companyDetails.companyId,
+    //       "books"
+    //     );
+    //     const getBookData = await getDocs(bookRef);
+    //     const fetchBooks = getBookData.docs.map((doc) => ({
+    //       id: doc.id,
+    //       ...doc.data(),
+    //     }));
+    //     setBooks(fetchBooks);
+    //   } catch (error) {
+    //     console.log("🚀 ~ fetchBooks ~ error:", error);
+    //   }
+    // }
 
     const fetchProducts = async () => {
       try {
@@ -310,17 +312,17 @@ const SetInvoice = () => {
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching invoices:", error);
+        console.error("Error fetching creditnote:", error);
       }
     };
 
-    if (!invoiceId) {
-      fetchInvoiceNumbers();
+    if (!creditnoteId) {
+      fetchCreditNoteNumbers();
     }
 
     fetchProducts();
-    fetchBooks();
-    fetchInvoiceData();
+    // fetchBooks();
+    fetchCreditNoteData();
     fetchTax();
     customerDetails();
   }, [companyDetails]);
@@ -475,7 +477,7 @@ const SetInvoice = () => {
     total_TCS_TDS_Amount();
   }, [products, selectedTaxDetails]);
 
-  async function onSetInvoice() {
+  async function onSetCreditNote() {
     try {
       if (!selectedCustomerData.id) {
         return;
@@ -535,7 +537,7 @@ const SetInvoice = () => {
         ...formData,
         tds,
         tcs,
-        invoiceDate,
+        creditNoteDate,
         dueDate,
         createdBy: {
           companyRef: companyRef,
@@ -559,14 +561,20 @@ const SetInvoice = () => {
         },
       };
 
-      if (invoiceId) {
+      if (creditnoteId) {
         await updateDoc(
-          doc(db, "companies", companyDetails.companyId, "invoices", invoiceId),
+          doc(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "creditnote",
+            creditnoteId
+          ),
           payload
         );
       } else {
         await addDoc(
-          collection(db, "companies", companyDetails.companyId, "invoices"),
+          collection(db, "companies", companyDetails.companyId, "creditnote"),
           payload
         );
       }
@@ -585,15 +593,17 @@ const SetInvoice = () => {
           throw new Error("Product is out of stock!");
         }
 
-        await updateDoc(item.productRef, {
-          stock: currentQuantity - item.quantity,
-        });
+        // await updateDoc(item.productRef, {
+        //   stock: currentQuantity - item.quantity,
+        // });
       }
 
       alert(
-        "Successfully " + (invoiceId ? "Updated" : "Created") + " the Invoice"
+        "Successfully " +
+          (creditnoteId ? "Updated" : "Created") +
+          " the CreditNote"
       );
-      navigate("/invoice");
+      navigate("/credit-note");
     } catch (err) {
       console.error(err);
     }
@@ -609,22 +619,22 @@ const SetInvoice = () => {
 
     return `${getFullYear}-${getMonth}-${getDate}`;
   }
-  function onSelectBook(e) {
-    const { value } = e.target;
-    const data = books.find((ele) => ele.id === value);
-    console.log("🚀 ~ onSelectBook ~ data:", data);
-    const bookRef = doc(
-      db,
-      "companies",
-      companyDetails.companyId,
-      "books",
-      value
-    );
-    setFormData((val) => ({
-      ...val,
-      book: { name: data.name, bookRef },
-    }));
-  }
+  //   function onSelectBook(e) {
+  //     const { value } = e.target;
+  //     const data = books.find((ele) => ele.id === value);
+  //     console.log("🚀 ~ onSelectBook ~ data:", data);
+  //     const bookRef = doc(
+  //       db,
+  //       "companies",
+  //       companyDetails.companyId,
+  //       "books",
+  //       value
+  //     );
+  //     setFormData((val) => ({
+  //       ...val,
+  //       book: { name: data.name, bookRef },
+  //     }));
+  //   }
 
   return (
     <div
@@ -639,7 +649,7 @@ const SetInvoice = () => {
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
         <h1 className="text-2xl font-bold">
-          {invoiceId ? "Edit" : "Create"} Invoice
+          {creditnoteId ? "Edit" : "Create"} CreditNote
         </h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -694,14 +704,14 @@ const SetInvoice = () => {
             <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
-                  Invoice Date <span className="text-red-500">*</span>
+                  creditnote Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(invoiceDate)}
+                  value={DateFormate(creditNoteDate)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setInvoiceDate(
+                    setCreditNoteDate(
                       Timestamp.fromDate(new Date(e.target.value))
                     );
                   }}
@@ -723,28 +733,28 @@ const SetInvoice = () => {
               </div>
               <div>
                 <label className="text-sm text-gray-600">
-                  Invoice No. <span className="text-red-500">*</span>
-                  {preInvoiceList.includes(formData.invoiceNo) && (
+                  creditnote No. <span className="text-red-500">*</span>
+                  {preCreditNoteList.includes(formData.creditnoteNo) && (
                     <span className="text-red-800 text-xs">
-                      "Already Invoice No. exist"{" "}
+                      "Already creditnote No. exist"{" "}
                     </span>
                   )}
-                  {Number(formData.invoiceNo) == 0 && (
+                  {Number(formData.creditnoteNo) == 0 && (
                     <span className="text-red-800 text-xs">
-                      "Kindly Enter valid Invoice No."{" "}
+                      "Kindly Enter valid creditnote No."{" "}
                     </span>
                   )}
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter Invoice No. "
+                  placeholder="Enter creditnote No. "
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.invoiceNo}
+                  value={formData.creditnoteNo}
                   onChange={(e) => {
                     const { value } = e.target;
                     setFormData((val) => ({
                       ...val,
-                      invoiceNo: value,
+                      creditnoteNo: value,
                     }));
                   }}
                   required
@@ -879,7 +889,7 @@ const SetInvoice = () => {
                     </option>
                   </select>
                 </div>
-                <div className="w-full ">
+                {/* <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
                     value={formData.book.bookRef?.id || ""}
@@ -896,7 +906,7 @@ const SetInvoice = () => {
                         </option>
                       ))}
                   </select>
-                </div>
+                </div> */}
                 <div className="w-full ">
                   <div>Sign</div>
                   <select
@@ -1214,13 +1224,13 @@ const SetInvoice = () => {
               onClick={() => {
                 {
                   products.length > 0 && isProductSelected
-                    ? onSetInvoice()
+                    ? onSetCreditNote()
                     : alert("Please select items to proceed.");
                 }
               }}
             >
-              <span className="text-lg">+</span> {invoiceId ? "Edit" : "Create"}{" "}
-              Invoice
+              <span className="text-lg">+</span>{" "}
+              {creditnoteId ? "Edit" : "Create"} CreditNote
             </button>
           </div>
         </div>
@@ -1229,4 +1239,4 @@ const SetInvoice = () => {
   );
 };
 
-export default SetInvoice;
+export default SetCreditNote;

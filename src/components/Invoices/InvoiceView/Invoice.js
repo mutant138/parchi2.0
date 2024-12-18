@@ -4,7 +4,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbEdit } from "react-icons/tb";
 import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
-import { db } from "../../../firebase";
+import { db , storage} from "../../../firebase";
+import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
 import Template1 from "../Templates/Template1";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
@@ -17,7 +18,7 @@ function Invoice({ invoice, bankDetails }) {
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
-
+  console.log("invoice", invoice);
   const invoiceRef = useRef();
 
   useEffect(() => {
@@ -46,6 +47,82 @@ function Invoice({ invoice, bankDetails }) {
       y: 0,
     });
   };
+
+  const handleWhatsAppShare = async () => {
+    if (!invoice.id) {
+      console.error("Invoice ID is missing!");
+      return;
+    }
+  
+    try {
+      // Generate the PDF in-memory
+      const doc = new jsPDF("p", "pt", "a4");
+      doc.html(invoiceRef.current, {
+        callback: async function (doc) {
+          const pdfBlob = doc.output("blob");
+  
+          // Create a reference to the file in Firebase Storage
+          const fileName = `invoices/${invoice.id}.pdf`;
+          const fileRef = ref(storage, fileName);
+  
+          // Upload the file
+          await uploadBytes(fileRef, pdfBlob);
+  
+          // Generate a public download URL
+          const downloadURL = await getDownloadURL(fileRef);
+  
+          // Share the public link via WhatsApp
+          const message = `Here is your invoice for ${invoice.customerDetails.name}: ${downloadURL}`;
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, "_blank");
+        },
+        x: 0,
+        y: 0,
+      });
+    } catch (error) {
+      console.error("Error uploading or sharing the PDF:", error);
+    }
+  };
+  
+  
+
+  const handleEmailShare = async () => {
+    if (!invoice.id) {
+      console.error("Invoice ID is missing!");
+      return;
+    }
+  
+    try {
+      // Generate the PDF in-memory
+      const doc = new jsPDF("p", "pt", "a4");
+      doc.html(invoiceRef.current, {
+        callback: async function (doc) {
+          const pdfBlob = doc.output("blob");
+  
+          // Create a reference to the file in Firebase Storage
+          const fileName = `invoices/${invoice.id}.pdf`;
+          const fileRef = ref(storage, fileName);
+  
+          // Upload the file to Firebase Storage
+          await uploadBytes(fileRef, pdfBlob);
+  
+          // Generate a public download URL
+          const downloadURL = await getDownloadURL(fileRef);
+  
+          // Construct the email subject and body
+          const subject = `Invoice for ${invoice.customerDetails.name}`;
+          const body = `Hi ${invoice.customerDetails.name},%0D%0A%0D%0AHere is your invoice for the recent purchase.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
+  
+          // Open the default email client with pre-filled subject and body
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        },
+        x: 0,
+        y: 0,
+      });
+    } catch (error) {
+      console.error("Error uploading or sharing the PDF:", error);
+    }
+  };
+  
 
   const handleDelete = async () => {
     try {
@@ -144,6 +221,18 @@ function Invoice({ invoice, bankDetails }) {
           >
             <IoMdDownload /> &nbsp; download
           </button>
+          <button
+            className="px-4 py-1 bg-green-400 text-white rounded-full flex items-center"
+            onClick={handleWhatsAppShare}
+          >
+            Share on WhatsApp
+          </button>
+          <button
+            className="px-4 py-1 bg-gray-500 text-white rounded-full flex items-center"
+            onClick={handleEmailShare}
+          >
+            Share via Email
+          </button>
         </div>
         {invoice.paymentStatus !== "Paid" && (
           <div className="text-end">
@@ -180,16 +269,37 @@ function Invoice({ invoice, bankDetails }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele?.sellingPrice}</div>
-                  <div>Tax :{ele?.tax}</div>
-                  <div>Discount :{ele?.discount}</div>
+                  <div>Price: ₹{ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}%</div>
+                  <div>Discount :₹{ele?.discount}</div>
                 </div>
               </div>
             ))}
           <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹ {invoice.subTotal}</div>
-            <div>Discount: {totalDiscount}</div>
-            <div>Tax: {totalTax}</div>
+            <div>subTotal: ₹{invoice.subTotal}</div>
+            <div>Tax: {totalTax}%</div>
+            <div>
+              {invoice.extraDiscount?.amount > 0 && (
+                <>
+                  Extra Discount:{" "}
+                  {invoice?.extraDiscount?.type === "percentage"
+                    ? `${invoice.extraDiscount.amount}%`
+                    : `₹${invoice.extraDiscount.amount}`}{" "}
+                </>
+              )}
+            </div>
+            <div>
+              {" "}
+              {invoice.packagingCharges > 0 && (
+                <>Packaging Charges: ₹{invoice.packagingCharges}</>
+              )}
+            </div>
+            <div>
+              {" "}
+              {invoice.shippingCharges > 0 && (
+                <>Shipping Charges: ₹{invoice.shippingCharges} </>
+              )}{" "}
+            </div>
           </div>
           <div className="flex space-x-3 justify-end font-bold text-lg">
             <div>Total:</div>

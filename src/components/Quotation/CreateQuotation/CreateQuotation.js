@@ -6,21 +6,22 @@ import {
   query,
   updateDoc,
   where,
+  getDoc,
   Timestamp,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
 
 const CreateQuotation = () => {
-  const userDetails = useSelector((state) => state.users);
+  const { quotationId } = useParams();
 
+  const userDetails = useSelector((state) => state.users);
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
-
   const phoneNo = userDetails.phone;
   const selectedDashboardUser = userDetails.selectedDashboard;
 
@@ -57,6 +58,11 @@ const CreateQuotation = () => {
     attachments: [],
     tcs: {},
     terms: "",
+    mode: "Cash",
+    extraDiscount: {
+      amount: 0,
+      type: "percentage",
+    },
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
