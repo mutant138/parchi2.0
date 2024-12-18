@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template = forwardRef((props, ref) => {
-  const { creditNoteData } = props;
-  if (!creditNoteData) {
+  const { quotationData } = props;
+  if (!quotationData) {
     return;
   }
   function DateFormate(timestamp) {
@@ -15,9 +15,9 @@ const Template = forwardRef((props, ref) => {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-  const ModifiedCreditNoteData = {
-    ...creditNoteData,
-    items: creditNoteData.products.map((item) => {
+  const ModifiedQuotationData = {
+    ...quotationData,
+    items: quotationData.products.map((item) => {
       let discount = +item.discount || 0;
 
       if (item.discountType) {
@@ -43,42 +43,42 @@ const Template = forwardRef((props, ref) => {
     }),
   };
 
-  const totalTaxableAmount = ModifiedCreditNoteData.items.reduce(
+  const totalTaxableAmount = ModifiedQuotationData.items.reduce(
     (sum, product) => sum + product.netAmount * product.quantity,
     0
   );
 
-  const totalSgstAmount_2_5 = ModifiedCreditNoteData.items.reduce(
+  const totalSgstAmount_2_5 = ModifiedQuotationData.items.reduce(
     (sum, product) =>
       product.sgst === 2.5 ? sum + product.sgstAmount * product.quantity : sum,
     0
   );
 
-  const totalCgstAmount_2_5 = ModifiedCreditNoteData.items.reduce(
+  const totalCgstAmount_2_5 = ModifiedQuotationData.items.reduce(
     (sum, product) =>
       product.cgst === 2.5 ? sum + product.cgstAmount * product.quantity : sum,
     0
   );
 
-  const totalSgstAmount_6 = ModifiedCreditNoteData.items.reduce(
+  const totalSgstAmount_6 = ModifiedQuotationData.items.reduce(
     (sum, product) =>
       product.sgst === 6 ? sum + product.sgstAmount * product.quantity : sum,
     0
   );
 
-  const totalCgstAmount_6 = ModifiedCreditNoteData.items.reduce(
+  const totalCgstAmount_6 = ModifiedQuotationData.items.reduce(
     (sum, product) =>
       product.cgst === 6 ? sum + product.cgstAmount * product.quantity : sum,
     0
   );
 
-  const totalSgstAmount_9 = ModifiedCreditNoteData.items.reduce(
+  const totalSgstAmount_9 = ModifiedQuotationData.items.reduce(
     (sum, product) =>
       product.sgst === 9 ? sum + product.sgstAmount * product.quantity : sum,
     0
   );
 
-  const totalCgstAmount_9 = ModifiedCreditNoteData.items.reduce(
+  const totalCgstAmount_9 = ModifiedQuotationData.items.reduce(
     (sum, product) =>
       product.cgst === 9 ? sum + product.cgstAmount * product.quantity : sum,
     0
@@ -102,9 +102,9 @@ const Template = forwardRef((props, ref) => {
       <div className="flex justify-between">
         <div>
           <div className="text-lg font-bold text-start">
-            {ModifiedCreditNoteData?.createdBy?.name}
+            {ModifiedQuotationData?.createdBy?.name}
           </div>
-          <div>Mobile : {ModifiedCreditNoteData?.createdBy?.phoneNo}</div>
+          <div>Mobile : {ModifiedQuotationData?.createdBy?.phoneNo}</div>
         </div>
         <div>
           <h3 className="font-bold">TAX INVOICE</h3>
@@ -113,22 +113,19 @@ const Template = forwardRef((props, ref) => {
       <div className="flex justify-between text-start">
         <div className="mt-2 text-start">
           <strong>Bill To :</strong>
-          <div>{ModifiedCreditNoteData.customerDetails.name}</div>
-          <div>Ph : {ModifiedCreditNoteData.customerDetails.phone}</div>
+          <div>{ModifiedQuotationData.customerDetails.name}</div>
+          <div>Ph : {ModifiedQuotationData.customerDetails.phone}</div>
         </div>
         <div>
           <div>
-            <strong>CreditNote # :</strong>{" "}
-            {ModifiedCreditNoteData.creditnoteNo}
+            <strong>Quotation # :</strong>{" "}
+            {ModifiedQuotationData.quotationNo}
           </div>
           <div>
-            <strong>CreditNote Date :</strong>{" "}
-            {DateFormate(ModifiedCreditNoteData.creditNoteDate)}
+            <strong>Quotation Date :</strong>{" "}
+            {DateFormate(ModifiedQuotationData.date)}
           </div>
-          <div>
-            <strong>Due Date :</strong>{" "}
-            {DateFormate(ModifiedCreditNoteData?.dueDate)}
-          </div>
+         
           <div>
             <strong>Place of Supply :</strong> -
           </div>
@@ -151,7 +148,7 @@ const Template = forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {ModifiedCreditNoteData.items.map((item, index) => (
+            {ModifiedQuotationData.items.map((item, index) => (
               <tr key={index}>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   {index + 1}
@@ -189,40 +186,40 @@ const Template = forwardRef((props, ref) => {
         </table>
       </div>
       <div className="mt-4 text-end">
-        {ModifiedCreditNoteData.shippingCharges > 0 && (
+        {ModifiedQuotationData.shippingCharges > 0 && (
           <div>
             Delivery/Shipping Charges :
             <span className="ml-5">
               {" "}
-              {ModifiedCreditNoteData.shippingCharges}
+              {ModifiedQuotationData.shippingCharges}
             </span>
           </div>
         )}
-        {ModifiedCreditNoteData.packagingCharges > 0 && (
+        {ModifiedQuotationData.packagingCharges > 0 && (
           <div>
             Packaging Charges :
             <span className="ml-5">
               {" "}
-              {ModifiedCreditNoteData.packagingCharges}
+              {ModifiedQuotationData.packagingCharges}
             </span>
           </div>
         )}
       </div>
 
       <div className="mt-4 mb-3 text-end">
-        {ModifiedCreditNoteData.tcs.isTcsApplicable && (
+        {ModifiedQuotationData.tcs.isTcsApplicable && (
           <div>
             TCS :
             <span className="ml-5">
-              {ModifiedCreditNoteData.tcs.tcs_amount.toFixed(2)}
+              {ModifiedQuotationData.tcs.tcs_amount.toFixed(2)}
             </span>
           </div>
         )}
-        {ModifiedCreditNoteData.tds.isTdsApplicable && (
+        {ModifiedQuotationData.tds.isTdsApplicable && (
           <div>
             TDS :
             <span className="ml-5">
-              {ModifiedCreditNoteData.tds.tds_amount.toFixed(2)}
+              {ModifiedQuotationData.tds.tds_amount.toFixed(2)}
             </span>
           </div>
         )}
@@ -253,7 +250,7 @@ const Template = forwardRef((props, ref) => {
       </div>
       <hr />
       <div className="text-end font-bold">
-        <h3>Total : {+ModifiedCreditNoteData.total?.toFixed(2)}</h3>
+        <h3>Total : {+ModifiedQuotationData.total?.toFixed(2)}</h3>
       </div>
 
       <div className=" flex justify-between">

@@ -112,7 +112,10 @@ const Home = () => {
               path="/quotation/create-quotation"
               element={<SetQuotation />}
             ></Route>
-
+            <Route
+              path="/quotation/:quotationId/edit-quotation"
+              element={<SetQuotation />}
+            ></Route>
             <Route
               path="/pro-forma-invoice"
               element={<ProFormaInvoice />}

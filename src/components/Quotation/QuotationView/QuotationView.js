@@ -8,7 +8,7 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import Template1 from "../../Invoices/Templates/Template1";
+import Template from "../Template/Template";
 function QuotationView({ quotation }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
@@ -58,7 +58,7 @@ function QuotationView({ quotation }) {
         db,
         "companies",
         companyId,
-        "quotation",
+        "quotations",
         quotation.id
       );
 
@@ -67,7 +67,7 @@ function QuotationView({ quotation }) {
       );
       if (!confirmDelete) return;
       await deleteDoc(quotationDocRef);
-      navigate("/delivery-challan");
+      navigate("/quotation");
     } catch (error) {
       console.error("Error deleting quotation:", error);
       alert("Failed to delete the quotation. Check the console for details.");
@@ -139,7 +139,7 @@ function QuotationView({ quotation }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(quotation?.quotationDate)}</div>
+            <div>Date: {DateFormate(quotation?.date)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
@@ -225,7 +225,7 @@ function QuotationView({ quotation }) {
                     </div>
                   </div>
                 </div>
-                <Template1
+                <Template
                   ref={quotationRef}
                   quotationData={quotation}
                   //   bankDetails={bankDetails}

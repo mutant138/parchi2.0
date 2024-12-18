@@ -171,7 +171,7 @@ const Template1 = forwardRef((props, ref) => {
                   {item.sellingPrice.toFixed(1)}
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.sellingPrice.taxSlab}%
+                  {item.tax}%
                 </td>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   CGST SGST
