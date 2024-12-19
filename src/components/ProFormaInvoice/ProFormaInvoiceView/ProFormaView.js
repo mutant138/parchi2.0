@@ -53,7 +53,7 @@ function ProFormaView() {
       </header>
       <hr />
       <div>
-        <nav className="flex space-x-4 mt-3 mb-3">
+        {/* <nav className="flex space-x-4 mt-3 mb-3">
           <button
             className={
               "px-4 py-1" +
@@ -76,7 +76,7 @@ function ProFormaView() {
           >
             Returns
           </button>
-        </nav>
+        </nav> */}
       </div>
       <hr />
       <div className="w-full">
@@ -85,11 +85,11 @@ function ProFormaView() {
             <ProForma proForma={proForma} />
           </div>
         )}
-        {activeTab === "Returns" && (
+        {/* {activeTab === "Returns" && (
           <div>
             <Returns />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

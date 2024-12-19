@@ -198,7 +198,9 @@ function PO() {
                           </span>
                         </td>
                         <td className="py-3 ">{`₹ ${po.total.toFixed(2)}`}</td>
-                        <td className="py-3 ">
+                        <td className="py-3 "
+                            onClick={(e) => e.stopPropagation()}
+                            >
                           <select
                             value={po.orderStatus}
                             className={`border p-1 rounded ${

@@ -79,11 +79,11 @@ const ProFormaInvoice = () => {
   };
 
   const filteredProForma = proForma.filter((invoice) => {
-    const { customerDetails, invoiceNo, paymentStatus } = invoice;
+    const { customerDetails, proFormaNo, paymentStatus } = invoice;
     const customerName = customerDetails?.name || "";
     const matchesSearch =
       customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoiceNo?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+      proFormaNo?.toString().toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       filterStatus === "All" || paymentStatus === filterStatus;
@@ -112,7 +112,7 @@ const ProFormaInvoice = () => {
           <h1 className="text-2xl font-bold">ProForma</h1>
           <Link
             className="bg-blue-500 text-white py-1 px-2 rounded"
-            to="create-invoice"
+            to="create-proForma-invoice"
           >
             + Create ProForma Invoice
           </Link>
@@ -187,7 +187,7 @@ const ProFormaInvoice = () => {
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
-                    <th className="p-4">Invoice NO</th>
+                    <th className="p-4">ProFormaInvoice NO</th>
                     <th className="p-4">Date / Updated Time</th>
                     {/* <th className="p-4">Actions</th> */}
                   </tr>
@@ -236,7 +236,7 @@ const ProFormaInvoice = () => {
                         <td className="py-3">
                           {invoice.paymentMode || "Online"}
                         </td>
-                        <td className="py-3">{invoice.invoiceNo}</td>
+                        <td className="py-3">{invoice.proFormaNo}</td>
 
                         <td className="py-3">
                           {(() => {

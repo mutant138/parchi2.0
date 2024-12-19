@@ -64,6 +64,7 @@ import DeliveryChallanView from "../DeliveryChallan/DeliveryChallanView/Delivery
 import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliveryChallan";
 import PoView from "../PO/PoView/PoView";
 import SetPO from "../PO/SetPO/SetPO";
+import SetProFormaInvoice from "../ProFormaInvoice/SetProFormaInvoice/SetProFormaInvoice";
 
 const Home = () => {
   const location = useLocation();
@@ -126,7 +127,14 @@ const Home = () => {
               path="/pro-forma-invoice/:id"
               element={<ProFormaView />}
             ></Route>
-
+               <Route
+              path="/pro-forma-invoice/create-proForma-invoice"
+              element={<SetProFormaInvoice />}
+            ></Route>
+            <Route
+              path="/pro-forma-invoice/:proFormaId/edit-proForma-invoice"
+              element={<SetProFormaInvoice />}
+            ></Route>
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
             <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
@@ -202,7 +210,7 @@ const Home = () => {
               path="/po/:poId/edit-po"
               element={<SetPO />}
             ></Route>
-            <Route path="/create-po" element={<CreatePo />}></Route>
+            {/* <Route path="/create-po" element={<CreatePo />}></Route> */}
             <Route path="/reminder" element={<Reminder />}></Route>
             <Route path="/expense" element={<BookList />}></Route>
             <Route path="/expense/:id" element={<Expense />}></Route>

@@ -6,7 +6,7 @@ import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
-import Template1 from "../../Invoices/Templates/Template1";
+import Template from "../Template/Template";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
@@ -23,12 +23,12 @@ function ProForma({ proForma }) {
   const proFormaRef = useRef();
 
   useEffect(() => {
-    if (proForma.items) {
-      const tax = proForma?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.sellingPrice.taxSlab;
+    if (proForma.products) {
+      const tax = proForma?.products.reduce((acc, cur) => {
+        return acc + cur?.tax;
       }, 0);
-      const discount = proForma?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.discount.amount;
+      const discount = proForma?.products.reduce((acc, cur) => {
+        return acc + cur?.amount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
@@ -69,30 +69,30 @@ function ProForma({ proForma }) {
       if (!confirmDelete) return;
       await deleteDoc(proFormaDocRef);
 
-      if (proForma.items && proForma.items.length > 0) {
-        const updateInventoryPromises = proForma.items.map((inventoryItem) => {
-          if (
-            !inventoryItem.productRef ||
-            typeof inventoryItem.quantity !== "number"
-          ) {
-            console.error("Invalid inventory item:", inventoryItem);
-            return Promise.resolve();
-          }
+      // if (proForma.products && proForma.products.length > 0) {
+      //   const updateInventoryPromises = proForma.products.map((inventoryItem) => {
+      //     if (
+      //       !inventoryItem.productRef ||
+      //       typeof inventoryItem.quantity !== "number"
+      //     ) {
+      //       console.error("Invalid inventory item:", inventoryItem);
+      //       return Promise.resolve();
+      //     }
 
-          const inventoryDocRef = doc(
-            db,
-            "companies",
-            companyId,
-            "inventories",
-            inventoryItem.productRef.id
-          );
+      //     const inventoryDocRef = doc(
+      //       db,
+      //       "companies",
+      //       companyId,
+      //       "products",
+      //       inventoryItem.productRef.id
+      //     );
 
-          return updateDoc(inventoryDocRef, {
-            "stock.quantity": increment(inventoryItem.quantity),
-          });
-        });
-        await Promise.all(updateInventoryPromises);
-      }
+      //     return updateDoc(inventoryDocRef, {
+      //       stock: increment(inventoryItem.quantity),
+      //     });
+      //   });
+      //   await Promise.all(updateInventoryPromises);
+      // }
       navigate("/pro-forma-invoice");
     } catch (error) {
       console.error("Error deleting proForma:", error);
@@ -130,6 +130,7 @@ function ProForma({ proForma }) {
             className={
               "px-4 py-1 bg-red-300 text-white rounded-full flex items-center"
             }
+            onClick={() => navigate("edit-proForma-invoice")}
           >
             <TbEdit /> &nbsp; Edit
           </button>
@@ -168,8 +169,8 @@ function ProForma({ proForma }) {
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {proForma?.items?.length > 0 &&
-            proForma.items.map((ele, index) => (
+          {proForma?.products?.length > 0 &&
+            proForma?.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -177,16 +178,37 @@ function ProForma({ proForma }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele.pricing.sellingPrice.amount}</div>
-                  <div>Tax :{ele.pricing.sellingPrice.taxSlab}</div>
-                  <div>Discount :{ele.pricing.discount.amount}</div>
+                  <div>Price: ₹{ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}%</div>
+                  <div>Discount :₹{ele?.discount}</div>
                 </div>
               </div>
             ))}
           <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹ {proForma.subTotal}</div>
-            <div>Discount: {totalDiscount}</div>
-            <div>Tax: {totalTax}</div>
+            <div>subTotal: ₹{proForma.subTotal}</div>
+            <div>Tax: {totalTax}%</div>
+            <div>
+              {proForma.extraDiscount?.amount > 0 && (
+                <>
+                  Extra Discount:{" "}
+                  {proForma?.extraDiscount?.type === "percentage"
+                    ? `${proForma.extraDiscount.amount}%`
+                    : `₹${proForma.extraDiscount.amount}`}{" "}
+                </>
+              )}
+            </div>
+            <div>
+              {" "}
+              {proForma.packagingCharges > 0 && (
+                <>Packaging Charges: ₹{proForma.packagingCharges}</>
+              )}
+            </div>
+            <div>
+              {" "}
+              {proForma.shippingCharges > 0 && (
+                <>Shipping Charges: ₹{proForma.shippingCharges} </>
+              )}{" "}
+            </div>
           </div>
           <div className="flex space-x-3 justify-end font-bold text-lg">
             <div>Total:</div>
@@ -229,7 +251,11 @@ function ProForma({ proForma }) {
                     </div>
                   </div>
                 </div>
-                {/* <Template1 ref={proFormaRef} invoiceData={proForma} /> */}
+                <Template
+                  ref={proFormaRef}
+                  proFormaData={proForma}
+                  //   bankDetails={bankDetails}
+                />
               </div>
             </div>
           </div>

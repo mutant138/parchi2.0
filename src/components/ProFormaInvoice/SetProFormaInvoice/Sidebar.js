@@ -12,7 +12,7 @@ function Sidebar({
   const [Products, setProducts] = useState(productList);
   const [searchTerm, setSearchTerm] = useState("");
   const filteredProducts = Products.filter((ele) =>
-    ele.itemName.toLowerCase().includes(searchTerm.toLowerCase())
+    ele?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
