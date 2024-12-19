@@ -13,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import Sidebar from "./Sidebar";
+// import Sidebar from "./Sidebar";
 
 const CreatePo = () => {
   const userDetails = useSelector((state) => state.users);
@@ -699,7 +699,7 @@ const CreatePo = () => {
                   )}
                 </tbody>
               </table>
-              {isSidebarOpen && (
+              {/* {isSidebarOpen && (
                 <Sidebar
                   isOpen={isSidebarOpen}
                   onClose={() => setIsSidebarOpen(false)}
@@ -707,7 +707,7 @@ const CreatePo = () => {
                   handleActionQty={handleActionQty}
                   totalAmount={+totalAmounts.totalAmount}
                 />
-              )}
+              )} */}
             </div>
             <div className="w-full mt-4 border-t pt-4 bg-gray-50 p-4 ">
               <div className="w-full grid grid-cols-3 gap-4">

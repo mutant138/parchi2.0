@@ -33,6 +33,7 @@ const CreatePOS = () => {
 
   const [products, setProducts] = useState([]);
   const [prePOSList, setPrePOSList] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -599,6 +600,12 @@ const CreatePOS = () => {
 
         <div className="flex justify-between">
           <h2 className="font-semibold mb-2">Products & Services</h2>
+          <button
+              className="bg-blue-500 text-white py-1 px-4 rounded mt-1 ml-auto"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              + Add Items
+            </button>
         </div>
         <div className="bg-blue-50 p-4 rounded-lg shadow-inner mb-6">
           <div className="flex justify-between items-center mb-4 space-x-4">

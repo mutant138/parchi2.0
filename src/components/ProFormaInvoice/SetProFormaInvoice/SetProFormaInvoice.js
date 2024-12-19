@@ -6,25 +6,32 @@ import {
   query,
   updateDoc,
   where,
+  getDoc,
   Timestamp,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../firebase";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
+import { setAllCustomersDetails } from "../../../store/CustomerSlice";
 
-const CreateProFormaInvoice = () => {
+const SetProFormaInvoice = () => {
+  const { proFormaId } = useParams();
+
   const userDetails = useSelector((state) => state.users);
-
+  const customersDetails = useSelector((state) => state.customers).data;
+  const dispatch = useDispatch();
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
 
   const phoneNo = userDetails.phone;
 
-  // const [discountDropdownOpen, setDiscountDropdownOpen] = useState(false);
-  const [invoiceDate, setInvoiceDate] = useState(new Date());
+  const [date, setDate] = useState(
+    Timestamp.fromDate(new Date())
+  );
+
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -33,15 +40,16 @@ const CreateProFormaInvoice = () => {
     tcs: [],
   });
   const [isProductSelected, setIsProductSelected] = useState(false);
-  const [books, setBooks] = useState([]);
 
   const [products, setProducts] = useState([]);
-  const [preProFormaList, setPreProFormaList] = useState([]);
+  const [preQuotationList, setPreQuotationList] = useState([]);
+  const [books, setBooks] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    book: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -55,6 +63,11 @@ const CreateProFormaInvoice = () => {
     attachments: [],
     tcs: {},
     terms: "",
+    mode: "Cash",
+    extraDiscount: {
+      amount: 0,
+      type: "percentage",
+    },
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -68,7 +81,6 @@ const CreateProFormaInvoice = () => {
     totalAmount: 0,
   });
 
-  const [customersData, setCustomersData] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState({
     name: "",
   });
@@ -76,68 +88,119 @@ const CreateProFormaInvoice = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    function addActionQty() {
+      if (
+        formData?.products?.length === 0 ||
+        products.length === 0 ||
+        !proFormaId
+      ) {
+        return;
+      }
+      setIsProductSelected(true);
+      let productData = products;
+      for (let ele of formData.products) {
+        productData = products.map((pro) => {
+          if (pro.id === ele.productRef.id) {
+            pro.actionQty = ele.quantity;
+            pro.quantity += ele.quantity;
+            pro.totalAmount = ele.quantity * pro.netAmount;
+          }
+          return pro;
+        });
+      }
+      setProducts(productData);
+      calculateProduct(productData);
+    }
+    addActionQty();
+    if (proFormaId) {
+      fetchQuotationNumbers();
+    }
+  }, [formData.products]);
+
+  const fetchQuotationNumbers = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(db, "companies", companyDetails.companyId, "proFormaInvoice")
+      );
+      const noList = querySnapshot.docs.map((doc) => doc.data().proFormaNo);
+      if (proFormaId) {
+        setPreQuotationList(
+          noList.filter((ele) => ele !== formData.proFormaNo)
+        );
+      } else {
+        setPreQuotationList(noList);
+        setFormData((val) => ({
+          ...val,
+          proFormaNo: String(noList.length + 1).padStart(4, 0),
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  function onSelect_TDS_TCS(e) {
+    const taxId = e.target.value;
+    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
+    setSelectedTaxDetails(taxDetails);
+  }
+
+  useEffect(() => {
+    async function fetchProFormaData() {
+      if (!proFormaId) {
+        return;
+      }
       try {
-        const productRef = collection(
+        const docRef = doc(
           db,
           "companies",
           companyDetails.companyId,
-          "inventories"
+          "proFormaInvoice",
+          proFormaId
         );
-        const querySnapshot = await getDocs(productRef);
-        const productsData = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const netAmount =
-            +data.pricing.sellingPrice?.amount -
-            (+data.pricing.discount?.amount || 0);
-          const taxRate = data.pricing.gstTax || 0;
-          const sgst = taxRate / 2;
-          const cgst = taxRate / 2;
-          const taxAmount = netAmount * (taxRate / 100);
-          const sgstAmount = netAmount * (sgst / 100);
-          const cgstAmount = netAmount * (cgst / 100);
+        const getData = (await getDoc(docRef)).data();
 
-          return {
-            id: doc.id,
-            itemName: data.itemName || "N/A",
-            quantity: data.stock?.quantity ?? 0,
-            unitPrice: data.pricing.sellingPrice?.amount ?? 0,
-            discount: data.pricing.discount?.amount ?? 0,
-            gstTax: data.pricing.gstTax,
-            fieldValue: data.pricing.discount?.fieldValue ?? 0,
-            actionQty: 0,
-            totalAmount: 0,
-            netAmount: netAmount,
-            sgst,
-            cgst,
-            sgstAmount,
-            cgstAmount,
-            taxAmount,
-            taxSlab: data.pricing.sellingPrice?.taxSlab,
-          };
+        setDate(getData.date);
+    
+        const customerData = (
+          await getDoc(getData.customerDetails.customerRef)
+        ).data();
+        handleSelectCustomer({
+          id: getData.customerDetails.customerRef.id,
+          ...customerData,
         });
-        setProducts(productsData);
+        setFormData(getData);
       } catch (error) {
-        console.error("Error fetching invoices:", error);
+        console.log("🚀 ~ fetchProFormaData ~ error:", error);
       }
-    };
+    }
 
     async function customerDetails() {
+      if (customersDetails.length !== 0) {
+        return;
+      }
+
       try {
         const customersRef = collection(db, "customers");
         const companyRef = doc(db, "companies", companyDetails.companyId);
         const q = query(customersRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
-        const customerData = company.docs.map((doc) => ({
-          customerId: doc.id,
-          ...doc.data(),
-        }));
-        setCustomersData(customerData);
-        setSuggestions(customerData);
+        const customersData = company.docs.map((doc) => {
+          const { createdAt, companyRef, ...data } = doc.data();
+          return {
+            id: doc.id,
+            createdAt: JSON.stringify(createdAt),
+            companyRef: JSON.stringify(companyRef),
+            ...data,
+          };
+        });
+        dispatch(setAllCustomersDetails(customersData));
+        setSuggestions(customersData);
       } catch (error) {
         console.log("🚀 ~ customerDetails ~ error:", error);
       }
     }
+
     async function fetchTax() {
       try {
         const tdsRef = collection(db, "tds");
@@ -173,63 +236,108 @@ const CreateProFormaInvoice = () => {
       }
     }
 
-    const fetchProFormaInvoice = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          collection(
-            db,
-            "companies",
-            companyDetails.companyId,
-            "proFormaInvoice"
-          )
-        );
+    // async function fetchBooks() {
+    //   try {
+    //     const bookRef = collection(
+    //       db,
+    //       "companies",
+    //       companyDetails.companyId,
+    //       "books"
+    //     );
+    //     const getBookData = await getDocs(bookRef);
+    //     const fetchBooks = getBookData.docs.map((doc) => ({
+    //       id: doc.id,
+    //       ...doc.data(),
+    //     }));
+    //     setBooks(fetchBooks);
+    //   } catch (error) {
+    //     console.log("🚀 ~ fetchBooks ~ error:", error);
+    //   }
+    // }
 
-        const noList = querySnapshot.docs.map((doc) => doc.data().proFormaNo);
-        setPreProFormaList(noList);
-        setFormData((val) => ({
-          ...val,
-          proFormaNo: String(noList.length + 1).padStart(4, 0),
-        }));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    async function fetchBooks() {
+    const fetchProducts = async () => {
       try {
-        const bookRef = collection(
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const productRef = collection(
           db,
           "companies",
           companyDetails.companyId,
-          "books"
+          "products"
         );
-        const getBookData = await getDocs(bookRef);
-        const fetchBooks = getBookData.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBooks(fetchBooks);
+        const q = query(productRef, where("companyRef", "==", companyRef));
+        const querySnapshot = await getDocs(q);
+
+        const productsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          let discount = +data.discount || 0;
+
+          if (data.discountType) {
+            discount = (+data.sellingPrice / 100) * data.discount;
+          }
+          const netAmount = +data.sellingPrice - discount;
+          const taxRate = data.tax || 0;
+          let sgst = 0;
+          let cgst = 0;
+          let taxAmount = 0;
+          let sgstAmount = 0;
+          let cgstAmount = 0;
+
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
+
+          return {
+            id: doc.id,
+            description: data.description ?? "",
+            name: data.name ?? "N/A",
+            quantity: data.stock ?? 0,
+            sellingPrice: data.sellingPrice ?? 0,
+            sellingPriceTaxType: data.sellingPriceTaxType,
+            purchasePrice: data.purchasePrice ?? 0,
+            purchasePriceTaxType: data.purchasePriceTaxType,
+            discount: discount ?? 0,
+            discountType: data.discountType,
+            tax: data.tax,
+            actionQty: 0,
+            totalAmount: 0,
+            netAmount: netAmount,
+            sgst,
+            cgst,
+            sgstAmount,
+            cgstAmount,
+            taxAmount,
+          };
+        });
+        setProducts(productsData);
       } catch (error) {
-        console.log("🚀 ~ fetchBooks ~ error:", error);
+        console.error("Error fetching quotation:", error);
       }
+    };
+
+    if (!proFormaId) {
+      fetchQuotationNumbers();
     }
-    fetchBooks();
-    fetchProFormaInvoice();
+
+    fetchProducts();
+    // fetchBooks();
+    fetchProFormaData();
     fetchTax();
     customerDetails();
-    fetchProducts();
   }, [companyDetails]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setSelectedCustomerData({ name: e.target.value });
+    setSelectedCustomerData({ name: value });
     if (value) {
-      const filteredSuggestions = customersData.filter((item) =>
+      const filteredSuggestions = customersDetails.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
       setIsDropdownVisible(true);
     } else {
-      setSuggestions(customersData);
+      setSuggestions(customersDetails);
     }
   };
 
@@ -260,20 +368,27 @@ const CreateProFormaInvoice = () => {
       return product;
     });
     setIsProductSelected(countOfSelect > 0);
+    calculateProduct(updatedProducts);
     // Calculate totals based on updated quantities
-    const totalTaxableAmount = updatedProducts.reduce(
-      (sum, product) => sum + product.netAmount * product.actionQty,
-      0
-    );
+  }
+  function calculateProduct(products) {
+    const totalTaxableAmount = products.reduce((sum, product) => {
+      const cal =
+        sum + (product.netAmount - product.taxAmount) * product.actionQty;
+      if (!product.sellingPriceTaxType) {
+        return sum + product.netAmount * product.actionQty;
+      }
+      return cal;
+    }, 0);
 
-    const totalSgstAmount_2_5 = updatedProducts.reduce(
+    const totalSgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.sgst === 2.5
           ? sum + product.sgstAmount * product.actionQty
           : sum,
       0
     );
-    const totalCgstAmount_2_5 = updatedProducts.reduce(
+    const totalCgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.cgst === 2.5
           ? sum + product.cgstAmount * product.actionQty
@@ -281,23 +396,24 @@ const CreateProFormaInvoice = () => {
       0
     );
 
-    const totalSgstAmount_6 = updatedProducts.reduce(
+    const totalSgstAmount_6 = products.reduce(
       (sum, product) =>
         product.sgst === 6 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_6 = updatedProducts.reduce(
+    const totalCgstAmount_6 = products.reduce(
       (sum, product) =>
         product.cgst === 6 ? sum + product.cgstAmount * product.actionQty : sum,
       0
     );
 
-    const totalSgstAmount_9 = updatedProducts.reduce(
+    const totalSgstAmount_9 = products.reduce(
       (sum, product) =>
         product.sgst === 9 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_9 = updatedProducts.reduce(
+
+    const totalCgstAmount_9 = products.reduce(
       (sum, product) =>
         product.cgst === 9 ? sum + product.cgstAmount * product.actionQty : sum,
       0
@@ -312,8 +428,7 @@ const CreateProFormaInvoice = () => {
       totalSgstAmount_9 +
       totalCgstAmount_9;
 
-    // Set state with the new values
-    setProducts(updatedProducts);
+    setProducts(products);
     setTotalAmounts({
       totalTaxableAmount,
       totalSgstAmount_2_5,
@@ -325,6 +440,22 @@ const CreateProFormaInvoice = () => {
       totalAmount,
     });
   }
+
+  const calculateTotal = () => {
+    const discountAmount =
+      formData.extraDiscount.type === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
+        : formData.extraDiscount.amount || 0;
+
+    const total =
+      totalAmounts.totalAmount +
+      formData.shippingCharges +
+      formData.packagingCharges +
+      total_Tax_Amount -
+      (isProductSelected ? discountAmount : 0);
+
+    return total.toFixed(2);
+  };
 
   function total_TCS_TDS_Amount() {
     const totalQty = products.reduce((acc, cur) => {
@@ -346,12 +477,12 @@ const CreateProFormaInvoice = () => {
     total_TCS_TDS_Amount();
   }, [products, selectedTaxDetails]);
 
-  async function onCreateProForma() {
+  async function OnSetProForma() {
     try {
-      if (!selectedCustomerData.customerId) {
+      if (!selectedCustomerData.id) {
         return;
       }
-      const customerRef = doc(db, "customers", selectedCustomerData.customerId);
+      const customerRef = doc(db, "customers", selectedCustomerData.id);
       const companyRef = doc(db, "companies", companyDetails.companyId);
       let subTotal = 0;
       const items = [];
@@ -363,36 +494,25 @@ const CreateProFormaInvoice = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "inventories",
+          "products",
           product.id
         );
         subTotal += product.totalAmount;
         items.push({
+          name: product.name,
+          description: product.description,
+          discount: product.discount,
+          discountType: product.discountType,
+          purchasePrice: product.purchasePrice,
+          purchasePriceTaxType: product.purchasePriceTaxType,
+          sellingPrice: product.sellingPrice,
+          sellingPriceTaxType: product.sellingPriceTaxType,
+          tax: product.tax,
           quantity: product.actionQty,
-          desc: "",
-          pricing: {
-            gstTax: product.gstTax,
-            purchasePrice: {
-              includingTax: true,
-              amount: product.unitPrice,
-              taxSlab: product.taxSlab,
-            },
-            sellingPrice: {
-              amount: product.unitPrice,
-              taxAmount: product.totalAmount,
-              taxSlab: product.taxSlab,
-              includingTax: true,
-            },
-            discount: {
-              amount: product.discount,
-              fieldValue: product.fieldValue,
-              type: "Percentage",
-            },
-          },
-          name: product.itemName,
           productRef: productRef,
         });
       }
+
       let tcs = {
         isTcsApplicable: Boolean(taxSelect === "tcs"),
         tax: taxSelect === "tcs" ? selectedTaxDetails.tax : "",
@@ -417,38 +537,46 @@ const CreateProFormaInvoice = () => {
         ...formData,
         tds,
         tcs,
-        date: Timestamp.fromDate(invoiceDate),
+        date,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
-          address: {},
+          address: companyDetails.address ?? "",
+          city: companyDetails.city ?? "",
+          zipCode: companyDetails.zipCode ?? "",
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
-        total:
-          +totalAmounts.totalAmount +
-          formData.shippingCharges +
-          formData.packagingCharges +
-          total_Tax_Amount,
-        items: items,
+        total: +calculateTotal(),
+        products: items,
         customerDetails: {
-          gstNumber: "",
-          custRef: customerRef,
-          address: selectedCustomerData.address,
-          phoneNumber: selectedCustomerData.phone,
+          gstNumber: selectedCustomerData.gstNumber ?? "",
+          customerRef: customerRef,
+          address: selectedCustomerData.address ?? "",
+          city: selectedCustomerData.city ?? "",
+          zipCode: selectedCustomerData.zipCode ?? "",
+          phone: selectedCustomerData.phone ?? "",
           name: selectedCustomerData.name,
         },
       };
 
-      await addDoc(
-        collection(
-          db,
-          "companies",
-          companyDetails.companyId,
-          "proFormaInvoice"
-        ),
-        payload
-      );
+      if (proFormaId) {
+        await updateDoc(
+          doc(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "proFormaInvoice",
+            proFormaId
+          ),
+          payload
+        );
+      } else {
+        await addDoc(
+          collection(db, "companies", companyDetails.companyId, "proFormaInvoice"),
+          payload
+        );
+      }
 
       for (const item of items) {
         if (item.quantity === 0) {
@@ -456,7 +584,7 @@ const CreateProFormaInvoice = () => {
         }
 
         const currentQuantity = products.find(
-          (val) => val.itemName === item.name
+          (val) => val.name === item.name
         ).quantity;
 
         if (currentQuantity <= 0) {
@@ -464,46 +592,48 @@ const CreateProFormaInvoice = () => {
           throw new Error("Product is out of stock!");
         }
 
-        await updateDoc(item.productRef, {
-          "stock.quantity": currentQuantity - item.quantity,
-        });
+        // await updateDoc(item.productRef, {
+        //   stock: currentQuantity - item.quantity,
+        // });
       }
 
-      alert("Successfully Created the Invoice");
+      alert(
+        "Successfully " +
+          (proFormaId ? "Updated" : "Created") +
+          " the quotation"
+      );
       navigate("/pro-forma-invoice");
     } catch (err) {
       console.error(err);
     }
   }
 
-  function onSelect_TDS_TCS(e) {
-    const taxId = e.target.value;
-    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
-    setSelectedTaxDetails(taxDetails);
-  }
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
 
-  function setCurrentDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${getFullYear}-${getMonth}-${getDate}`;
   }
-
-  function onSelectBook(e) {
-    const { value } = e.target;
-    const data = books.find((ele) => ele.id === value);
-    const bookRef = doc(
-      db,
-      "companies",
-      companyDetails.companyId,
-      "books",
-      value
-    );
-    setFormData((val) => ({
-      ...val,
-      book: { id: value, name: data.name, bookRef },
-    }));
-  }
+  //   function onSelectBook(e) {
+  //     const { value } = e.target;
+  //     const data = books.find((ele) => ele.id === value);
+  //     console.log("🚀 ~ onSelectBook ~ data:", data);
+  //     const bookRef = doc(
+  //       db,
+  //       "companies",
+  //       companyDetails.companyId,
+  //       "books",
+  //       value
+  //     );
+  //     setFormData((val) => ({
+  //       ...val,
+  //       book: { name: data.name, bookRef },
+  //     }));
+  //   }
 
   return (
     <div
@@ -517,14 +647,18 @@ const CreateProFormaInvoice = () => {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">Create Pro Forma Invoice</h1>
+        <h1 className="text-2xl font-bold">
+          {proFormaId ? "Edit" : "Create"} ProFormaInvoice
+        </h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex gap-8 mb-6">
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Customer Details</h2>
             <div className="bg-blue-50 p-4 rounded-lg">
-              <label className="text-sm text-gray-600">Select Customer</label>
+              <label className="text-sm text-gray-600">
+                Select Customer <span className="text-red-500">*</span>{" "}
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -534,17 +668,18 @@ const CreateProFormaInvoice = () => {
                   onChange={handleInputChange}
                   onFocus={() => setIsDropdownVisible(true)}
                   onBlur={() => {
-                    if (!selectedCustomerData.customerId) {
+                    if (!selectedCustomerData.id) {
                       setSelectedCustomerData({ name: "" });
                     }
                     setIsDropdownVisible(false);
                   }}
+                  required
                 />
                 {isDropdownVisible && suggestions.length > 0 && (
                   <div className="absolute z-20 bg-white border border-gray-300 rounded-lg shadow-md max-h-60 overflow-y-auto w-full">
                     {suggestions.map((item) => (
                       <div
-                        key={item.customerId}
+                        key={item.id}
                         onMouseDown={() => handleSelectCustomer(item)}
                         className="flex flex-col px-4 py-3 text-gray-800 hover:bg-blue-50 cursor-pointer transition-all duration-150 ease-in-out"
                       >
@@ -568,34 +703,38 @@ const CreateProFormaInvoice = () => {
             <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
-                  ProFormaInvoice Date
+                  quotation Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={setCurrentDate(invoiceDate)}
+                  value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setInvoiceDate(new Date(e.target.value));
+                    setDate(
+                      Timestamp.fromDate(new Date(e.target.value))
+                    );
                   }}
+                  required
                 />
               </div>
+         
               <div>
                 <label className="text-sm text-gray-600">
-                  ProFormaInvoice No.{" "}
-                  {preProFormaList.includes(formData.proFormaNo) && (
+                  quotation No. <span className="text-red-500">*</span>
+                  {preQuotationList.includes(formData.proFormaNo) && (
                     <span className="text-red-800 text-xs">
-                      "Already ProFormaInvoice No. exist"{" "}
+                      "Already quotation No. exist"{" "}
                     </span>
                   )}
                   {Number(formData.proFormaNo) == 0 && (
                     <span className="text-red-800 text-xs">
-                      "Kindly Enter valid Invoice No."{" "}
+                      "Kindly Enter valid quotation No."{" "}
                     </span>
                   )}
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter Invoice No. "
+                  placeholder="Enter quotation No. "
                   className="border p-1 rounded w-full mt-1"
                   value={formData.proFormaNo}
                   onChange={(e) => {
@@ -605,6 +744,7 @@ const CreateProFormaInvoice = () => {
                       proFormaNo: value,
                     }));
                   }}
+                  required
                 />
               </div>
             </div>
@@ -636,6 +776,7 @@ const CreateProFormaInvoice = () => {
                     <th className="px-4 py-2">Unit Price</th>
                     <th className="px-4 py-2">Discount</th>
                     <th className="px-4 py-2">Net Amount</th>
+                    <th className="px-2 py-2">Is Tax Included</th>
                     <th className="px-4 py-2">Total Amount</th>
                     <th className="px-4 py-2">Action</th>
                   </tr>
@@ -646,11 +787,16 @@ const CreateProFormaInvoice = () => {
                       (product) =>
                         product.actionQty > 0 && (
                           <tr key={product.id}>
-                            <td className="px-4 py-2">{product.itemName}</td>
+                            <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
-                            <td className="px-4 py-2">₹{product.unitPrice}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.sellingPrice}
+                            </td>
                             <td className="px-4 py-2">₹{product.discount}</td>
                             <td className="px-4 py-2">₹{product.netAmount}</td>
+                            <td className="px-2 py-2">
+                              {product.sellingPriceTaxType ? "Yes" : "No"}
+                            </td>
                             <td className="px-4 py-2">
                               ₹{product.totalAmount}
                             </td>
@@ -730,10 +876,10 @@ const CreateProFormaInvoice = () => {
                     </option>
                   </select>
                 </div>
-                <div className="w-full ">
+                {/* <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
-                    defaultValue=""
+                    value={formData.book.bookRef?.id || ""}
                     onChange={onSelectBook}
                     className="border p-2 rounded w-full"
                   >
@@ -741,13 +887,13 @@ const CreateProFormaInvoice = () => {
                       Select Bank/Book
                     </option>
                     {books.length > 0 &&
-                      books.map((book) => (
-                        <option value={book.id} key={book.id}>
+                      books.map((book, index) => (
+                        <option value={book.id} key={index}>
                           {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
                   </select>
-                </div>
+                </div> */}
                 <div className="w-full ">
                   <div>Sign</div>
                   <select
@@ -761,9 +907,21 @@ const CreateProFormaInvoice = () => {
                   </select>
                 </div>
                 <div className="w-full ">
+                  <div>Attach Files</div>
+
+                  <input
+                    type="file"
+                    className="flex h-10 w-full rounded-md border border-input
+                  bg-white px-3 py-2 text-sm text-gray-400 file:border-0
+                  file:bg-transparent file:text-gray-600 file:text-sm
+                  file:font-medium"
+                  />
+                </div>
+                <div className="w-full ">
                   <div>Shipping Charges</div>
                   <input
                     type="number"
+                    value={formData.shippingCharges || ""}
                     placeholder="Shipping Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -778,6 +936,7 @@ const CreateProFormaInvoice = () => {
                   <div>Packaging Charges</div>
                   <input
                     type="number"
+                    value={formData.packagingCharges || ""}
                     placeholder="Packaging Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -789,20 +948,10 @@ const CreateProFormaInvoice = () => {
                   />
                 </div>
                 <div className="w-full ">
-                  <div>Attach Files</div>
-
-                  <input
-                    type="file"
-                    className="flex h-10 w-full rounded-md border border-input
-                  bg-white px-3 py-2 text-sm text-gray-400 file:border-0
-                  file:bg-transparent file:text-gray-600 file:text-sm
-                  file:font-medium"
-                  />
-                </div>
-                <div className="w-full ">
                   <div>Notes</div>
                   <input
                     type="text"
+                    value={formData.notes}
                     placeholder="Notes"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -817,6 +966,7 @@ const CreateProFormaInvoice = () => {
                   <div>Terms</div>
                   <textarea
                     type="text"
+                    value={formData.terms}
                     className="border p-2 rounded w-full max-h-16 min-h-16"
                     onChange={(e) => {
                       setFormData((val) => ({
@@ -826,7 +976,7 @@ const CreateProFormaInvoice = () => {
                     }}
                   />
                 </div>
-                <div className="w-full flex justify-between items-center">
+                <div className="w-full flex justify-between items-center mt-5 space-x-3">
                   <div>TDS</div>
                   <div>
                     <label className="relative inline-block w-14 h-8">
@@ -863,9 +1013,10 @@ const CreateProFormaInvoice = () => {
                       <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
                     </label>
                   </div>
-                  <div>
+                  <div className="w-full">
                     <select
                       className="border p-2 rounded w-full"
+                      value={formData.mode}
                       onChange={(e) =>
                         setFormData((val) => ({ ...val, mode: e.target.value }))
                       }
@@ -924,30 +1075,43 @@ const CreateProFormaInvoice = () => {
               </div>
             </div>
             <div className="flex justify-end items-center mt-4 border-t pt-4 bg-gray-50 p-4 ">
-              {/* <div className="flex items-center gap-2">
-                <label className="text-gray-600">
-                  Apply discount (%) to all items?
-                </label>
-                <input
-                  type="text"
-                  className="border border-green-500 p-1 rounded w-16"
-                  placeholder="%"
-                  onChange={(e) =>
-                    setFormData((val) => ({ ...val, discount: e.target.value }))
-                  }
-                />
-              </div> */}
-
-              <div className="flex flex-col justify-between">
-                <div className=" p-6" style={{ width: "600px" }}>
-                  {/* <div className="flex items-center mb-4">
-                    <label className="mr-2">Extra Discount</label>
+              <div className="flex justify-between">
+                <div className="flex space-x-3 items-center">
+                  <div className=""> Extra Discount: </div>
+                  <div>
                     <input
-                      type="text"
-                      placeholder="%"
-                      className="border p-1 rounded w-16 text-center"
+                      type="number"
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount?.amount || ""}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: {
+                            ...val.extraDiscount,
+                            amount: +e.target.value || 0,
+                          },
+                        }));
+                      }}
                     />
-                  </div> */}
+                    <select
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount?.type || "percentage"}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: {
+                            ...val.extraDiscount,
+                            type: e.target.value,
+                          },
+                        }));
+                      }}
+                    >
+                      <option value="percentage">%</option>
+                      <option value="fixed">Fixed</option>
+                    </select>
+                  </div>
+                </div>
+                <div className=" p-6" style={{ width: "600px" }}>
                   {formData.shippingCharges > 0 && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>Shipping Charges</span>
@@ -1015,18 +1179,22 @@ const CreateProFormaInvoice = () => {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
-
+                  {formData?.extraDiscount?.amount > 0 && isProductSelected && (
+                    <div className="flex justify-between text-gray-700 mb-2">
+                      <span>Extra Discount Amount</span>
+                      <span>
+                        ₹{" "}
+                        {formData.extraDiscount.type === "percentage"
+                          ? (+totalAmounts.totalAmount *
+                              formData?.extraDiscount?.amount) /
+                            100
+                          : formData?.extraDiscount?.amount}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-xl mb-2">
                     <span>Total Amount</span>
-                    <span>
-                      ₹{" "}
-                      {(
-                        totalAmounts.totalAmount +
-                        formData.shippingCharges +
-                        formData.packagingCharges +
-                        total_Tax_Amount
-                      ).toFixed(2)}
-                    </span>
+                    <span>₹ {calculateTotal()}</span>
                   </div>
                 </div>
               </div>
@@ -1040,9 +1208,16 @@ const CreateProFormaInvoice = () => {
             </button> */}
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onCreateProForma}
+              onClick={() => {
+                {
+                  products.length > 0 && isProductSelected
+                    ? OnSetProForma()
+                    : alert("Please select items to proceed.");
+                }
+              }}
             >
-              <span className="text-lg">+</span> Create Invoice
+              <span className="text-lg">+</span>{" "}
+              {proFormaId ? "Edit" : "Create"} ProFormaInvoice
             </button>
           </div>
         </div>
@@ -1051,4 +1226,4 @@ const CreateProFormaInvoice = () => {
   );
 };
 
-export default CreateProFormaInvoice;
+export default SetProFormaInvoice;
