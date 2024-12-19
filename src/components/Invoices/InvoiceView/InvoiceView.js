@@ -11,10 +11,8 @@ import {
   getDocs,
   orderBy,
   query,
-  where,
 } from "firebase/firestore";
 import { db } from "../../../firebase";
-import jsPDF from "jspdf";
 import ReturnsHistory from "./ReturnsHistory";
 
 function InvoiceView() {
@@ -30,6 +28,13 @@ function InvoiceView() {
 
   const fetchInvoices = async () => {
     try {
+      let totalTaxableAmount = 0;
+      let totalSgstAmount_2_5 = 0;
+      let totalCgstAmount_2_5 = 0;
+      let totalSgstAmount_6 = 0;
+      let totalCgstAmount_6 = 0;
+      let totalSgstAmount_9 = 0;
+      let totalCgstAmount_9 = 0;
       const invoiceRef = doc(db, "companies", companyId, "invoices", id);
       const resData = (await getDoc(invoiceRef)).data();
       const invoicesData = {
@@ -37,6 +42,18 @@ function InvoiceView() {
         ...resData,
         products: resData.products.map((item) => {
           let discount = +item.discount || 0;
+
+          if (item.discountType) {
+            discount = (+item.sellingPrice / 100) * item.discount;
+          }
+          const netAmount = item.sellingPrice - (discount || 0);
+          const taxRate = item.tax || 0;
+          const sgst = taxRate / 2;
+          const cgst = taxRate / 2;
+          const taxAmount = netAmount * (taxRate / 100);
+          const sgstAmount = netAmount * (sgst / 100);
+          const cgstAmount = netAmount * (cgst / 100);
+
           item.returnQty = 0;
           if (returnData.length > 0) {
             const returnProductQty = returnData.reduce((acc, cur) => {
@@ -48,13 +65,33 @@ function InvoiceView() {
 
             item.returnQty = returnProductQty || 0;
           }
-          if (item.discountType) {
-            discount = (+item.sellingPrice / 100) * item.discount;
-          }
-          item.netAmount = +item.sellingPrice - discount;
-          return item;
+          totalTaxableAmount += netAmount * item.quantity;
+          totalSgstAmount_2_5 += sgst === 2.5 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_2_5 += cgst === 2.5 ? cgstAmount * item.quantity : 0;
+          totalSgstAmount_6 += sgst === 6 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_6 += cgst === 6 ? cgstAmount * item.quantity : 0;
+          totalSgstAmount_9 += sgst === 9 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_9 += cgst === 9 ? cgstAmount * item.quantity : 0;
+          return {
+            ...item,
+            sgst,
+            cgst,
+            taxAmount,
+            sgstAmount,
+            cgstAmount,
+            totalAmount: netAmount * item.quantity,
+            netAmount,
+          };
         }),
+        totalTaxableAmount,
+        totalSgstAmount_2_5,
+        totalCgstAmount_2_5,
+        totalSgstAmount_6,
+        totalCgstAmount_6,
+        totalSgstAmount_9,
+        totalCgstAmount_9,
       };
+
       if (invoicesData.book.bookRef) {
         const bankData = (await getDoc(invoicesData.book.bookRef)).data();
         setBankDetails(bankData);

@@ -139,7 +139,7 @@ const CreditNote = ({ creditNote }) => {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(creditNote?.creditNoteDate)}</div>
+            <div>Date: {DateFormate(creditNote?.date)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
