@@ -64,10 +64,8 @@ const SetInvoice = () => {
     tcs: {},
     terms: "",
     mode: "Cash",
-    extraDiscount: {
-      amount: 0,
-      type: "percentage",
-    },
+    extraDiscount: 0,
+    extraDiscountType: "percentage",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({

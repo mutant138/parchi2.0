@@ -8,7 +8,6 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import Template1 from "../../Invoices/Templates/Template1";
 function POSViewHome({ POS }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);

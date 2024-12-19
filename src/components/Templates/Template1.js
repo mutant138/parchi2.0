@@ -5,6 +5,7 @@ const Template1 = forwardRef((props, ref) => {
   if (!invoiceData) {
     return;
   }
+
   function DateFormate(timestamp) {
     const milliseconds =
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
@@ -15,6 +16,7 @@ const Template1 = forwardRef((props, ref) => {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
   const ModifiedInvoiceData = {
     ...invoiceData,
     items: invoiceData.products.map((item) => {
@@ -83,7 +85,16 @@ const Template1 = forwardRef((props, ref) => {
       product.cgst === 9 ? sum + product.cgstAmount * product.quantity : sum,
     0
   );
-
+  console.log("🚀 ~ Template1 ~ totalTaxableAmount:", totalTaxableAmount);
+  console.log(
+    "🚀 ~ Template1 ~",
+    totalSgstAmount_2_5,
+    totalCgstAmount_2_5,
+    totalSgstAmount_6,
+    totalCgstAmount_6,
+    totalSgstAmount_9,
+    totalCgstAmount_9
+  );
   const totalAmount =
     totalTaxableAmount +
     totalSgstAmount_2_5 +
@@ -234,6 +245,18 @@ const Template1 = forwardRef((props, ref) => {
             <span className="ml-5">{totalSgstAmount_9.toFixed(2)}</span>
           </div>
         )}
+        {totalCgstAmount_6 > 0 && (
+          <div>
+            CGST 6.0% :
+            <span className="ml-5">{totalCgstAmount_6.toFixed(2)}</span>
+          </div>
+        )}
+        {totalSgstAmount_6 > 0 && (
+          <div>
+            SGST 6.0% :
+            <span className="ml-5">{totalSgstAmount_6.toFixed(2)}</span>
+          </div>
+        )}
         {totalCgstAmount_2_5 > 0 && (
           <div>
             CGST 2.5% :
@@ -249,7 +272,9 @@ const Template1 = forwardRef((props, ref) => {
       </div>
       <hr />
       <div className="text-end font-bold">
-        <h3>Total : {+ModifiedInvoiceData.total?.toFixed(2)}</h3>
+        <h3>
+          Total : {+ModifiedInvoiceData.total?.toFixed(2)} {totalAmount}
+        </h3>
       </div>
 
       <div className=" flex justify-between">
