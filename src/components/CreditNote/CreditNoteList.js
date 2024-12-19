@@ -270,12 +270,12 @@ const CreditNoteList = () => {
                         <td className="py-3">
                           {(() => {
                             if (
-                              creditnote.creditNoteDate.seconds &&
-                              typeof creditnote.creditNoteDate.seconds ===
+                              creditnote.date.seconds &&
+                              typeof creditnote.date.seconds ===
                                 "number"
                             ) {
                               const date = new Date(
-                                creditnote.creditNoteDate.seconds * 1000
+                                creditnote.date.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =

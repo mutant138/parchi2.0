@@ -28,10 +28,9 @@ const SetCreditNote = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [creditNoteDate, setCreditNoteDate] = useState(
+  const [date, setDate] = useState(
     Timestamp.fromDate(new Date())
   );
-  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -102,7 +101,7 @@ const SetCreditNote = () => {
         productData = products.map((pro) => {
           if (pro.id === ele.productRef.id) {
             pro.actionQty = ele.quantity;
-            pro.quantity += ele.quantity;
+            // pro.quantity += ele.quantity;
             pro.totalAmount = ele.quantity * pro.netAmount;
           }
           return pro;
@@ -160,8 +159,8 @@ const SetCreditNote = () => {
         );
         const getData = (await getDoc(docRef)).data();
 
-        setCreditNoteDate(getData.creditNoteDate);
-        setDueDate(getData.dueDate);
+        setDate(getData.date);
+        
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -508,7 +507,7 @@ const SetCreditNote = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.actionQty,
+          quantity: product.quantity,
           productRef: productRef,
         });
       }
@@ -537,8 +536,7 @@ const SetCreditNote = () => {
         ...formData,
         tds,
         tcs,
-        creditNoteDate,
-        dueDate,
+        date,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -701,17 +699,17 @@ const SetCreditNote = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
-                  creditnote Date <span className="text-red-500">*</span>
+                  CreditNote Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(creditNoteDate)}
+                  value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setCreditNoteDate(
+                    setDate(
                       Timestamp.fromDate(new Date(e.target.value))
                     );
                   }}
@@ -720,28 +718,15 @@ const SetCreditNote = () => {
               </div>
               <div>
                 <label className="text-sm text-gray-600">
-                  Due Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  value={DateFormate(dueDate)}
-                  className="border p-1 rounded w-full mt-1"
-                  onChange={(e) => {
-                    setDueDate(Timestamp.fromDate(new Date(e.target.value)));
-                  }}
-                />
-              </div>
-              <div>
-                <label className="text-sm text-gray-600">
-                  creditnote No. <span className="text-red-500">*</span>
+                  CreditNote No. <span className="text-red-500">*</span>
                   {preCreditNoteList.includes(formData.creditnoteNo) && (
                     <span className="text-red-800 text-xs">
-                      "Already creditnote No. exist"{" "}
+                      "Already CreditNote No. exist"{" "}
                     </span>
                   )}
                   {Number(formData.creditnoteNo) == 0 && (
                     <span className="text-red-800 text-xs">
-                      "Kindly Enter valid creditnote No."{" "}
+                      "Kindly Enter valid CreditNote No."{" "}
                     </span>
                   )}
                 </label>
@@ -803,15 +788,15 @@ const SetCreditNote = () => {
                             <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
                             <td className="px-4 py-2">
-                              ₹{product.sellingPrice}
+                              ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount}</td>
-                            <td className="px-4 py-2">₹{product.netAmount}</td>
+                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
+                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
                             <td className="px-4 py-2">
-                              ₹{product.totalAmount}
+                              ₹{product.totalAmount.toFixed(2)}
                             </td>
                             <td className="px-4 py-2">
                               {product.actionQty >= 1 && (
