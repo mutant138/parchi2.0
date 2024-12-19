@@ -375,7 +375,7 @@ function Invoice({ invoice, bankDetails }) {
                     {[
                       {
                         label: "Sub Total",
-                        amount: "2146.00",
+                        amount: invoice.subTotal,
                       },
                       {
                         label: "Extra Discount",
