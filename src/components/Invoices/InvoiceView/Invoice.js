@@ -7,21 +7,19 @@ import { FaRegEye } from "react-icons/fa";
 import { db, storage } from "../../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
-import Template1 from "../Templates/Template1";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import SunyaLogo from "../../../assets/SunyaLogo.jpg";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
-  console.log("🚀 ~ Invoice ~ userDetails:", userDetails);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
-  const [totalDiscount, setTotalDiscount] = useState(0);
-  console.log("invoice", invoice);
   const invoiceRef = useRef();
 
   useEffect(() => {
@@ -29,11 +27,7 @@ function Invoice({ invoice, bankDetails }) {
       const tax = invoice?.products.reduce((acc, cur) => {
         return acc + cur?.tax;
       }, 0);
-      const discount = invoice?.products.reduce((acc, cur) => {
-        return acc + cur?.discount;
-      }, 0);
       setTotalTax(tax);
-      setTotalDiscount(discount);
     }
   }, [invoice]);
 
@@ -195,7 +189,6 @@ function Invoice({ invoice, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-  console.log("invoice", invoice?.products);
   const columns = [
     {
       id: 1,
@@ -215,6 +208,10 @@ function Invoice({ invoice, bankDetails }) {
     },
     {
       id: 5,
+      label: "isTax Included",
+    },
+    {
+      id: 6,
       label: "PRICE",
     },
   ];
@@ -271,7 +268,10 @@ function Invoice({ invoice, bankDetails }) {
           </div>
         )}
       </div>
-      <div className="grid grid-cols-12 gap-6 mt-6">
+      <div
+        className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
+        style={{ height: "64vh" }}
+      >
         <div className="col-span-12 ">
           <div className="p-5 bg-white rounded-lg my-3">
             <div className="">
@@ -363,6 +363,9 @@ function Invoice({ invoice, bankDetails }) {
                           <td className="  text-gray-600 whitespace-nowrap p-3">
                             {item.tax}%
                           </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.sellingPriceTaxType ? "YES" : "NO"}
+                          </td>
                           <td className="ltr:text-right rtl:text-left   text-gray-600 p-3">
                             ₹{item.sellingPrice}
                           </td>
@@ -386,7 +389,7 @@ function Invoice({ invoice, bankDetails }) {
                       },
                       {
                         label: "TAX(%)",
-                        amount: invoice.tax,
+                        amount: totalTax,
                       },
                       {
                         label: "Shipping",
@@ -396,21 +399,23 @@ function Invoice({ invoice, bankDetails }) {
                         label: "Packaging",
                         amount: "₹" + invoice.packagingCharges,
                       },
-                      {
-                        label: "total",
-                        amount: invoice.total,
-                      },
                     ].map((item, index) => (
                       <div
                         key={`invoice-item-${index}`}
-                        className="mb-3 text-end flex justify-end"
+                        className="mb-3 text-end flex justify-end "
                       >
                         <span className="  text-gray-600 ">{item.label}:</span>
-                        <span className="  text-gray-600  text-end w-[100px] md:w-[160px] block">
+                        <span className="  text-end w-[100px] md:w-[160px] block ">
                           {item.amount}
                         </span>
                       </div>
                     ))}
+                    <div className="mb-3 text-end flex justify-end ">
+                      <span className="  text-gray-600 ">Total :</span>
+                      <span className="   text-end w-[100px] md:w-[160px] block  font-bold">
+                        {invoice.total}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -440,6 +445,7 @@ function Invoice({ invoice, bankDetails }) {
           </div>
         </div>
       </div>
+
       {invoice.id && (
         <div
           className="fixed inset-0 z-20 "
@@ -463,6 +469,11 @@ function Invoice({ invoice, bankDetails }) {
                     </div>
                   </div>
                 </div>
+                {/* <Template2
+                  ref={invoiceRef}
+                  invoiceData={invoice}
+                  bankDetails={bankDetails}
+                /> */}
                 <Template1
                   ref={invoiceRef}
                   invoiceData={invoice}
@@ -475,44 +486,6 @@ function Invoice({ invoice, bankDetails }) {
       )}
     </div>
   );
-
-  //         <div className="text-end border-b-2 border-dashed py-3">
-  //           <div>subTotal: ₹{invoice.subTotal}</div>
-  //           <div>Tax: {totalTax}%</div>
-
-  //           <div>
-  //             {" "}
-  //             {invoice.packagingCharges > 0 && (
-  //               <>Packaging Charges: ₹{invoice.packagingCharges}</>
-  //             )}
-  //           </div>
-  //           <div>
-  //             {" "}
-  //             {invoice.shippingCharges > 0 && (
-  //               <>Shipping Charges: ₹{invoice.shippingCharges} </>
-  //             )}{" "}
-  //           </div>
-  //         </div>
-  //         <div className="flex space-x-3 justify-end font-bold text-lg">
-  //           <div>Total:</div>
-  //           <div>₹ {invoice.total}</div>
-  //         </div>
-  //         <div className="bg-gray-100  rounded-lg">
-  //           <div className="p-2">
-  //             <div>Notes</div>
-  //             <div className="font-bold">{invoice.notes || "No Data"}</div>
-  //           </div>
-  //           <hr />
-  //           <div className="p-2">
-  //             <div>Terms And Conditions</div>
-  //             <div className="font-bold">{invoice.terms || "No Data"}</div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //   </div>
-  // );
 }
 
 export default Invoice;
