@@ -2,7 +2,6 @@ import React, { forwardRef } from "react";
 
 const Template1 = forwardRef((props, ref) => {
   const { invoiceData, bankDetails } = props;
-  console.log("🚀 ~ Template1 ~ invoiceData:", invoiceData);
   if (!invoiceData) {
     return;
   }
@@ -62,7 +61,7 @@ const Template1 = forwardRef((props, ref) => {
           <thead>
             <tr className="bg-blue-700 text-white text-center ">
               <th className="border border-black pb-2">Sl. No</th>
-              <th className="border border-black pb-2">Description</th>
+              <th className="border border-black pb-2">Product</th>
               <th className="border border-black pb-2">Unit Price</th>
               <th className="border border-black pb-2">Discount</th>
               <th className="border border-black pb-2">Qty</th>
