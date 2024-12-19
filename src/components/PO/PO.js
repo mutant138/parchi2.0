@@ -45,7 +45,7 @@ function PO() {
       setLoading(true);
       try {
         const getData = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "purchases")
+          collection(db, "companies", companyDetails.companyId, "po")
         );
         let receivedCount = 0;
         let totalPrice = 0;
@@ -80,7 +80,7 @@ function PO() {
         db,
         "companies",
         companyDetails.companyId,
-        "purchases",
+        "po",
         poId
       );
       await updateDoc(docRef, { orderStatus: value });

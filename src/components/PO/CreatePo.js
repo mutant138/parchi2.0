@@ -192,7 +192,7 @@ const CreatePo = () => {
     const fetchPONumbers = async () => {
       try {
         const querySnapshot = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "purchases")
+          collection(db, "companies", companyDetails.companyId, "po")
         );
 
         const noList = querySnapshot.docs.map((doc) => doc.data().no);
@@ -461,7 +461,7 @@ const CreatePo = () => {
       };
 
       await addDoc(
-        collection(db, "companies", companyDetails.companyId, "purchases"),
+        collection(db, "companies", companyDetails.companyId, "po"),
         payload
       );
 

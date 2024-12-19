@@ -66,6 +66,9 @@ import PoView from "../PO/PoView/PoView";
 import SetPO from "../PO/SetPO/SetPO";
 import SetProFormaInvoice from "../ProFormaInvoice/SetProFormaInvoice/SetProFormaInvoice";
 import SetPos from "../POS/CreatePOS/SetPos"
+import Purchase from "../Purchase/Purchase";
+import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
+import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 
 const Home = () => {
   const location = useLocation();
@@ -119,6 +122,19 @@ const Home = () => {
             <Route
               path="/quotation/:quotationId/edit-quotation"
               element={<SetQuotation />}
+            ></Route>
+               <Route path="/purchase" element={<Purchase />}></Route>
+            <Route
+              path="/purchase/:id"
+              element={<PurchaseViewHome />}
+            ></Route>
+            <Route
+              path="/purchase/create-purchase"
+              element={<SetPurchase />}
+            ></Route>
+            <Route
+              path="/purchase/:purchaseId/edit-purchase"
+              element={<SetPurchase />}
             ></Route>
             <Route
               path="/pro-forma-invoice"

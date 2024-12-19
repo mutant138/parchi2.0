@@ -42,6 +42,10 @@ function SideBar() {
           path: "/quotation",
         },
         {
+          name: "Purchase",
+          path:"/purchase"
+        },
+        {
           name: "Pro Forma Invoice",
           path: "/pro-forma-invoice",
         },
