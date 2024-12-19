@@ -43,13 +43,12 @@ const SetQuotation = () => {
 
   const [products, setProducts] = useState([]);
   const [preQuotationList, setPreQuotationList] = useState([]);
-  const [books, setBooks] = useState([]);
+ 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    book: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -102,7 +101,7 @@ const SetQuotation = () => {
         productData = products.map((pro) => {
           if (pro.id === ele.productRef.id) {
             pro.actionQty = ele.quantity;
-            pro.quantity += ele.quantity;
+            // pro.quantity += ele.quantity;
             pro.totalAmount = ele.quantity * pro.netAmount;
           }
           return pro;
@@ -508,7 +507,7 @@ const SetQuotation = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.actionQty,
+          quantity: product.quantity,
           productRef: productRef,
         });
       }
@@ -790,15 +789,15 @@ const SetQuotation = () => {
                             <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
                             <td className="px-4 py-2">
-                              ₹{product.sellingPrice}
+                              ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount}</td>
-                            <td className="px-4 py-2">₹{product.netAmount}</td>
+                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
+                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
                             <td className="px-4 py-2">
-                              ₹{product.totalAmount}
+                              ₹{product.totalAmount.toFixed(2)}
                             </td>
                             <td className="px-4 py-2">
                               {product.actionQty >= 1 && (

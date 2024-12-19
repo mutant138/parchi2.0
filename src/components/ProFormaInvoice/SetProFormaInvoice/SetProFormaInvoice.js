@@ -102,7 +102,7 @@ const SetProFormaInvoice = () => {
         productData = products.map((pro) => {
           if (pro.id === ele.productRef.id) {
             pro.actionQty = ele.quantity;
-            pro.quantity += ele.quantity;
+            // pro.quantity += ele.quantity;
             pro.totalAmount = ele.quantity * pro.netAmount;
           }
           return pro;
@@ -113,11 +113,11 @@ const SetProFormaInvoice = () => {
     }
     addActionQty();
     if (proFormaId) {
-      fetchQuotationNumbers();
+      fetchProFormaInvoiceNumbers();
     }
   }, [formData.products]);
 
-  const fetchQuotationNumbers = async () => {
+  const fetchProFormaInvoiceNumbers = async () => {
     try {
       const querySnapshot = await getDocs(
         collection(db, "companies", companyDetails.companyId, "proFormaInvoice")
@@ -312,12 +312,12 @@ const SetProFormaInvoice = () => {
         });
         setProducts(productsData);
       } catch (error) {
-        console.error("Error fetching quotation:", error);
+        console.error("Error fetching ProForma Invoice:", error);
       }
     };
 
     if (!proFormaId) {
-      fetchQuotationNumbers();
+      fetchProFormaInvoiceNumbers();
     }
 
     fetchProducts();
@@ -508,7 +508,7 @@ const SetProFormaInvoice = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.actionQty,
+          quantity: product.quantity,
           productRef: productRef,
         });
       }
@@ -703,7 +703,7 @@ const SetProFormaInvoice = () => {
             <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
-                  quotation Date <span className="text-red-500">*</span>
+                  ProForma Invoice Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -720,21 +720,21 @@ const SetProFormaInvoice = () => {
          
               <div>
                 <label className="text-sm text-gray-600">
-                  quotation No. <span className="text-red-500">*</span>
+                  ProForma Invoice No. <span className="text-red-500">*</span>
                   {preProFormaList .includes(formData.proFormaNo) && (
                     <span className="text-red-800 text-xs">
-                      "Already quotation No. exist"{" "}
+                      "Already ProForma Invoice No. exist"{" "}
                     </span>
                   )}
                   {Number(formData.proFormaNo) == 0 && (
                     <span className="text-red-800 text-xs">
-                      "Kindly Enter valid quotation No."{" "}
+                      "Kindly Enter valid ProForma Invoice No."{" "}
                     </span>
                   )}
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter quotation No. "
+                  placeholder="Enter ProForma Invoice No. "
                   className="border p-1 rounded w-full mt-1"
                   value={formData.proFormaNo}
                   onChange={(e) => {
@@ -790,15 +790,15 @@ const SetProFormaInvoice = () => {
                             <td className="px-4 py-2">{product.name}</td>
                             <td className="px-4 py-2">{product.quantity}</td>
                             <td className="px-4 py-2">
-                              ₹{product.sellingPrice}
+                              ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount}</td>
-                            <td className="px-4 py-2">₹{product.netAmount}</td>
+                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
+                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
                             <td className="px-4 py-2">
-                              ₹{product.totalAmount}
+                              ₹{product.totalAmount.toFixed(2)}
                             </td>
                             <td className="px-4 py-2">
                               {product.actionQty >= 1 && (

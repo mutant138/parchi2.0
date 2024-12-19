@@ -65,7 +65,7 @@ function Sidebar({
                 <div className="font-bold">
                   {product.name} - Quantity: {product.quantity || "0"}
                 </div>
-                {product.quantity !== 0 && (
+                {/* {product.quantity !== 0 && ( */}
                   <div className="border-2 rounded-lg flex justify-between w-20 text-lg mt-2">
                     <button
                       onClick={() => handleActionQty("-", product.id)}
@@ -81,7 +81,7 @@ function Sidebar({
                       +
                     </button>
                   </div>
-                )}
+                {/* )} */}
               </div>
               <div className="text-end">
                 <div className="font-bold">₹ {product.sellingPrice}</div>
