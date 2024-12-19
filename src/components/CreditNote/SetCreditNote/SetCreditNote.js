@@ -48,7 +48,6 @@ const SetCreditNote = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    book: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -507,7 +506,7 @@ const SetCreditNote = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.quantity,
+          quantity: product.actionQty,
           productRef: productRef,
         });
       }

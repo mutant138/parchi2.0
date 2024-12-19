@@ -45,7 +45,7 @@ import {
       const [prePoList, setPrePoList] = useState([]);
       const [books, setBooks] = useState([]);
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
+      const [existQuantity, setExistQuantity] = useState(0);
       const navigate = useNavigate();
     
       const [formData, setFormData] = useState({
@@ -86,7 +86,7 @@ import {
       });
       const [suggestions, setSuggestions] = useState([]);
       const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-    
+     console.log("existquantity", existQuantity)
       useEffect(() => {
         function addActionQty() {
           if (
@@ -105,9 +105,11 @@ import {
                 // pro.quantity += ele.quantity;
                 pro.totalAmount = ele.quantity * pro.netAmount;
               }
+          
               return pro;
             });
           }
+       
           setProducts(productData);
           calculateProduct(productData);
         }
@@ -574,7 +576,7 @@ import {
             if (item.quantity === 0) {
               continue;
             }
-    
+           
             const currentQuantity = products.find(
               (val) => val.name === item.name
             ).quantity;
@@ -585,10 +587,10 @@ import {
             }
     
             await updateDoc(item.productRef, {
-              stock: currentQuantity + item.quantity,
+              stock: currentQuantity + item.quantity ,
             });
           }
-    
+
           alert(
             "Successfully " + (poId ? "Updated" : "Created") + " the PO"
           );

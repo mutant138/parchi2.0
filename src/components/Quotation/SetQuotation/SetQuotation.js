@@ -507,7 +507,7 @@ const SetQuotation = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.quantity,
+          quantity: product.actionQty,
           productRef: productRef,
         });
       }
