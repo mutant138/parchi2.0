@@ -4,12 +4,15 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbEdit } from "react-icons/tb";
 import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
-import { db , storage} from "../../../firebase";
-import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
-import Template1 from "../Templates/Template1";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import SunyaLogo from "../../../assets/SunyaLogo.jpg";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
@@ -17,8 +20,6 @@ function Invoice({ invoice, bankDetails }) {
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
-  const [totalDiscount, setTotalDiscount] = useState(0);
-  console.log("invoice", invoice);
   const invoiceRef = useRef();
 
   useEffect(() => {
@@ -26,11 +27,7 @@ function Invoice({ invoice, bankDetails }) {
       const tax = invoice?.products.reduce((acc, cur) => {
         return acc + cur?.tax;
       }, 0);
-      const discount = invoice?.products.reduce((acc, cur) => {
-        return acc + cur?.discount;
-      }, 0);
       setTotalTax(tax);
-      setTotalDiscount(discount);
     }
   }, [invoice]);
 
@@ -53,27 +50,30 @@ function Invoice({ invoice, bankDetails }) {
       console.error("Invoice ID is missing!");
       return;
     }
-  
+
     try {
       // Generate the PDF in-memory
       const doc = new jsPDF("p", "pt", "a4");
       doc.html(invoiceRef.current, {
         callback: async function (doc) {
           const pdfBlob = doc.output("blob");
-  
+
           // Create a reference to the file in Firebase Storage
           const fileName = `invoices/${invoice.id}.pdf`;
           const fileRef = ref(storage, fileName);
-  
+
           // Upload the file
           await uploadBytes(fileRef, pdfBlob);
-  
+
           // Generate a public download URL
           const downloadURL = await getDownloadURL(fileRef);
-  
+
           // Share the public link via WhatsApp
           const message = `Here is your invoice for ${invoice.customerDetails.name}: ${downloadURL}`;
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, "_blank");
+          window.open(
+            `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`,
+            "_blank"
+          );
         },
         x: 0,
         y: 0,
@@ -82,36 +82,34 @@ function Invoice({ invoice, bankDetails }) {
       console.error("Error uploading or sharing the PDF:", error);
     }
   };
-  
-  
 
   const handleEmailShare = async () => {
     if (!invoice.id) {
       console.error("Invoice ID is missing!");
       return;
     }
-  
+
     try {
       // Generate the PDF in-memory
       const doc = new jsPDF("p", "pt", "a4");
       doc.html(invoiceRef.current, {
         callback: async function (doc) {
           const pdfBlob = doc.output("blob");
-  
+
           // Create a reference to the file in Firebase Storage
           const fileName = `invoices/${invoice.id}.pdf`;
           const fileRef = ref(storage, fileName);
-  
+
           // Upload the file to Firebase Storage
           await uploadBytes(fileRef, pdfBlob);
-  
+
           // Generate a public download URL
           const downloadURL = await getDownloadURL(fileRef);
-  
+
           // Construct the email subject and body
           const subject = `Invoice for ${invoice.customerDetails.name}`;
           const body = `Hi ${invoice.customerDetails.name},%0D%0A%0D%0AHere is your invoice for the recent purchase.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
-  
+
           // Open the default email client with pre-filled subject and body
           window.location.href = `mailto:?subject=${subject}&body=${body}`;
         },
@@ -122,7 +120,6 @@ function Invoice({ invoice, bankDetails }) {
       console.error("Error uploading or sharing the PDF:", error);
     }
   };
-  
 
   const handleDelete = async () => {
     try {
@@ -192,9 +189,35 @@ function Invoice({ invoice, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-  console.log("invoice", invoice?.products);
+  const columns = [
+    {
+      id: 1,
+      label: "NAME",
+    },
+    {
+      id: 2,
+      label: "QUANTITY",
+    },
+    {
+      id: 3,
+      label: "DISCOUNT",
+    },
+    {
+      id: 4,
+      label: "TAX",
+    },
+    {
+      id: 5,
+      label: "isTax Included",
+    },
+    {
+      id: 6,
+      label: "PRICE",
+    },
+  ];
+
   return (
-    <div className="">
+    <div>
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
         <div className="space-x-4 flex">
           <button
@@ -245,75 +268,179 @@ function Invoice({ invoice, bankDetails }) {
           </div>
         )}
       </div>
-      <div className="space-y-2 ">
-        <div className="bg-white rounded-t-lg p-3 py-2">
-          <div>
-            <div>
-              <div></div>
-              <div>
-                <div>Bill To</div>
-                <div></div>
-                <div></div>
-              </div>
-            </div>
-            <div>Date: {DateFormate(invoice?.invoiceDate)}</div>
-          </div>
-        </div>
-        <div className="bg-white rounded-b-lg px-3 pb-3">
-          {invoice?.products?.length > 0 &&
-            invoice?.products.map((ele, index) => (
-              <div key={index} className="flex justify-between border-b-2 py-3">
-                <div>
-                  <div className="text-lg font-bold">{ele.name}</div>
-                  <div>-</div>
-                  <div>Qty: {ele.quantity}</div>
+      <div
+        className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
+        style={{ height: "64vh" }}
+      >
+        <div className="col-span-12 ">
+          <div className="p-5 bg-white rounded-lg my-3">
+            <div className="">
+              <div className="flex gap-6 flex-col md:flex-row pt-8">
+                <div className="flex-1">
+                  <Link href="#">
+                    <img src={SunyaLogo} width={100} alt="logo" height={100} />
+                    <span className="text-3xl font-bold text-primary-600">
+                      Sunya
+                    </span>
+                  </Link>
+                  <div className="mt-5">
+                    <div className="text-lg font-semibold text-gray-900">
+                      Billing To:
+                    </div>
+                    <div className="text-lg  text-gray-800 mt-1">
+                      {invoice.customerDetails?.name}
+                    </div>
+                    <div className=" text-gray-600 mt-2">
+                      {invoice.customerDetails?.address} <br />
+                      {invoice.customerDetails?.city} <br />
+                      {invoice.customerDetails?.zipCode} <br />
+                    </div>
+                  </div>
                 </div>
-                <div className="text-end">
-                  <div>Price: ₹{ele?.sellingPrice}</div>
-                  <div>Tax :{ele?.tax}%</div>
-                  <div>Discount :₹{ele?.discount}</div>
+                <div className="flex-none md:text-end">
+                  <div className="text-4xl font-semibold text-gray-900">
+                    Invoice #
+                  </div>
+                  <div className="mt-1.5 text-xl  text-gray-600">
+                    {invoice.invoiceNo}
+                  </div>
+                  <div className="mt-4  text-gray-600">
+                    {invoice.createdBy?.name} <br />
+                    {invoice.createdBy?.address} <br />
+                    {invoice.createdBy?.city} <br />
+                    {invoice.createdBy?.zipCode} <br />
+                  </div>
+                  <div className="mt-8">
+                    <div className="mb-2.5">
+                      <span className="mr-12  font-semibold text-gray-900">
+                        Invoice Date:
+                      </span>
+                      <span className="  text-gray-600">
+                        {DateFormate(invoice?.invoiceDate)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="mr-12  font-semibold text-gray-900">
+                        Due Date:
+                      </span>
+                      <span className="  text-gray-600">
+                        {DateFormate(invoice?.dueDate)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
-          <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹{invoice.subTotal}</div>
-            <div>Tax: {totalTax}%</div>
-            <div>
-              {invoice.extraDiscount?.amount > 0 && (
-                <>
-                  Extra Discount:{" "}
-                  {invoice?.extraDiscount?.type === "percentage"
-                    ? `${invoice.extraDiscount.amount}%`
-                    : `₹${invoice.extraDiscount.amount}`}{" "}
-                </>
-              )}
-            </div>
-            <div>
-              {" "}
-              {invoice.packagingCharges > 0 && (
-                <>Packaging Charges: ₹{invoice.packagingCharges}</>
-              )}
-            </div>
-            <div>
-              {" "}
-              {invoice.shippingCharges > 0 && (
-                <>Shipping Charges: ₹{invoice.shippingCharges} </>
-              )}{" "}
-            </div>
-          </div>
-          <div className="flex space-x-3 justify-end font-bold text-lg">
-            <div>Total:</div>
-            <div>₹ {invoice.total}</div>
-          </div>
-          <div className="bg-gray-100  rounded-lg">
-            <div className="p-2">
-              <div>Notes</div>
-              <div className="font-bold">{invoice.notes || "No Data"}</div>
-            </div>
-            <hr />
-            <div className="p-2">
-              <div>Terms And Conditions</div>
-              <div className="font-bold">{invoice.terms || "No Data"}</div>
+              <div className="mt-6 border-2  rounded-lg">
+                <table className="w-full ">
+                  <thead>
+                    <tr className="border-b-2 [&_th:last-child]:text-end">
+                      {columns.map((column) => (
+                        <th
+                          key={`invoice-table-${column.id}`}
+                          className="text-start p-3 "
+                        >
+                          {column.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="[&_tr:last-child]:border-1 ">
+                    {invoice?.products?.length > 0 &&
+                      invoice?.products.map((item) => (
+                        <tr
+                          key={`invoice-description-${item.id}`}
+                          className="border-b-2 p-3 [&_td:last-child]:text-end"
+                        >
+                          <td className="  text-gray-600 max-w-[200px] truncate p-3">
+                            {item.name}
+                          </td>
+                          <td className="  text-gray-600 p-3">
+                            {item.quantity} pcs
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.discount}
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.tax}%
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.sellingPriceTaxType ? "YES" : "NO"}
+                          </td>
+                          <td className="ltr:text-right rtl:text-left   text-gray-600 p-3">
+                            ₹{item.sellingPrice}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                <div className="mt-2 flex justify-end  p-6">
+                  <div>
+                    {[
+                      {
+                        label: "Sub Total",
+                        amount: invoice.subTotal,
+                      },
+                      {
+                        label: "Extra Discount",
+                        amount:
+                          invoice?.extraDiscountType === "percentage"
+                            ? `${invoice?.extraDiscount || 0}%`
+                            : `₹${invoice?.extraDiscount || 0}`,
+                      },
+                      {
+                        label: "TAX(%)",
+                        amount: totalTax,
+                      },
+                      {
+                        label: "Shipping",
+                        amount: "₹" + invoice.shippingCharges,
+                      },
+                      {
+                        label: "Packaging",
+                        amount: "₹" + invoice.packagingCharges,
+                      },
+                    ].map((item, index) => (
+                      <div
+                        key={`invoice-item-${index}`}
+                        className="mb-3 text-end flex justify-end "
+                      >
+                        <span className="  text-gray-600 ">{item.label}:</span>
+                        <span className="  text-end w-[100px] md:w-[160px] block ">
+                          {item.amount}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="mb-3 text-end flex justify-end ">
+                      <span className="  text-gray-600 ">Total :</span>
+                      <span className="   text-end w-[100px] md:w-[160px] block  font-bold">
+                        {invoice.total}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="  text-gray-600 mt-6">Note:</div>
+              <div className=" text-gray-800">
+                {invoice.notes || "No notes"}
+              </div>
+              <div className="mt-3.5   text-gray-600">Terms & Conditions:</div>
+              <div className=" text-gray-800 mt-1">
+                {invoice.terms || "No Terms and Conditions"}
+              </div>
+              <div className="mt-6 text-lg font-semibold text-gray-900">
+                Thank You!
+              </div>
+              <div className="mt-1  text-gray-800">
+                If you have any questions concerning this invoice, use the
+                following contact information:
+              </div>
+              <div className="text-xs text-gray-800 mt-2">
+                {userDetails.email}
+              </div>
+              <div className="text-xs text-gray-800 mt-1">
+                {userDetails.phone}
+              </div>
+              <div className="mt-8 text-xs text-gray-800">© 2024 Sunya</div>
             </div>
           </div>
         </div>
@@ -342,6 +469,11 @@ function Invoice({ invoice, bankDetails }) {
                     </div>
                   </div>
                 </div>
+                {/* <Template2
+                  ref={invoiceRef}
+                  invoiceData={invoice}
+                  bankDetails={bankDetails}
+                /> */}
                 <Template1
                   ref={invoiceRef}
                   invoiceData={invoice}

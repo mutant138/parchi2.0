@@ -65,7 +65,7 @@ import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliver
 import PoView from "../PO/PoView/PoView";
 import SetPO from "../PO/SetPO/SetPO";
 import SetProFormaInvoice from "../ProFormaInvoice/SetProFormaInvoice/SetProFormaInvoice";
-import SetPos from "../POS/CreatePOS/SetPos"
+import SetPos from "../POS/CreatePOS/SetPos";
 import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
@@ -123,11 +123,8 @@ const Home = () => {
               path="/quotation/:quotationId/edit-quotation"
               element={<SetQuotation />}
             ></Route>
-               <Route path="/purchase" element={<Purchase />}></Route>
-            <Route
-              path="/purchase/:id"
-              element={<PurchaseViewHome />}
-            ></Route>
+            <Route path="/purchase" element={<Purchase />}></Route>
+            <Route path="/purchase/:id" element={<PurchaseViewHome />}></Route>
             <Route
               path="/purchase/create-purchase"
               element={<SetPurchase />}
@@ -144,7 +141,7 @@ const Home = () => {
               path="/pro-forma-invoice/:id"
               element={<ProFormaView />}
             ></Route>
-               <Route
+            <Route
               path="/pro-forma-invoice/create-proForma-invoice"
               element={<SetProFormaInvoice />}
             ></Route>
@@ -155,7 +152,7 @@ const Home = () => {
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
             <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
-            <Route path="/pos/:posId/edit-pos" element={<SetPos />}></Route>
+            <Route path="/pos/:id/edit-pos" element={<SetPos />}></Route>
             <Route path="/customers" element={<CustomerList />}></Route>
             <Route path="/customers/:id" element={<CustomerView />}></Route>
             <Route path="/vendors" element={<VendorList />}></Route>
@@ -215,19 +212,10 @@ const Home = () => {
               element={<EditService />}
             ></Route>
             <Route path="/po" element={<PO />}></Route>
-           
-            <Route
-              path="/po/:id"
-              element={<PoView />}
-            ></Route>
-            <Route
-              path="/po/create-po"
-              element={<SetPO />}
-            ></Route>
-            <Route
-              path="/po/:poId/edit-po"
-              element={<SetPO />}
-            ></Route>
+
+            <Route path="/po/:id" element={<PoView />}></Route>
+            <Route path="/po/create-po" element={<SetPO />}></Route>
+            <Route path="/po/:poId/edit-po" element={<SetPO />}></Route>
             {/* <Route path="/create-po" element={<CreatePo />}></Route> */}
             <Route path="/reminder" element={<Reminder />}></Route>
             <Route path="/expense" element={<BookList />}></Route>

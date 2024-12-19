@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
-import Template1 from "./Templates/Template1";
 import jsPDF from "jspdf";
 import { useSelector } from "react-redux";
 import { FaRegEye } from "react-icons/fa";
@@ -19,7 +18,7 @@ const InvoiceList = () => {
   const [filterStatus, setFilterStatus] = useState("All");
 
   const userDetails = useSelector((state) => state.users);
- 
+
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const navigate = useNavigate();
@@ -280,7 +279,11 @@ const InvoiceList = () => {
                             }
                           })()}
                         </td>
-                        <td className="py-3">{invoice?.createdBy?.name == userDetails.name ? "Owner" : userDetails.name}</td>
+                        <td className="py-3">
+                          {invoice?.createdBy?.name == userDetails.name
+                            ? "Owner"
+                            : userDetails.name}
+                        </td>
 
                         {/* <td className="py-3 space-x-2">
                           <button
