@@ -26,7 +26,7 @@ const POS = () => {
           id: doc.id,
           ...doc.data(),
         }));
-
+ 
         setPOS(POSData);
       } catch (error) {
         console.error("Error fetching POS:", error);

@@ -60,30 +60,30 @@ function POSViewHome({ POS }) {
       if (!confirmDelete) return;
       await deleteDoc(POSDocRef);
 
-      if (POS.items && POS.items.length > 0) {
-        const updateInventoryPromises = POS.items.map((inventoryItem) => {
-          if (
-            !inventoryItem.productRef ||
-            typeof inventoryItem.quantity !== "number"
-          ) {
-            console.error("Invalid inventory item:", inventoryItem);
-            return Promise.resolve();
-          }
+      // if (POS.items && POS.items.length > 0) {
+      //   const updateInventoryPromises = POS.items.map((inventoryItem) => {
+      //     if (
+      //       !inventoryItem.productRef ||
+      //       typeof inventoryItem.quantity !== "number"
+      //     ) {
+      //       console.error("Invalid inventory item:", inventoryItem);
+      //       return Promise.resolve();
+      //     }
 
-          const inventoryDocRef = doc(
-            db,
-            "companies",
-            companyId,
-            "inventories",
-            inventoryItem.productRef.id
-          );
+      //     const inventoryDocRef = doc(
+      //       db,
+      //       "companies",
+      //       companyId,
+      //       "products",
+      //       inventoryItem.productRef.id
+      //     );
 
-          return updateDoc(inventoryDocRef, {
-            "stock.quantity": increment(inventoryItem.quantity),
-          });
-        });
-        await Promise.all(updateInventoryPromises);
-      }
+      //     return updateDoc(inventoryDocRef, {
+      //       "stock.quantity": increment(inventoryItem.quantity),
+      //     });
+      //   });
+      //   await Promise.all(updateInventoryPromises);
+      // }
       navigate("/pos");
     } catch (error) {
       console.error("Error deleting POS:", error);
@@ -133,7 +133,7 @@ function POSViewHome({ POS }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {POS.paymentStatus !== "Paid" && (
+        {POS?.paymentStatus !== "Paid" && (
           <div className="text-end">
             <button
               className={"px-4 py-1 text-red-700 text-2xl"}
@@ -159,8 +159,8 @@ function POSViewHome({ POS }) {
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {POS?.items?.length > 0 &&
-            POS.items.map((ele, index) => (
+          {POS?.products?.length > 0 &&
+            POS.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -168,9 +168,9 @@ function POSViewHome({ POS }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele.pricing.sellingPrice.amount}</div>
-                  <div>Tax :{ele.pricing.sellingPrice.taxSlab}</div>
-                  <div>Discount :{ele.pricing.discount.amount}</div>
+                <div>Price: ₹{ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}%</div>
+                  <div>Discount :₹{ele?.discount}</div>
                 </div>
               </div>
             ))}

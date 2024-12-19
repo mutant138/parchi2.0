@@ -49,7 +49,6 @@ const SetDeliveryChallan = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-   
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",

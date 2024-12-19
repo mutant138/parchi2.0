@@ -40,7 +40,7 @@ import BookList from "../Expense/Book/BookList";
 import Quotation from "../Quotation/Quotation";
 import QuotationViewHome from "../Quotation/QuotationView/QuotationViewHome";
 import POS from "../POS/POS";
-import POSViewHome from "../POS/POSView/POSViewHome";
+import POSView from "../POS/POSView/POSView";
 import ProFormaInvoice from "../ProFormaInvoice/ProFormaInvoice";
 // import CreateProFormaInvoice from "../ProFormaInvoice/CreateProFormaInvoice/CreateProFormaInvoice";
 import ProFormaView from "../ProFormaInvoice/ProFormaInvoiceView/ProFormaView";
@@ -64,7 +64,7 @@ import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliver
 import PoView from "../PO/PoView/PoView";
 import SetPO from "../PO/SetPO/SetPO";
 import SetProFormaInvoice from "../ProFormaInvoice/SetProFormaInvoice/SetProFormaInvoice";
-import SetPos from "../POS/CreatePOS/SetPos";
+import SetPos from "../POS/SetPos/SetPos";
 import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
@@ -149,8 +149,8 @@ const Home = () => {
               element={<SetProFormaInvoice />}
             ></Route>
             <Route path="/pos" element={<POS />}></Route>
-            <Route path="/pos/:id" element={<POSViewHome />}></Route>
-            <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
+            <Route path="/pos/:id" element={<POSView />}></Route>
+            <Route path="/pos/create-pos" element={<SetPos />}></Route>
             <Route path="/pos/:id/edit-pos" element={<SetPos />}></Route>
             <Route path="/customers" element={<CustomerList />}></Route>
             <Route path="/customers/:id" element={<CustomerView />}></Route>
