@@ -102,7 +102,7 @@ import {
             productData = products.map((pro) => {
               if (pro.id === ele.productRef.id) {
                 pro.actionQty = ele.quantity;
-                pro.quantity += ele.quantity;
+                // pro.quantity += ele.quantity;
                 pro.totalAmount = ele.quantity * pro.netAmount;
               }
               return pro;
