@@ -28,9 +28,7 @@ const SetQuotation = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [date, setDate] = useState(
-    Timestamp.fromDate(new Date())
-  );
+  const [date, setDate] = useState(Timestamp.fromDate(new Date()));
 
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -43,7 +41,7 @@ const SetQuotation = () => {
 
   const [products, setProducts] = useState([]);
   const [preQuotationList, setPreQuotationList] = useState([]);
- 
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -160,7 +158,7 @@ const SetQuotation = () => {
         const getData = (await getDoc(docRef)).data();
 
         setDate(getData.date);
-    
+
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -507,7 +505,7 @@ const SetQuotation = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.quantity,
+          quantity: product.actionQty,
           productRef: productRef,
         });
       }
@@ -709,14 +707,12 @@ const SetQuotation = () => {
                   value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setDate(
-                      Timestamp.fromDate(new Date(e.target.value))
-                    );
+                    setDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />
               </div>
-         
+
               <div>
                 <label className="text-sm text-gray-600">
                   quotation No. <span className="text-red-500">*</span>
@@ -791,8 +787,12 @@ const SetQuotation = () => {
                             <td className="px-4 py-2">
                               ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
-                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.discount.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-2">
+                              ₹{product.netAmount.toFixed(2)}
+                            </td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>

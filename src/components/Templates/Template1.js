@@ -2,6 +2,7 @@ import React, { forwardRef } from "react";
 
 const Template1 = forwardRef((props, ref) => {
   const { invoiceData, bankDetails } = props;
+  console.log("🚀 ~ Template1 ~ invoiceData:", invoiceData);
   if (!invoiceData) {
     return;
   }
@@ -17,93 +18,6 @@ const Template1 = forwardRef((props, ref) => {
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
 
-  const ModifiedInvoiceData = {
-    ...invoiceData,
-    items: invoiceData.products.map((item) => {
-      let discount = +item.discount || 0;
-
-      if (item.discountType) {
-        discount = (+item.sellingPrice / 100) * item.discount;
-      }
-      const netAmount = item.sellingPrice - (discount || 0);
-      const taxRate = item.tax || 0;
-      const sgst = taxRate / 2;
-      const cgst = taxRate / 2;
-      const taxAmount = netAmount * (taxRate / 100);
-      const sgstAmount = netAmount * (sgst / 100);
-      const cgstAmount = netAmount * (cgst / 100);
-      return {
-        ...item,
-        sgst,
-        cgst,
-        taxAmount,
-        sgstAmount,
-        cgstAmount,
-        totalAmount: netAmount * item.quantity,
-        netAmount,
-      };
-    }),
-  };
-
-  const totalTaxableAmount = ModifiedInvoiceData.items.reduce(
-    (sum, product) => sum + product.netAmount * product.quantity,
-    0
-  );
-
-  const totalSgstAmount_2_5 = ModifiedInvoiceData.items.reduce(
-    (sum, product) =>
-      product.sgst === 2.5 ? sum + product.sgstAmount * product.quantity : sum,
-    0
-  );
-
-  const totalCgstAmount_2_5 = ModifiedInvoiceData.items.reduce(
-    (sum, product) =>
-      product.cgst === 2.5 ? sum + product.cgstAmount * product.quantity : sum,
-    0
-  );
-
-  const totalSgstAmount_6 = ModifiedInvoiceData.items.reduce(
-    (sum, product) =>
-      product.sgst === 6 ? sum + product.sgstAmount * product.quantity : sum,
-    0
-  );
-
-  const totalCgstAmount_6 = ModifiedInvoiceData.items.reduce(
-    (sum, product) =>
-      product.cgst === 6 ? sum + product.cgstAmount * product.quantity : sum,
-    0
-  );
-
-  const totalSgstAmount_9 = ModifiedInvoiceData.items.reduce(
-    (sum, product) =>
-      product.sgst === 9 ? sum + product.sgstAmount * product.quantity : sum,
-    0
-  );
-
-  const totalCgstAmount_9 = ModifiedInvoiceData.items.reduce(
-    (sum, product) =>
-      product.cgst === 9 ? sum + product.cgstAmount * product.quantity : sum,
-    0
-  );
-  console.log("🚀 ~ Template1 ~ totalTaxableAmount:", totalTaxableAmount);
-  console.log(
-    "🚀 ~ Template1 ~",
-    totalSgstAmount_2_5,
-    totalCgstAmount_2_5,
-    totalSgstAmount_6,
-    totalCgstAmount_6,
-    totalSgstAmount_9,
-    totalCgstAmount_9
-  );
-  const totalAmount =
-    totalTaxableAmount +
-    totalSgstAmount_2_5 +
-    totalCgstAmount_2_5 +
-    totalSgstAmount_6 +
-    totalCgstAmount_6 +
-    totalSgstAmount_9 +
-    totalCgstAmount_9;
-
   return (
     <div
       className="invoice"
@@ -113,9 +27,9 @@ const Template1 = forwardRef((props, ref) => {
       <div className="flex justify-between">
         <div>
           <div className="text-lg font-bold text-start">
-            {ModifiedInvoiceData?.createdBy?.name}
+            {invoiceData?.createdBy?.name}
           </div>
-          <div>Mobile : {ModifiedInvoiceData?.createdBy?.phoneNo}</div>
+          <div>Mobile : {invoiceData?.createdBy?.phoneNo}</div>
         </div>
         <div>
           <h3 className="font-bold">TAX INVOICE</h3>
@@ -124,20 +38,19 @@ const Template1 = forwardRef((props, ref) => {
       <div className="flex justify-between text-start">
         <div className="mt-2 text-start">
           <strong>Bill To :</strong>
-          <div>{ModifiedInvoiceData.customerDetails.name}</div>
-          <div>Ph : {ModifiedInvoiceData.customerDetails.phone}</div>
+          <div>{invoiceData.customerDetails.name}</div>
+          <div>Ph : {invoiceData.customerDetails.phone}</div>
         </div>
         <div>
           <div>
-            <strong>Invoice # :</strong> {ModifiedInvoiceData.invoiceNo}
+            <strong>Invoice # :</strong> {invoiceData.invoiceNo}
           </div>
           <div>
             <strong>Invoice Date :</strong>{" "}
-            {DateFormate(ModifiedInvoiceData.invoiceDate)}
+            {DateFormate(invoiceData.invoiceDate)}
           </div>
           <div>
-            <strong>Due Date :</strong>{" "}
-            {DateFormate(ModifiedInvoiceData.dueDate)}
+            <strong>Due Date :</strong> {DateFormate(invoiceData.dueDate)}
           </div>
           <div>
             <strong>Place of Supply :</strong> -
@@ -161,7 +74,7 @@ const Template1 = forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {ModifiedInvoiceData.items.map((item, index) => (
+            {invoiceData.products.map((item, index) => (
               <tr key={index}>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   {index + 1}
@@ -199,82 +112,89 @@ const Template1 = forwardRef((props, ref) => {
         </table>
       </div>
       <div className="mt-4 text-end">
-        {ModifiedInvoiceData.shippingCharges > 0 && (
+        {invoiceData.shippingCharges > 0 && (
           <div>
             Delivery/Shipping Charges :
-            <span className="ml-5"> {ModifiedInvoiceData.shippingCharges}</span>
+            <span className="ml-5"> {invoiceData.shippingCharges}</span>
           </div>
         )}
-        {ModifiedInvoiceData.packagingCharges > 0 && (
+        {invoiceData.packagingCharges > 0 && (
           <div>
             Packaging Charges :
-            <span className="ml-5">
-              {" "}
-              {ModifiedInvoiceData.packagingCharges}
-            </span>
+            <span className="ml-5"> {invoiceData.packagingCharges}</span>
           </div>
         )}
       </div>
 
       <div className="mt-4 mb-3 text-end">
-        {ModifiedInvoiceData.tcs.isTcsApplicable && (
+        {invoiceData.tcs.isTcsApplicable && (
           <div>
             TCS :
             <span className="ml-5">
-              {ModifiedInvoiceData.tcs.tcs_amount.toFixed(2)}
+              {invoiceData.tcs.tcs_amount.toFixed(2)}
             </span>
           </div>
         )}
-        {ModifiedInvoiceData.tds.isTdsApplicable && (
+        {invoiceData.tds.isTdsApplicable && (
           <div>
             TDS :
             <span className="ml-5">
-              {ModifiedInvoiceData.tds.tds_amount.toFixed(2)}
+              {invoiceData.tds.tds_amount.toFixed(2)}
             </span>
           </div>
         )}
-        {totalCgstAmount_9 > 0 && (
+        {invoiceData.totalCgstAmount_9 > 0 && (
           <div>
             CGST 9.0% :
-            <span className="ml-5">{totalCgstAmount_9.toFixed(2)}</span>
+            <span className="ml-5">
+              {invoiceData.totalCgstAmount_9.toFixed(2)}
+            </span>
           </div>
         )}
-        {totalSgstAmount_9 > 0 && (
+        {invoiceData.totalSgstAmount_9 > 0 && (
           <div>
             SGST 9.0% :
-            <span className="ml-5">{totalSgstAmount_9.toFixed(2)}</span>
+            <span className="ml-5">
+              {invoiceData.totalSgstAmount_9.toFixed(2)}
+            </span>
           </div>
         )}
-        {totalCgstAmount_6 > 0 && (
+        {invoiceData.totalCgstAmount_6 > 0 && (
           <div>
             CGST 6.0% :
-            <span className="ml-5">{totalCgstAmount_6.toFixed(2)}</span>
+            <span className="ml-5">
+              {invoiceData.totalCgstAmount_6.toFixed(2)}
+            </span>
           </div>
         )}
-        {totalSgstAmount_6 > 0 && (
+        {invoiceData.totalSgstAmount_6 > 0 && (
           <div>
             SGST 6.0% :
-            <span className="ml-5">{totalSgstAmount_6.toFixed(2)}</span>
+            <span className="ml-5">
+              {invoiceData.totalSgstAmount_6.toFixed(2)}
+            </span>
           </div>
         )}
-        {totalCgstAmount_2_5 > 0 && (
+        {invoiceData.totalCgstAmount_2_5 > 0 && (
           <div>
             CGST 2.5% :
-            <span className="ml-5">{totalCgstAmount_2_5.toFixed(2)}</span>
+            <span className="ml-5">
+              {invoiceData.totalCgstAmount_2_5.toFixed(2)}
+            </span>
           </div>
         )}
-        {totalSgstAmount_2_5 > 0 && (
+        {invoiceData.totalSgstAmount_2_5 > 0 && (
           <div>
             SGST 2.5% :
-            <span className="ml-5">{totalSgstAmount_2_5.toFixed(2)}</span>
+            <span className="ml-5">
+              {invoiceData.totalSgstAmount_2_5.toFixed(2)}
+            </span>
           </div>
         )}
       </div>
       <hr />
       <div className="text-end font-bold">
-        <h3>
-          Total : {+ModifiedInvoiceData.total?.toFixed(2)} {totalAmount}
-        </h3>
+        <h3>Total : {+invoiceData.total?.toFixed(2)}</h3>
       </div>
 
       <div className=" flex justify-between">

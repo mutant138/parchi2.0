@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import SunyaLogo from "../../../assets/SunyaLogo.jpg";
 import Template1 from "../../Templates/Template1";
 import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
@@ -189,6 +190,7 @@ function Invoice({ invoice, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
   const columns = [
     {
       id: 1,
@@ -470,6 +472,11 @@ function Invoice({ invoice, bankDetails }) {
                   </div>
                 </div>
                 {/* <Template2
+                  ref={invoiceRef}
+                  invoiceData={invoice}
+                  bankDetails={bankDetails}
+                /> */}
+                {/* <Template3
                   ref={invoiceRef}
                   invoiceData={invoice}
                   bankDetails={bankDetails}
