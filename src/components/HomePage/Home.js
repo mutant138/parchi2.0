@@ -41,7 +41,6 @@ import Quotation from "../Quotation/Quotation";
 import QuotationViewHome from "../Quotation/QuotationView/QuotationViewHome";
 import POS from "../POS/POS";
 import POSViewHome from "../POS/POSView/POSViewHome";
-import CreatePOS from "../POS/CreatePOS/CreatePOS";
 import ProFormaInvoice from "../ProFormaInvoice/ProFormaInvoice";
 // import CreateProFormaInvoice from "../ProFormaInvoice/CreateProFormaInvoice/CreateProFormaInvoice";
 import ProFormaView from "../ProFormaInvoice/ProFormaInvoiceView/ProFormaView";
@@ -64,7 +63,7 @@ import DeliveryChallanView from "../DeliveryChallan/DeliveryChallanView/Delivery
 import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliveryChallan";
 import PoView from "../PO/PoView/PoView";
 import SetPO from "../PO/SetPO/SetPO";
-import SetPos from "../POS/CreatePOS/SetPos"
+import SetPos from "../POS/SetPos/SetPos";
 
 const Home = () => {
   const location = useLocation();
@@ -130,7 +129,7 @@ const Home = () => {
 
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
-            <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
+            <Route path="/pos/create-pos" element={<SetPos />}></Route>
             <Route path="/pos/:posId/edit-pos" element={<SetPos />}></Route>
             <Route path="/customers" element={<CustomerList />}></Route>
             <Route path="/customers/:id" element={<CustomerView />}></Route>

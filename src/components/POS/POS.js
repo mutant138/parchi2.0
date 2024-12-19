@@ -20,7 +20,7 @@ const POS = () => {
     const fetchPOS = async () => {
       setLoading(true);
       try {
-        const POSRef = collection(db, "companies", companyId, "POS");
+        const POSRef = collection(db, "companies", companyId, "pos");
         const querySnapshot = await getDocs(POSRef);
         const POSData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -41,7 +41,7 @@ const POS = () => {
 
   const handleStatusChange = async (POSId, newStatus) => {
     try {
-      const POSDoc = doc(db, "companies", companyId, "POS", POSId);
+      const POSDoc = doc(db, "companies", companyId, "pos", POSId);
       await updateDoc(POSDoc, { paymentStatus: newStatus });
       setPOS((prevPOS) =>
         prevPOS.map((POS) =>

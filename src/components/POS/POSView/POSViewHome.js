@@ -23,10 +23,10 @@ function POSViewHome({ POS }) {
   useEffect(() => {
     if (POS.items) {
       const tax = POS?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.sellingPrice.taxSlab;
+        return acc + cur?.tax;
       }, 0);
       const discount = POS?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.discount.amount;
+        return acc + cur?.amount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
@@ -39,7 +39,7 @@ function POSViewHome({ POS }) {
     const doc = new jsPDF("p", "pt", "a4");
     doc.html(POSRef.current, {
       callback: function (doc) {
-        doc.save(`${POS.customerDetails.name}'s POS.pdf`);
+        doc.save(`${POS.customerDetails?.name}'s POS.pdf`);
       },
       x: 0,
       y: 0,
