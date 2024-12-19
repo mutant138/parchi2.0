@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import {
-  FaBolt,
-  FaBell,
-  FaBullhorn,
-  FaUserCircle,
-  FaSearch,
-} from "react-icons/fa";
+import { FaBolt, FaBell, FaBullhorn, FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { IoMdHeadset } from "react-icons/io";
-import { IoSettingsSharp } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import {
