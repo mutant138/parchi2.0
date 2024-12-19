@@ -16,10 +16,10 @@ import {
   import { AiOutlineArrowLeft } from "react-icons/ai";
   import Sidebar from "./Sidebar";
   
-  const SetPO = () => {
+  const SetPurchase = () => {
  
 
-      const { poId } = useParams();
+      const { purchaseId } = useParams();
 
       const userDetails = useSelector((state) => state.users);
   
@@ -29,7 +29,7 @@ import {
     
       const phoneNo = userDetails.phone;
     
-      const [poDate, setPoDate] = useState(
+      const [date, setDate] = useState(
         Timestamp.fromDate(new Date())
       );
       const [taxSelect, setTaxSelect] = useState("");
@@ -42,18 +42,17 @@ import {
       const [isProductSelected, setIsProductSelected] = useState(false);
       const [vendorsDetails, setVendorsDetails] = useState([])
       const [products, setProducts] = useState([]);
-      const [prePoList, setPrePoList] = useState([]);
-      const [books, setBooks] = useState([]);
+      const [prePurchaseList, setPrePurchaseList] = useState([]);
+    //   const [books, setBooks] = useState([]);
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     
       const navigate = useNavigate();
     
       const [formData, setFormData] = useState({
-        book: {},
         discount: 0,
-        orderStatus: "Pending",
+        paymentStatus: "Pending",
         notes: "",
-        poNo: "",
+        purchaseNo: "",
         packagingCharges: 0,
         subTotal: 0,
         tds: {},
@@ -92,7 +91,7 @@ import {
           if (
             formData?.products?.length === 0 ||
             products.length === 0 ||
-            !poId
+            !purchaseId
           ) {
             return;
           }
@@ -112,24 +111,24 @@ import {
           calculateProduct(productData);
         }
         addActionQty();
-        if (poId) {
-          fetchPoNumbers();
+        if (purchaseId) {
+          fetchPurchaseNumbers();
         }
       }, [formData.products]);
     
-      const fetchPoNumbers = async () => {
+      const fetchPurchaseNumbers = async () => {
         try {
           const querySnapshot = await getDocs(
-            collection(db, "companies", companyDetails.companyId, "po")
+            collection(db, "companies", companyDetails.companyId, "purchases")
           );
-          const noList = querySnapshot.docs.map((doc) => doc.data().poNo);
-          if (poId) {
-            setPrePoList(noList.filter((ele) => ele !== formData.poNo));
+          const noList = querySnapshot.docs.map((doc) => doc.data().purchaseNo);
+          if (purchaseId) {
+            setPrePurchaseList(noList.filter((ele) => ele !== formData.purchaseNo));
           } else {
-            setPrePoList(noList);
+            setPrePurchaseList(noList);
             setFormData((val) => ({
               ...val,
-              poNo: String(noList.length + 1).padStart(4, 0),
+              purchaseNo: String(noList.length + 1).padStart(4, 0),
             }));
           }
         } catch (error) {
@@ -144,8 +143,8 @@ import {
       }
     
       useEffect(() => {
-        async function fetchPoData() {
-          if (!poId) {
+        async function fetchPurchaseData() {
+          if (!purchaseId) {
             return;
           }
           try {
@@ -153,23 +152,23 @@ import {
               db,
               "companies",
               companyDetails.companyId,
-              "po",
-              poId
+              "purchases",
+              purchaseId
             );
             const getData = (await getDoc(docRef)).data();
     
-            setPoDate(getData.poDate);
+            setDate(getData.date);
             
             const vendorData = (
               await getDoc(getData.vendorDetails.vendorRef)
             ).data();
-            handleSelectCustomer({
+            handleSelectVendor({
               id: getData.vendorDetails.vendorRef.id,
               ...vendorData,
             });
             setFormData(getData);
           } catch (error) {
-            console.log("🚀 ~ fetchPoData ~ error:", error);
+            console.log("🚀 ~ fetchPurchaseData ~ error:", error);
           }
         }
     
@@ -231,24 +230,24 @@ import {
           }
         }
     
-        async function fetchBooks() {
-          try {
-            const bookRef = collection(
-              db,
-              "companies",
-              companyDetails.companyId,
-              "books"
-            );
-            const getBookData = await getDocs(bookRef);
-            const fetchBooks = getBookData.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setBooks(fetchBooks);
-          } catch (error) {
-            console.log("🚀 ~ fetchBooks ~ error:", error);
-          }
-        }
+        // async function fetchBooks() {
+        //   try {
+        //     const bookRef = collection(
+        //       db,
+        //       "companies",
+        //       companyDetails.companyId,
+        //       "books"
+        //     );
+        //     const getBookData = await getDocs(bookRef);
+        //     const fetchBooks = getBookData.docs.map((doc) => ({
+        //       id: doc.id,
+        //       ...doc.data(),
+        //     }));
+        //     setBooks(fetchBooks);
+        //   } catch (error) {
+        //     console.log("🚀 ~ fetchBooks ~ error:", error);
+        //   }
+        // }
     
         const fetchProducts = async () => {
           try {
@@ -314,13 +313,13 @@ import {
           }
         };
     
-        if (!poId) {
-          fetchPoNumbers();
+        if (!purchaseId) {
+          fetchPurchaseNumbers();
         }
     
         fetchProducts();
-        fetchBooks();
-        fetchPoData();
+        // fetchBooks();
+        fetchPurchaseData();
         fetchTax();
         vendorDetails();
       }, [companyDetails]);
@@ -339,7 +338,7 @@ import {
         }
       };
     
-      const handleSelectCustomer = (item) => {
+      const handleSelectVendor = (item) => {
         setSelectedVendorData(item);
         setIsDropdownVisible(false);
       };
@@ -475,7 +474,7 @@ import {
         total_TCS_TDS_Amount();
       }, [products, selectedTaxDetails]);
     
-      async function onSetPo() {
+      async function onSetPurchase() {
         try {
           if (!selectedVendorData.id) {
             return;
@@ -535,7 +534,7 @@ import {
             ...formData,
             tds,
             tcs,
-            poDate,
+            date,
             createdBy: {
               companyRef: companyRef,
               name: companyDetails.name,
@@ -558,41 +557,41 @@ import {
             },
           };
     
-          if (poId) {
+          if (purchaseId) {
             await updateDoc(
-              doc(db, "companies", companyDetails.companyId, "po", poId),
+              doc(db, "companies", companyDetails.companyId, "purchases", purchaseId),
               payload
             );
           } else {
             await addDoc(
-              collection(db, "companies", companyDetails.companyId, "po"),
+              collection(db, "companies", companyDetails.companyId, "purchases"),
               payload
             );
           }
     
-          for (const item of items) {
-            if (item.quantity === 0) {
-              continue;
-            }
+        //   for (const item of items) {
+        //     if (item.quantity === 0) {
+        //       continue;
+        //     }
     
-            const currentQuantity = products.find(
-              (val) => val.name === item.name
-            ).quantity;
+        //     const currentQuantity = products.find(
+        //       (val) => val.name === item.name
+        //     ).quantity;
     
-            if (currentQuantity <= 0) {
-              alert("Product is out of stock!");
-              throw new Error("Product is out of stock!");
-            }
+        //     if (currentQuantity <= 0) {
+        //       alert("Product is out of stock!");
+        //       throw new Error("Product is out of stock!");
+        //     }
     
-            await updateDoc(item.productRef, {
-              stock: currentQuantity + item.quantity,
-            });
-          }
+        //     // await updateDoc(item.productRef, {
+        //     //   stock: currentQuantity + item.quantity,
+        //     // });
+        //   }
     
           alert(
-            "Successfully " + (poId ? "Updated" : "Created") + " the PO"
+            "Successfully " + (purchaseId ? "Updated" : "Created") + " the Purchase"
           );
-          navigate("/po");
+          navigate("/purchase");
         } catch (err) {
           console.error(err);
         }
@@ -608,22 +607,22 @@ import {
     
         return `${getFullYear}-${getMonth}-${getDate}`;
       }
-      function onSelectBook(e) {
-        const { value } = e.target;
-        const data = books.find((ele) => ele.id === value);
-        console.log("🚀 ~ onSelectBook ~ data:", data);
-        const bookRef = doc(
-          db,
-          "companies",
-          companyDetails.companyId,
-          "books",
-          value
-        );
-        setFormData((val) => ({
-          ...val,
-          book: { name: data.name, bookRef },
-        }));
-      }
+    //   function onSelectBook(e) {
+    //     const { value } = e.target;
+    //     const data = books.find((ele) => ele.id === value);
+    //     console.log("🚀 ~ onSelectBook ~ data:", data);
+    //     const bookRef = doc(
+    //       db,
+    //       "companies",
+    //       companyDetails.companyId,
+    //       "books",
+    //       value
+    //     );
+    //     setFormData((val) => ({
+    //       ...val,
+    //       book: { name: data.name, bookRef },
+    //     }));
+    //   }
     
       return (
         <div
@@ -638,7 +637,7 @@ import {
               <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
             </Link>
             <h1 className="text-2xl font-bold">
-              {poId ? "Edit" : "Create"} PO
+              {purchaseId ? "Edit" : "Create"} Purchase
             </h1>
           </header>
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -670,7 +669,7 @@ import {
                         {suggestions.map((item) => (
                           <div
                             key={item.id}
-                            onMouseDown={() => handleSelectCustomer(item)}
+                            onMouseDown={() => handleSelectVendor(item)}
                             className="flex flex-col px-4 py-3 text-gray-800 hover:bg-blue-50 cursor-pointer transition-all duration-150 ease-in-out"
                           >
                             <span className="font-medium text-sm">
@@ -693,14 +692,14 @@ import {
                 <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
                   <div>
                     <label className="text-sm text-gray-600">
-                      PO Date <span className="text-red-500">*</span>
+                      Purchase Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
-                      value={DateFormate(poDate)}
+                      value={DateFormate(date)}
                       className="border p-1 rounded w-full mt-1"
                       onChange={(e) => {
-                        setPoDate(
+                        setDate(
                           Timestamp.fromDate(new Date(e.target.value))
                         );
                       }}
@@ -709,28 +708,28 @@ import {
                   </div>
                   <div>
                     <label className="text-sm text-gray-600">
-                      PO No. <span className="text-red-500">*</span>
-                      {prePoList.includes(formData.poNo) && (
+                      Purchase No. <span className="text-red-500">*</span>
+                      {prePurchaseList.includes(formData.purchaseNo) && (
                         <span className="text-red-800 text-xs">
-                          "Already PO No. exist"{" "}
+                          "Already Purchase No. exist"{" "}
                         </span>
                       )}
-                      {Number(formData.poNo) == 0 && (
+                      {Number(formData.purchaseNo) == 0 && (
                         <span className="text-red-800 text-xs">
-                          "Kindly Enter valid PO No."{" "}
+                          "Kindly Enter valid Purchase No."{" "}
                         </span>
                       )}
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter PO No. "
+                      placeholder="Enter Purchase No. "
                       className="border p-1 rounded w-full mt-1"
-                      value={formData.poNo}
+                      value={formData.purchaseNo}
                       onChange={(e) => {
                         const { value } = e.target;
                         setFormData((val) => ({
                           ...val,
-                          poNo: value,
+                          purchaseNo: value,
                         }));
                       }}
                       required
@@ -866,7 +865,7 @@ import {
                         </option>
                       </select>
                     </div>
-                    <div className="w-full ">
+                    {/* <div className="w-full ">
                       <div>Bank/Book</div>
                       <select
                         value={formData.book.bookRef?.id || ""}
@@ -883,7 +882,7 @@ import {
                             </option>
                           ))}
                       </select>
-                    </div>
+                    </div> */}
                     <div className="w-full ">
                       <div>Sign</div>
                       <select
@@ -1201,13 +1200,13 @@ import {
                   onClick={() => {
                     {
                       products.length > 0 && isProductSelected
-                        ? onSetPo()
+                        ? onSetPurchase()
                         : alert("Please select items to proceed.");
                     }
                   }}
                 >
-                  <span className="text-lg">+</span> {poId ? "Edit" : "Create"}{" "}
-                  PO
+                  <span className="text-lg">+</span> {purchaseId ? "Edit" : "Create"}{" "}
+                  Purchase
                 </button>
               </div>
             </div>
@@ -1217,5 +1216,5 @@ import {
 
   };
   
-  export default SetPO;
+  export default SetPurchase;
   

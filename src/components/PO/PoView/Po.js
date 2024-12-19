@@ -135,7 +135,7 @@ function Po({ Po, bankDetails }) {
         db,
         "companies",
         companyId,
-        "Pos",
+        "po",
         Po.id
       );
 
@@ -166,13 +166,13 @@ function Po({ Po, bankDetails }) {
             );
 
             return updateDoc(inventoryDocRef, {
-              stock: increment(inventoryItem.quantity),
+              stock: increment(-inventoryItem.quantity),
             });
           }
         );
         await Promise.all(updateInventoryPromises);
       }
-      navigate("/Po");
+      navigate("/po");
     } catch (error) {
       console.error("Error deleting Po:", error);
       alert("Failed to delete the Po. Check the console for details.");
@@ -223,7 +223,7 @@ function Po({ Po, bankDetails }) {
           </button>
   
         </div>
-        {Po.paymentStatus !== "Paid" && (
+        {Po.orderStatus !== "Received" && (
           <div className="text-end">
             <button
               className={"px-4 py-1 text-red-700 text-2xl"}

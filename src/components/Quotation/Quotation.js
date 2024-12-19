@@ -220,7 +220,7 @@ function Quotation() {
                           </select>
                         </td>
                         <td className="py-3">
-                          {quotation.paymentMode || "Online"}
+                          {quotation.mode || "Online"}
                         </td>
                         <td className="py-3">{quotation.quotationNo}</td>
 

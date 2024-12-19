@@ -1,43 +1,35 @@
-import React, { useEffect, useRef, useState } from "react";
-import ProForma from "./ProForma";
-import Returns from "./Returns";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useSelector } from "react-redux";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
-import jsPDF from "jspdf";
+import PurchaseView from "./PurchaseView";
 
-function ProFormaView() {
+function PurchaseViewHome() {
   const { id } = useParams();
-  const [activeTab, setActiveTab] = useState("ProForma");
-  const [proForma, setProForma] = useState({});
+  const [activeTab, setActiveTab] = useState("purchase");
+  const [purchase, setPurchase] = useState({});
   const userDetails = useSelector((state) => state.users);
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
 
-  const fetchProForma = async () => {
+  const fetchPurchases = async () => {
     try {
-      const proFormaRef = doc(
-        db,
-        "companies",
-        companyId,
-        "proFormaInvoice",
-        id
-      );
-      const resData = await getDoc(proFormaRef);
-      const proFormasData = {
+      const purchaseRef = doc(db, "companies", companyId, "purchases", id);
+      const resData = await getDoc(purchaseRef);
+      const purchasesData = {
         id: resData.id,
         ...resData.data(),
       };
-      setProForma(proFormasData);
+      setPurchase(purchasesData);
     } catch (error) {
-      console.error("Error fetching proFormas:", error);
+      console.error("Error fetching purchases:", error);
     }
   };
   useEffect(() => {
-    fetchProForma();
+    fetchPurchases();
   }, [companyId]);
 
   return (
@@ -49,23 +41,23 @@ function ProFormaView() {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">{proForma.proFormaNo}</h1>
+        <h1 className="text-2xl font-bold">{purchase.purchaseNo}</h1>
       </header>
       <hr />
       <div>
-        {/* <nav className="flex space-x-4 mt-3 mb-3">
-          <button
+        <nav className="flex space-x-4 mt-3 mb-3">
+          {/* <button
             className={
               "px-4 py-1" +
-              (activeTab === "ProForma"
+              (activeTab === "purchase"
                 ? " bg-blue-700 text-white rounded-full"
                 : "")
             }
-            onClick={() => setActiveTab("proForma")}
+            onClick={() => setActiveTab("purchase")}
           >
-            ProForma View
-          </button>
-          <button
+            purchase View
+          </button> */}
+          {/* <button
             className={
               "px-4 py-1" +
               (activeTab === "Returns"
@@ -75,14 +67,14 @@ function ProFormaView() {
             onClick={() => setActiveTab("Returns")}
           >
             Returns
-          </button>
-        </nav> */}
+          </button> */}
+        </nav>
       </div>
-      <hr />
+      {/* <hr /> */}
       <div className="w-full">
-        {activeTab === "ProForma" && (
+        {activeTab === "purchase" && (
           <div>
-            <ProForma proForma={proForma} />
+            <PurchaseView purchase={purchase} />
           </div>
         )}
         {/* {activeTab === "Returns" && (
@@ -95,4 +87,4 @@ function ProFormaView() {
   );
 }
 
-export default ProFormaView;
+export default PurchaseViewHome;

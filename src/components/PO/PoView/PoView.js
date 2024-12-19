@@ -28,7 +28,7 @@ const PoView = () => {
 
   const fechPO = async () => {
     try {
-      const poRef = doc(db, "companies", companyId, "purchases", id);
+      const poRef = doc(db, "companies", companyId, "po", id);
       const resData = (await getDoc(poRef)).data();
       const poData = {
         id,

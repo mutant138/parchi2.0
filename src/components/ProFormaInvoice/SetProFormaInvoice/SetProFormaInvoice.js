@@ -42,7 +42,7 @@ const SetProFormaInvoice = () => {
   const [isProductSelected, setIsProductSelected] = useState(false);
 
   const [products, setProducts] = useState([]);
-  const [preQuotationList, setPreQuotationList] = useState([]);
+  const [preProFormaList , setPreProFormaList ] = useState([]);
   const [books, setBooks] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -124,11 +124,11 @@ const SetProFormaInvoice = () => {
       );
       const noList = querySnapshot.docs.map((doc) => doc.data().proFormaNo);
       if (proFormaId) {
-        setPreQuotationList(
+        setPreProFormaList (
           noList.filter((ele) => ele !== formData.proFormaNo)
         );
       } else {
-        setPreQuotationList(noList);
+        setPreProFormaList (noList);
         setFormData((val) => ({
           ...val,
           proFormaNo: String(noList.length + 1).padStart(4, 0),
@@ -600,7 +600,7 @@ const SetProFormaInvoice = () => {
       alert(
         "Successfully " +
           (proFormaId ? "Updated" : "Created") +
-          " the quotation"
+          " the ProForma Invoice"
       );
       navigate("/pro-forma-invoice");
     } catch (err) {
@@ -721,7 +721,7 @@ const SetProFormaInvoice = () => {
               <div>
                 <label className="text-sm text-gray-600">
                   quotation No. <span className="text-red-500">*</span>
-                  {preQuotationList.includes(formData.proFormaNo) && (
+                  {preProFormaList .includes(formData.proFormaNo) && (
                     <span className="text-red-800 text-xs">
                       "Already quotation No. exist"{" "}
                     </span>

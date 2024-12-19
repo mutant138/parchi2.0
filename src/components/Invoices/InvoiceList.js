@@ -19,7 +19,7 @@ const InvoiceList = () => {
   const [filterStatus, setFilterStatus] = useState("All");
 
   const userDetails = useSelector((state) => state.users);
-
+ 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const navigate = useNavigate();
@@ -207,6 +207,7 @@ const InvoiceList = () => {
                     <th className="p-4">Mode</th>
                     <th className="p-4">Invoice NO</th>
                     <th className="p-4">Date / Updated Time</th>
+                    <th className="p-4">Created By</th>
                     {/* <th className="p-4">Actions</th> */}
                   </tr>
                 </thead>
@@ -279,6 +280,7 @@ const InvoiceList = () => {
                             }
                           })()}
                         </td>
+                        <td className="py-3">{invoice?.createdBy?.name == userDetails.name ? "Owner" : userDetails.name}</td>
 
                         {/* <td className="py-3 space-x-2">
                           <button

@@ -6,97 +6,71 @@ import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
-import Template from "../Template/Template";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-
-function ProForma({ proForma }) {
+import Template from "../Template/Template";
+function PurchaseView({ purchase }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
-
-  const [isProFormaOpen, setIsProFormaOpen] = useState(false);
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
 
-  const proFormaRef = useRef();
+  const purchaseRef = useRef();
 
   useEffect(() => {
-    if (proForma.products) {
-      const tax = proForma?.products.reduce((acc, cur) => {
+    if (purchase.products) {
+      const tax = purchase?.products.reduce((acc, cur) => {
         return acc + cur?.tax;
       }, 0);
-      const discount = proForma?.products.reduce((acc, cur) => {
-        return acc + cur?.amount;
+      const discount = purchase?.products.reduce((acc, cur) => {
+        return acc + cur?.discount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
     }
-  }, [proForma]);
+  }, [purchase]);
+
   const handleDownloadPdf = () => {
-    if (!proForma.id) {
+    if (!purchase.id) {
       return;
     }
     const doc = new jsPDF("p", "pt", "a4");
-    doc.html(proFormaRef.current, {
+    doc.html(purchaseRef.current, {
       callback: function (doc) {
-        doc.save(`${proForma.customerDetails.name}'s proForma.pdf`);
+        doc.save(`${purchase.customerDetails.name}'s purchase.pdf`);
       },
       x: 0,
       y: 0,
     });
   };
+
   const handleDelete = async () => {
     try {
-      if (!proForma.id || !companyId) {
-        alert("proForma ID or Company ID is missing.");
+      if (!purchase.id || !companyId) {
+        alert("purchase ID or Company ID is missing.");
         return;
       }
 
-      // Ref to the proForma document
-      const proFormaDocRef = doc(
+      const purchaseDocRef = doc(
         db,
         "companies",
         companyId,
-        "proFormaInvoice",
-        proForma.id
+        "purchases",
+        purchase.id
       );
 
       const confirmDelete = window.confirm(
-        "Are you sure you want to delete this proForma?"
+        "Are you sure you want to delete this purchase?"
       );
       if (!confirmDelete) return;
-      await deleteDoc(proFormaDocRef);
-
-      // if (proForma.products && proForma.products.length > 0) {
-      //   const updateInventoryPromises = proForma.products.map((inventoryItem) => {
-      //     if (
-      //       !inventoryItem.productRef ||
-      //       typeof inventoryItem.quantity !== "number"
-      //     ) {
-      //       console.error("Invalid inventory item:", inventoryItem);
-      //       return Promise.resolve();
-      //     }
-
-      //     const inventoryDocRef = doc(
-      //       db,
-      //       "companies",
-      //       companyId,
-      //       "products",
-      //       inventoryItem.productRef.id
-      //     );
-
-      //     return updateDoc(inventoryDocRef, {
-      //       stock: increment(inventoryItem.quantity),
-      //     });
-      //   });
-      //   await Promise.all(updateInventoryPromises);
-      // }
-      navigate("/pro-forma-invoice");
+      await deleteDoc(purchaseDocRef);
+      navigate("/purchase");
     } catch (error) {
-      console.error("Error deleting proForma:", error);
-      alert("Failed to delete the proForma. Check the console for details.");
+      console.error("Error deleting purchase:", error);
+      alert("Failed to delete the purchase. Check the console for details.");
     }
   };
 
@@ -113,7 +87,7 @@ function ProForma({ proForma }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-
+  console.log("purchase", purchase?.products);
   return (
     <div className="">
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
@@ -122,7 +96,7 @@ function ProForma({ proForma }) {
             className={
               "px-4 py-1 bg-blue-300 text-white rounded-full flex items-center"
             }
-            onClick={() => setIsProFormaOpen(true)}
+            onClick={() => setIsPurchaseOpen(true)}
           >
             <FaRegEye /> &nbsp; View
           </button>
@@ -130,7 +104,7 @@ function ProForma({ proForma }) {
             className={
               "px-4 py-1 bg-red-300 text-white rounded-full flex items-center"
             }
-            onClick={() => navigate("edit-proForma-invoice")}
+            onClick={() => navigate("edit-purchase")}
           >
             <TbEdit /> &nbsp; Edit
           </button>
@@ -143,7 +117,7 @@ function ProForma({ proForma }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {proForma.paymentStatus !== "Paid" && (
+        {purchase.paymentStatus !== "Paid" && (
           <div className="text-end">
             <button
               className={"px-4 py-1 text-red-700 text-2xl"}
@@ -165,12 +139,12 @@ function ProForma({ proForma }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(proForma?.date)}</div>
+            <div>Date: {DateFormate(purchase?.date)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {proForma?.products?.length > 0 &&
-            proForma?.products.map((ele, index) => (
+          {purchase?.products?.length > 0 &&
+            purchase?.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -185,54 +159,54 @@ function ProForma({ proForma }) {
               </div>
             ))}
           <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹{proForma.subTotal}</div>
+            <div>subTotal: ₹{purchase.subTotal}</div>
             <div>Tax: {totalTax}%</div>
             <div>
-              {proForma.extraDiscount?.amount > 0 && (
+              {purchase.extraDiscount?.amount > 0 && (
                 <>
                   Extra Discount:{" "}
-                  {proForma?.extraDiscount?.type === "percentage"
-                    ? `${proForma.extraDiscount.amount}%`
-                    : `₹${proForma.extraDiscount.amount}`}{" "}
+                  {purchase?.extraDiscount?.type === "percentage"
+                    ? `${purchase.extraDiscount.amount}%`
+                    : `₹${purchase.extraDiscount.amount}`}{" "}
                 </>
               )}
             </div>
             <div>
               {" "}
-              {proForma.packagingCharges > 0 && (
-                <>Packaging Charges: ₹{proForma.packagingCharges}</>
+              {purchase.packagingCharges > 0 && (
+                <>Packaging Charges: ₹{purchase.packagingCharges}</>
               )}
             </div>
             <div>
               {" "}
-              {proForma.shippingCharges > 0 && (
-                <>Shipping Charges: ₹{proForma.shippingCharges} </>
+              {purchase.shippingCharges > 0 && (
+                <>Shipping Charges: ₹{purchase.shippingCharges} </>
               )}{" "}
             </div>
           </div>
           <div className="flex space-x-3 justify-end font-bold text-lg">
             <div>Total:</div>
-            <div>₹ {proForma.total}</div>
+            <div>₹ {purchase.total}</div>
           </div>
           <div className="bg-gray-100  rounded-lg">
             <div className="p-2">
               <div>Notes</div>
-              <div className="font-bold">{proForma.notes || "No Data"}</div>
+              <div className="font-bold">{purchase.notes || "No Data"}</div>
             </div>
             <hr />
             <div className="p-2">
               <div>Terms And Conditions</div>
-              <div className="font-bold">{proForma.terms || "No Data"}</div>
+              <div className="font-bold">{purchase.terms || "No Data"}</div>
             </div>
           </div>
         </div>
       </div>
 
-      {proForma.id && (
+      {purchase.id && (
         <div
           className="fixed inset-0 z-20 "
-          onClick={() => setIsProFormaOpen(false)}
-          style={{ display: isProFormaOpen ? "block" : "none" }}
+          onClick={() => setIsPurchaseOpen(false)}
+          style={{ display: isPurchaseOpen ? "block" : "none" }}
         >
           <div
             className="fixed inset-0 flex pt-10 justify-center z-20 "
@@ -243,7 +217,7 @@ function ProForma({ proForma }) {
                 <div className="flex justify-end border-b-2 py-2">
                   <div
                     className="relative text-2xl text-red-700 group px-2 cursor-pointer"
-                    onClick={() => setIsProFormaOpen(false)}
+                    onClick={() => setIsPurchaseOpen(false)}
                   >
                     <IoMdClose />
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-8 px-1 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 z-200">
@@ -252,8 +226,8 @@ function ProForma({ proForma }) {
                   </div>
                 </div>
                 <Template
-                  ref={proFormaRef}
-                  proFormaData={proForma}
+                  ref={purchaseRef}
+                  purchaseData={purchase}
                   //   bankDetails={bankDetails}
                 />
               </div>
@@ -265,4 +239,4 @@ function ProForma({ proForma }) {
   );
 }
 
-export default ProForma;
+export default PurchaseView;
