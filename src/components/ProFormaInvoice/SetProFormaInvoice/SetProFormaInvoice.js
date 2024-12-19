@@ -64,10 +64,8 @@ const SetProFormaInvoice = () => {
     tcs: {},
     terms: "",
     mode: "Cash",
-    extraDiscount: {
-      amount: 0,
-      type: "percentage",
-    },
+    extraDiscount: 0,
+    extraDiscountType: "percentage",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -443,9 +441,9 @@ const SetProFormaInvoice = () => {
 
   const calculateTotal = () => {
     const discountAmount =
-      formData.extraDiscount.type === "percentage"
-        ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
-        : formData.extraDiscount.amount || 0;
+      formData.extraDiscountType === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount) / 100
+        : formData.extraDiscount || 0;
 
     const total =
       totalAmounts.totalAmount +
@@ -508,7 +506,7 @@ const SetProFormaInvoice = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.quantity,
+          quantity: product.actionQty,
           productRef: productRef,
         });
       }
@@ -1082,27 +1080,21 @@ const SetProFormaInvoice = () => {
                     <input
                       type="number"
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.amount || ""}
+                      value={formData?.extraDiscount || ""}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: {
-                            ...val.extraDiscount,
-                            amount: +e.target.value || 0,
-                          },
+                          extraDiscount: +e.target.value || 0
                         }));
                       }}
                     />
                     <select
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.type || "percentage"}
+                      value={formData?.extraDiscountType || "percentage"}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: {
-                            ...val.extraDiscount,
-                            type: e.target.value,
-                          },
+                          extraDiscountType: e.target.value 
                         }));
                       }}
                     >
@@ -1179,16 +1171,16 @@ const SetProFormaInvoice = () => {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
-                  {formData?.extraDiscount?.amount > 0 && isProductSelected && (
+                  {formData?.extraDiscount > 0 && isProductSelected && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>Extra Discount Amount</span>
                       <span>
                         ₹{" "}
-                        {formData.extraDiscount.type === "percentage"
+                        {formData.extraDiscountType === "percentage"
                           ? (+totalAmounts.totalAmount *
-                              formData?.extraDiscount?.amount) /
+                              formData?.extraDiscount) /
                             100
-                          : formData?.extraDiscount?.amount}
+                          : formData?.extraDiscount}
                       </span>
                     </div>
                   )}

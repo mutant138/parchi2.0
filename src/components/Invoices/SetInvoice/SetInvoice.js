@@ -294,6 +294,7 @@ const SetInvoice = () => {
             purchasePrice: data.purchasePrice ?? 0,
             purchasePriceTaxType: data.purchasePriceTaxType,
             discount: discount ?? 0,
+            fieldDiscount: data.discount,
             discountType: data.discountType,
             tax: data.tax,
             actionQty: 0,
@@ -497,7 +498,7 @@ const SetInvoice = () => {
         items.push({
           name: product.name,
           description: product.description,
-          discount: product.discount,
+          discount: product.fieldDiscount,
           discountType: product.discountType,
           purchasePrice: product.purchasePrice,
           purchasePriceTaxType: product.purchasePriceTaxType,
@@ -793,8 +794,12 @@ const SetInvoice = () => {
                             <td className="px-4 py-2">
                               ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
-                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.discount.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-2">
+                              ₹{product.netAmount.toFixed(2)}
+                            </td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>

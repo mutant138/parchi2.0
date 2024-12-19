@@ -9,7 +9,9 @@ import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
 import Template from "../Template/Template";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import SunyaLogo from "../../../assets/SunyaLogo.jpg";
+
 function Po({ Po, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
@@ -192,7 +194,33 @@ function Po({ Po, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-  console.log("Po", Po?.products);
+  const columns = [
+    {
+      id: 1,
+      label: "NAME",
+    },
+    {
+      id: 2,
+      label: "QUANTITY",
+    },
+    {
+      id: 3,
+      label: "DISCOUNT",
+    },
+    {
+      id: 4,
+      label: "TAX",
+    },
+    {
+      id: 5,
+      label: "isTax Included",
+    },
+    {
+      id: 6,
+      label: "PRICE",
+    },
+  ];
+
   return (
     <div className="">
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
@@ -234,7 +262,7 @@ function Po({ Po, bankDetails }) {
           </div>
         )}
       </div>
-      <div className="space-y-2 ">
+      {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
           <div>
             <div>
@@ -306,8 +334,184 @@ function Po({ Po, bankDetails }) {
             </div>
           </div>
         </div>
+      </div> */}
+<div
+        className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
+        style={{ height: "64vh" }}
+      >
+        <div className="col-span-12 ">
+          <div className="p-5 bg-white rounded-lg my-3">
+            <div className="">
+              <div className="flex gap-6 flex-col md:flex-row pt-8">
+                <div className="flex-1">
+                  <Link href="#">
+                    <img src={SunyaLogo} width={100} alt="logo" height={100} />
+                    <span className="text-3xl font-bold text-primary-600">
+                      Sunya
+                    </span>
+                  </Link>
+                  <div className="mt-5">
+                    <div className="text-lg font-semibold text-gray-900">
+                      Billing To:
+                    </div>
+                    <div className="text-lg  text-gray-800 mt-1">
+                      {Po.vendorDetails?.name}
+                    </div>
+                    <div className=" text-gray-600 mt-2">
+                      {Po.vendorDetails?.address} <br />
+                      {Po.vendorDetails?.city} <br />
+                      {Po.vendorDetails?.zipCode} <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-none md:text-end">
+                  <div className="text-4xl font-semibold text-gray-900">
+                    Po #
+                  </div>
+                  <div className="mt-1.5 text-xl  text-gray-600">
+                    {Po.PoNo}
+                  </div>
+                  <div className="mt-4  text-gray-600">
+                    {Po.createdBy?.name} <br />
+                    {Po.createdBy?.address} <br />
+                    {Po.createdBy?.city} <br />
+                    {Po.createdBy?.zipCode} <br />
+                  </div>
+                  <div className="mt-8">
+                    <div className="mb-2.5">
+                      <span className="mr-12  font-semibold text-gray-900">
+                        Po Date:
+                      </span>
+                      <span className="  text-gray-600">
+                        {DateFormate(Po?.poDate)}
+                      </span>
+                    </div>
+                    {/* <div>
+                      <span className="mr-12  font-semibold text-gray-900">
+                        Due Date:
+                      </span>
+                      <span className="  text-gray-600">
+                        {DateFormate(Po?.dueDate)}
+                      </span>
+                    </div> */}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 border-2  rounded-lg">
+                <table className="w-full ">
+                  <thead>
+                    <tr className="border-b-2 [&_th:last-child]:text-end">
+                      {columns.map((column) => (
+                        <th
+                          key={`Po-table-${column.id}`}
+                          className="text-start p-3 "
+                        >
+                          {column.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="[&_tr:last-child]:border-1 ">
+                    {Po?.products?.length > 0 &&
+                      Po?.products.map((item) => (
+                        <tr
+                          key={`Po-description-${item.id}`}
+                          className="border-b-2 p-3 [&_td:last-child]:text-end"
+                        >
+                          <td className="  text-gray-600 max-w-[200px] truncate p-3">
+                            {item.name}
+                          </td>
+                          <td className="  text-gray-600 p-3">
+                            {item.quantity} pcs
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.discount}
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.tax}%
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.sellingPriceTaxType ? "YES" : "NO"}
+                          </td>
+                          <td className="ltr:text-right rtl:text-left   text-gray-600 p-3">
+                            ₹{item.sellingPrice}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                <div className="mt-2 flex justify-end  p-6">
+                  <div>
+                    {[
+                      {
+                        label: "Sub Total",
+                        amount: Po.subTotal,
+                      },
+                      {
+                        label: "Extra Discount",
+                        amount:
+                          Po?.extraDiscountType === "percentage"
+                            ? `${Po?.extraDiscount || 0}%`
+                            : `₹${Po?.extraDiscount || 0}`,
+                      },
+                      {
+                        label: "TAX(%)",
+                        amount: totalTax,
+                      },
+                      {
+                        label: "Shipping",
+                        amount: "₹" + Po.shippingCharges,
+                      },
+                      {
+                        label: "Packaging",
+                        amount: "₹" + Po.packagingCharges,
+                      },
+                    ].map((item, index) => (
+                      <div
+                        key={`Po-item-${index}`}
+                        className="mb-3 text-end flex justify-end "
+                      >
+                        <span className="  text-gray-600 ">{item.label}:</span>
+                        <span className="  text-end w-[100px] md:w-[160px] block ">
+                          {item.amount}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="mb-3 text-end flex justify-end ">
+                      <span className="  text-gray-600 ">Total :</span>
+                      <span className="   text-end w-[100px] md:w-[160px] block  font-bold">
+                        {Po.total}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="  text-gray-600 mt-6">Note:</div>
+              <div className=" text-gray-800">
+                {Po.notes || "No notes"}
+              </div>
+              <div className="mt-3.5   text-gray-600">Terms & Conditions:</div>
+              <div className=" text-gray-800 mt-1">
+                {Po.terms || "No Terms and Conditions"}
+              </div>
+              <div className="mt-6 text-lg font-semibold text-gray-900">
+                Thank You!
+              </div>
+              <div className="mt-1  text-gray-800">
+                If you have any questions concerning this Po, use the
+                following contact information:
+              </div>
+              <div className="text-xs text-gray-800 mt-2">
+                {userDetails.email}
+              </div>
+              <div className="text-xs text-gray-800 mt-1">
+                {userDetails.phone}
+              </div>
+              <div className="mt-8 text-xs text-gray-800">© 2024 Sunya</div>
+            </div>
+          </div>
+        </div>
       </div>
-
       {Po.id && (
         <div
           className="fixed inset-0 z-20 "

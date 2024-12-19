@@ -9,9 +9,10 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
-import SunyaLogo from "../../../assets/SunyaLogo.jpg";
 import Template1 from "../../Templates/Template1";
 import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
@@ -189,6 +190,7 @@ function Invoice({ invoice, bankDetails }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
+
   const columns = [
     {
       id: 1,
@@ -278,9 +280,8 @@ function Invoice({ invoice, bankDetails }) {
               <div className="flex gap-6 flex-col md:flex-row pt-8">
                 <div className="flex-1">
                   <Link href="#">
-                    <img src={SunyaLogo} width={100} alt="logo" height={100} />
                     <span className="text-3xl font-bold text-primary-600">
-                      Sunya
+                      {invoice.createdBy?.name}
                     </span>
                   </Link>
                   <div className="mt-5">
@@ -474,7 +475,12 @@ function Invoice({ invoice, bankDetails }) {
                   invoiceData={invoice}
                   bankDetails={bankDetails}
                 /> */}
-                <Template1
+                {/* <Template3
+                  ref={invoiceRef}
+                  invoiceData={invoice}
+                  bankDetails={bankDetails}
+                /> */}
+                <Template2
                   ref={invoiceRef}
                   invoiceData={invoice}
                   bankDetails={bankDetails}

@@ -17,8 +17,8 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import Sidebar from "./Sidebar";
 import { setAllCustomersDetails } from "../../../store/CustomerSlice";
 
-const SetDeliveryChallan = () => {
-  const { deliverychallanId } = useParams();
+const SetPos = () => {
+  const { posId } = useParams();
 
   const userDetails = useSelector((state) => state.users);
   const customersDetails = useSelector((state) => state.customers).data;
@@ -28,10 +28,10 @@ const SetDeliveryChallan = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [deliveryChallanDate, setDeliveryChallanDate] = useState(
+  const [posDate, setPosDate] = useState(
     Timestamp.fromDate(new Date())
   );
-  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
+  // const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -42,8 +42,8 @@ const SetDeliveryChallan = () => {
   const [isProductSelected, setIsProductSelected] = useState(false);
 
   const [products, setProducts] = useState([]);
-  const [preDeliveryChallanList, setPreDeliveryChallanList] = useState([]);
-  const [books, setBooks] = useState([]);
+  const [prePosList, setPrePosList] = useState([]);
+  // const [books, setBooks] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const SetDeliveryChallan = () => {
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
-    deliveryChallanNo: "",
+    posNo: "",
     packagingCharges: 0,
     subTotal: 0,
     tds: {},
@@ -63,10 +63,8 @@ const SetDeliveryChallan = () => {
     tcs: {},
     terms: "",
     mode: "Cash",
-    extraDiscount: {
-      amount: 0,
-      type: "percentage",
-    },
+    extraDiscount: 0,
+    extraDiscountType: "percentage",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -91,7 +89,7 @@ const SetDeliveryChallan = () => {
       if (
         formData?.products?.length === 0 ||
         products.length === 0 ||
-        !deliverychallanId
+        !posId
       ) {
         return;
       }
@@ -111,28 +109,28 @@ const SetDeliveryChallan = () => {
       calculateProduct(productData);
     }
     addActionQty();
-    if (deliverychallanId) {
-      fetchDeliveryChallanNumbers();
+    if (posId) {
+      fetchPosNumbers();
     }
   }, [formData.products]);
 
-  const fetchDeliveryChallanNumbers = async () => {
+  const fetchPosNumbers = async () => {
     try {
       const querySnapshot = await getDocs(
         collection(db, "companies", companyDetails.companyId, "pos")
       );
       const noList = querySnapshot.docs.map(
-        (doc) => doc.data().deliveryChallanNo
+        (doc) => doc.data().posNo
       );
-      if (deliverychallanId) {
-        setPreDeliveryChallanList(
-          noList.filter((ele) => ele !== formData.deliveryChallanNo)
+      if (posId) {
+        setPrePosList(
+          noList.filter((ele) => ele !== formData.posNo)
         );
       } else {
-        setPreDeliveryChallanList(noList);
+        setPrePosList(noList);
         setFormData((val) => ({
           ...val,
-          deliveryChallanNo: String(noList.length + 1).padStart(4, 0),
+          posNo: String(noList.length + 1).padStart(4, 0),
         }));
       }
     } catch (error) {
@@ -147,8 +145,8 @@ const SetDeliveryChallan = () => {
   }
 
   useEffect(() => {
-    async function fetchDeliveryChallanData() {
-      if (!deliverychallanId) {
+    async function fetchPosData() {
+      if (!posId) {
         return;
       }
       try {
@@ -157,12 +155,12 @@ const SetDeliveryChallan = () => {
           "companies",
           companyDetails.companyId,
           "pos",
-          deliverychallanId
+          posId
         );
         const getData = (await getDoc(docRef)).data();
 
-        setDeliveryChallanDate(getData.deliveryChallanDate);
-        setDueDate(getData.dueDate);
+        setPosDate(getData.posDate);
+        // setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -172,7 +170,7 @@ const SetDeliveryChallan = () => {
         });
         setFormData(getData);
       } catch (error) {
-        console.log("🚀 ~ fetchDeliveryChallanData ~ error:", error);
+        console.log("🚀 ~ fetchPosData ~ error:", error);
       }
     }
 
@@ -317,13 +315,13 @@ const SetDeliveryChallan = () => {
       }
     };
 
-    if (!deliverychallanId) {
-      fetchDeliveryChallanNumbers();
+    if (!posId) {
+      fetchPosNumbers();
     }
 
     fetchProducts();
     // fetchBooks();
-    fetchDeliveryChallanData();
+    fetchPosData();
     fetchTax();
     customerDetails();
   }, [companyDetails]);
@@ -444,9 +442,9 @@ const SetDeliveryChallan = () => {
 
   const calculateTotal = () => {
     const discountAmount =
-      formData.extraDiscount.type === "percentage"
-        ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
-        : formData.extraDiscount.amount || 0;
+      formData.extraDiscountType === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount) / 100
+        : formData.extraDiscount || 0;
 
     const total =
       totalAmounts.totalAmount +
@@ -478,7 +476,7 @@ const SetDeliveryChallan = () => {
     total_TCS_TDS_Amount();
   }, [products, selectedTaxDetails]);
 
-  async function onSetDeliveryChallan() {
+  async function onSetPos() {
     try {
       if (!selectedCustomerData.id) {
         return;
@@ -538,8 +536,8 @@ const SetDeliveryChallan = () => {
         ...formData,
         tds,
         tcs,
-        deliveryChallanDate,
-        dueDate,
+        posDate,
+        // dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -562,14 +560,14 @@ const SetDeliveryChallan = () => {
         },
       };
 
-      if (deliverychallanId) {
+      if (posId) {
         await updateDoc(
           doc(
             db,
             "companies",
             companyDetails.companyId,
             "pos",
-            deliverychallanId
+            posId
           ),
           payload
         );
@@ -606,7 +604,7 @@ const SetDeliveryChallan = () => {
 
       alert(
         "Successfully " +
-          (deliverychallanId ? "Updated" : "Created") +
+          (posId ? "Updated" : "Created") +
           " the Pos"
       );
       navigate("/pos");
@@ -655,7 +653,7 @@ const SetDeliveryChallan = () => {
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
         <h1 className="text-2xl font-bold">
-          {deliverychallanId ? "Edit" : "Create"} Pos
+          {posId ? "Edit" : "Create"} Pos
         </h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -707,24 +705,24 @@ const SetDeliveryChallan = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
                 Pos Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(deliveryChallanDate)}
+                  value={DateFormate(posDate)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setDeliveryChallanDate(
+                    setPosDate(
                       Timestamp.fromDate(new Date(e.target.value))
                     );
                   }}
                   required
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="text-sm text-gray-600">
                   Due Date <span className="text-red-500">*</span>
                 </label>
@@ -736,18 +734,18 @@ const SetDeliveryChallan = () => {
                     setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="text-sm text-gray-600">
                   Pos No. <span className="text-red-500">*</span>
-                  {preDeliveryChallanList.includes(
-                    formData.deliveryChallanNo
+                  {prePosList.includes(
+                    formData.posNo
                   ) && (
                     <span className="text-red-800 text-xs">
                       {/* "Already DeliveryChallan No. exist"{" "} */}
                     </span>
                   )}
-                  {Number(formData.deliveryChallanNo) == 0 && (
+                  {Number(formData.posNo) == 0 && (
                     <span className="text-red-800 text-xs">
                       "Kindly Enter valid Pos No."{" "}
                     </span>
@@ -757,12 +755,12 @@ const SetDeliveryChallan = () => {
                   type="text"
                   placeholder="Enter Pos No. "
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.deliveryChallanNo}
+                  value={formData.posNo}
                   onChange={(e) => {
                     const { value } = e.target;
                     setFormData((val) => ({
                       ...val,
-                      deliveryChallanNo: value,
+                      posNo: value,
                     }));
                   }}
                   required
@@ -1103,27 +1101,21 @@ const SetDeliveryChallan = () => {
                     <input
                       type="number"
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.amount || ""}
+                      value={formData?.extraDiscount || ""}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: {
-                            ...val.extraDiscount,
-                            amount: +e.target.value || 0,
-                          },
+                          extraDiscount: +e.target.value || 0,
                         }));
                       }}
                     />
                     <select
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.type || "percentage"}
+                      value={formData?.extraDiscountType || "percentage"}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: {
-                            ...val.extraDiscount,
-                            type: e.target.value,
-                          },
+                          extraDiscountType: e.target.value,
                         }));
                       }}
                     >
@@ -1205,11 +1197,11 @@ const SetDeliveryChallan = () => {
                       <span>Extra Discount Amount</span>
                       <span>
                         ₹{" "}
-                        {formData.extraDiscount.type === "percentage"
+                        {formData.extraDiscountType === "percentage"
                           ? (+totalAmounts.totalAmount *
-                              formData?.extraDiscount?.amount) /
+                              formData?.extraDiscount) /
                             100
-                          : formData?.extraDiscount?.amount}
+                          : formData?.extraDiscount}
                       </span>
                     </div>
                   )}
@@ -1232,13 +1224,13 @@ const SetDeliveryChallan = () => {
               onClick={() => {
                 {
                   products.length > 0 && isProductSelected
-                    ? onSetDeliveryChallan()
+                    ? onSetPos()
                     : alert("Please select items to proceed.");
                 }
               }}
             >
               <span className="text-lg">+</span>{" "}
-              {deliverychallanId ? "Edit" : "Create"} Pos
+              {posId ? "Edit" : "Create"} Pos
             </button>
           </div>
         </div>
@@ -1247,4 +1239,4 @@ const SetDeliveryChallan = () => {
   );
 };
 
-export default SetDeliveryChallan;
+export default SetPos;

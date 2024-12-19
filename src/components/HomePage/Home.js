@@ -151,7 +151,7 @@ const Home = () => {
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSView />}></Route>
             <Route path="/pos/create-pos" element={<SetPos />}></Route>
-            <Route path="/pos/:id/edit-pos" element={<SetPos />}></Route>
+            <Route path="/pos/:posId/edit-pos" element={<SetPos />}></Route>
             <Route path="/customers" element={<CustomerList />}></Route>
             <Route path="/customers/:id" element={<CustomerView />}></Route>
             <Route path="/vendors" element={<VendorList />}></Route>

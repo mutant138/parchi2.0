@@ -31,7 +31,7 @@ const SetDeliveryChallan = () => {
   const [deliveryChallanDate, setDeliveryChallanDate] = useState(
     Timestamp.fromDate(new Date())
   );
-  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
+  // const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -64,10 +64,8 @@ const SetDeliveryChallan = () => {
     tcs: {},
     terms: "",
     mode: "Cash",
-    extraDiscount: {
-      amount: 0,
-      type: "percentage",
-    },
+    extraDiscount: 0,
+    extraDiscountType: "percentage",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -163,7 +161,7 @@ const SetDeliveryChallan = () => {
         const getData = (await getDoc(docRef)).data();
 
         setDeliveryChallanDate(getData.deliveryChallanDate);
-        setDueDate(getData.dueDate);
+        // setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -445,9 +443,9 @@ const SetDeliveryChallan = () => {
 
   const calculateTotal = () => {
     const discountAmount =
-      formData.extraDiscount.type === "percentage"
-        ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
-        : formData.extraDiscount.amount || 0;
+      formData.extraDiscountType === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount) / 100
+        : formData.extraDiscount || 0;
 
     const total =
       totalAmounts.totalAmount +
@@ -510,7 +508,7 @@ const SetDeliveryChallan = () => {
           sellingPrice: product.sellingPrice,
           sellingPriceTaxType: product.sellingPriceTaxType,
           tax: product.tax,
-          quantity: product.quantity,
+          quantity: product.actionQty,
           productRef: productRef,
         });
       }
@@ -540,7 +538,7 @@ const SetDeliveryChallan = () => {
         tds,
         tcs,
         deliveryChallanDate,
-        dueDate,
+        // dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -708,7 +706,7 @@ const SetDeliveryChallan = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
                   DeliveryChallan Date <span className="text-red-500">*</span>
@@ -725,7 +723,7 @@ const SetDeliveryChallan = () => {
                   required
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="text-sm text-gray-600">
                   Due Date <span className="text-red-500">*</span>
                 </label>
@@ -737,7 +735,7 @@ const SetDeliveryChallan = () => {
                     setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="text-sm text-gray-600">
                   DeliveryChallan No. <span className="text-red-500">*</span>
@@ -1104,27 +1102,21 @@ const SetDeliveryChallan = () => {
                     <input
                       type="number"
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.amount || ""}
+                      value={formData?.extraDiscount || ""}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: {
-                            ...val.extraDiscount,
-                            amount: +e.target.value || 0,
-                          },
+                          extraDiscount:e.target.value || 0
                         }));
                       }}
                     />
                     <select
                       className="border p-2 rounded"
-                      value={formData?.extraDiscount?.type || "percentage"}
+                      value={formData?.extraDiscountType || "percentage"}
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: {
-                            ...val.extraDiscount,
-                            type: e.target.value,
-                          },
+                          extraDiscountType: e.target.value
                         }));
                       }}
                     >
@@ -1201,16 +1193,16 @@ const SetDeliveryChallan = () => {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
-                  {formData?.extraDiscount?.amount > 0 && isProductSelected && (
+                  {formData?.extraDiscount > 0 && isProductSelected && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>Extra Discount Amount</span>
                       <span>
                         ₹{" "}
-                        {formData.extraDiscount.type === "percentage"
+                        {formData.extraDiscountType === "percentage"
                           ? (+totalAmounts.totalAmount *
-                              formData?.extraDiscount?.amount) /
+                              formData?.extraDiscount) /
                             100
-                          : formData?.extraDiscount?.amount}
+                          : formData?.extraDiscount}
                       </span>
                     </div>
                   )}

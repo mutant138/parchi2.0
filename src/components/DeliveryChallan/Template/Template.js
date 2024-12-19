@@ -125,10 +125,10 @@ const Template = forwardRef((props, ref) => {
             <strong>DeliveryChallan Date :</strong>{" "}
             {DateFormate(ModifiedDeliveryChallanData.deliveryChallanDate)}
           </div>
-          <div>
+          {/* <div>
             <strong>Due Date :</strong>{" "}
             {DateFormate(ModifiedDeliveryChallanData?.dueDate)}
-          </div>
+          </div> */}
           <div>
             <strong>Place of Supply :</strong> -
           </div>
