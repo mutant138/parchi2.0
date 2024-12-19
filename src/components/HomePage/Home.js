@@ -65,6 +65,7 @@ import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliver
 import PoView from "../PO/PoView/PoView";
 import SetPO from "../PO/SetPO/SetPO";
 import SetProFormaInvoice from "../ProFormaInvoice/SetProFormaInvoice/SetProFormaInvoice";
+import SetPos from "../POS/CreatePOS/SetPos"
 
 const Home = () => {
   const location = useLocation();
@@ -138,6 +139,7 @@ const Home = () => {
             <Route path="/pos" element={<POS />}></Route>
             <Route path="/pos/:id" element={<POSViewHome />}></Route>
             <Route path="/pos/create-pos" element={<CreatePOS />}></Route>
+            <Route path="/pos/:posId/edit-pos" element={<SetPos />}></Route>
             <Route path="/customers" element={<CustomerList />}></Route>
             <Route path="/customers/:id" element={<CustomerView />}></Route>
             <Route path="/vendors" element={<VendorList />}></Route>

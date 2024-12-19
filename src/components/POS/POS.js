@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -12,10 +12,10 @@ const POS = () => {
   const [filterStatus, setFilterStatus] = useState("All");
 
   const userDetails = useSelector((state) => state.users);
-
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchPOS = async () => {
       setLoading(true);
@@ -37,13 +37,11 @@ const POS = () => {
     fetchPOS();
   }, [companyId]);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const handleStatusChange = async (POSId, newStatus) => {
     try {
-      const POSDoc = doc(db, "companies", companyId, "pos", POSId);
+      const POSDoc = doc(db, "companies", companyId, "POS", POSId);
       await updateDoc(POSDoc, { paymentStatus: newStatus });
       setPOS((prevPOS) =>
         prevPOS.map((POS) =>
@@ -55,26 +53,47 @@ const POS = () => {
     }
   };
 
-  const filteredPOS = POS.filter((POS) => {
-    const { customerDetails, POSNo, paymentStatus } = POS;
-    const customerName = customerDetails?.name || "";
-    const matchesSearch =
-      customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      POSNo?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPOS = useMemo(
+    () =>
+      POS.filter((POS) => {
+        const { customerDetails, POSNo, paymentStatus } = POS;
+        const customerName = customerDetails?.name || "";
+        const matchesSearch =
+          customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          POSNo?.toString().toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus =
-      filterStatus === "All" || paymentStatus === filterStatus;
+        const matchesStatus =
+          filterStatus === "All" || paymentStatus === filterStatus;
 
-    return matchesSearch && matchesStatus;
-  });
+        return matchesSearch && matchesStatus;
+      }),
+    [POS, searchTerm, filterStatus]
+  );
 
-  const totalAmount = filteredPOS.reduce((sum, POS) => sum + POS.total, 0);
-  const paidAmount = filteredPOS
-    .filter((POS) => POS.paymentStatus === "Paid")
-    .reduce((sum, POS) => sum + POS.total, 0);
-  const pendingAmount = filteredPOS
-    .filter((POS) => POS.paymentStatus === "Pending")
-    .reduce((sum, POS) => sum + POS.total, 0);
+  const totalAmount = useMemo(
+    () => filteredPOS.reduce((sum, POS) => sum + POS.total, 0),
+    [filteredPOS]
+  );
+
+  const paidAmount = useMemo(
+    () =>
+      filteredPOS
+        .filter((POS) => POS.paymentStatus === "Paid")
+        .reduce((sum, POS) => sum + POS.total, 0),
+    [filteredPOS]
+  );
+
+  const pendingAmount = useMemo(
+    () =>
+      filteredPOS
+        .filter((POS) => POS.paymentStatus === "Pending")
+        .reduce((sum, POS) => sum + POS.total, 0),
+    [filteredPOS]
+  );
+
+  const handleDropdownClick = (e) => {
+    e.stopPropagation();
+  };
 
   return (
     <div className="w-full">
@@ -94,53 +113,25 @@ const POS = () => {
 
         <div className="bg-white p-4 rounded-lg shadow mb-4">
           <nav className="flex space-x-4 mb-4">
-            <button
-              onClick={() => setFilterStatus("All")}
-              className={` ${
-                filterStatus === "All"
-                  ? "text-blue-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              All Transactions
-            </button>
-            <button
-              onClick={() => setFilterStatus("Pending")}
-              className={`${
-                filterStatus === "Pending"
-                  ? "text-blue-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              Pending
-            </button>
-            <button
-              onClick={() => setFilterStatus("Paid")}
-              className={`${
-                filterStatus === "Paid"
-                  ? "text-blue-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              Paid
-            </button>
-
-            <button
-              onClick={() => setFilterStatus("UnPaid")}
-              className={`${
-                filterStatus === "UnPaid"
-                  ? "text-blue-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              UnPaid
-            </button>
+            {["All", "Pending", "Paid", "UnPaid"].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={` ${
+                  filterStatus === status
+                    ? "text-blue-500 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
+                {status} Transactions
+              </button>
+            ))}
           </nav>
           <div className="flex items-center space-x-4 mb-4 border p-2 rounded">
             <input
               type="text"
               placeholder="Search by transaction, customer, POS #..."
-              className=" w-full focus:outline-none"
+              className="w-full focus:outline-none"
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -151,7 +142,7 @@ const POS = () => {
             <div className="text-center py-6">Loading POS...</div>
           ) : (
             <div className="h-96 overflow-y-auto">
-              <table className="w-full border-collapse  h-2/4 text-center">
+              <table className="w-full border-collapse text-center">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="border-b">
                     <th className="p-4">Customer</th>
@@ -160,7 +151,6 @@ const POS = () => {
                     <th className="p-4">Mode</th>
                     <th className="p-4">POS NO</th>
                     <th className="p-4">Date / Updated Time</th>
-                    {/* <th className="p-4">Actions</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -168,10 +158,8 @@ const POS = () => {
                     filteredPOS.map((POS) => (
                       <tr
                         key={POS.id}
-                        className="border-b text-center cursor-pointer"
-                        onClick={(e) => {
-                          navigate(POS.id);
-                        }}
+                        className="border-b cursor-pointer"
+                        onClick={() => navigate(POS.id)}
                       >
                         <td className="py-3">
                           {POS.customerDetails?.name} <br />
@@ -180,15 +168,12 @@ const POS = () => {
                           </span>
                         </td>
                         <td className="py-3">{`₹ ${POS.total.toFixed(2)}`}</td>
-                        <td
-                          className="py-3"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <td className="py-3" onClick={handleDropdownClick}>
                           <select
                             value={POS.paymentStatus}
-                            onChange={(e) => {
-                              handleStatusChange(POS.id, e.target.value);
-                            }}
+                            onChange={(e) =>
+                              handleStatusChange(POS.id, e.target.value)
+                            }
                             className={`border p-1 rounded ${
                               POS.paymentStatus === "Paid"
                                 ? "bg-green-100 text-green-700"
@@ -204,14 +189,12 @@ const POS = () => {
                         </td>
                         <td className="py-3">{POS.paymentMode || "Online"}</td>
                         <td className="py-3">{POS.POSNo}</td>
-
                         <td className="py-3">
                           {(() => {
-                            if (
-                              POS.date &&
-                              typeof POS.date.seconds === "number"
-                            ) {
-                              const POSDate = new Date(POS.date.seconds * 1000);
+                            if (POS.date?.seconds) {
+                              const POSDate = new Date(
+                                POS.date.seconds * 1000
+                              );
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
@@ -223,9 +206,8 @@ const POS = () => {
                               if (daysDiff === 0) return "Today";
                               if (daysDiff === 1) return "Yesterday";
                               return `${daysDiff} days ago`;
-                            } else {
-                              return "Date not available";
                             }
+                            return "Date not available";
                           })()}
                         </td>
                       </tr>
