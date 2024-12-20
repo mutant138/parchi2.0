@@ -21,7 +21,6 @@ const Template6 = forwardRef((props, ref) => {
       style={{ height: "80vh" }}
     >
       <div ref={ref} style={{ width: "595px", padding: "20px" }}>
-        {/* Header */}
         <div className="flex justify-between items-center pb-4 mb-3">
           <h1 className="text-3xl font-bold ">
             {invoiceData?.createdBy?.name}
@@ -34,8 +33,7 @@ const Template6 = forwardRef((props, ref) => {
           </div>
         </div>
 
-        {/* Sold By and Billing Details */}
-        <div className="grid grid-cols-2 gap-6 text-gray-700">
+        <div className="grid grid-cols-2 gap-3 text-gray-700">
           <div>
             <h3 className="font-bold">Sold By:</h3>
             <p> {invoiceData?.createdBy?.name}</p>
@@ -50,6 +48,7 @@ const Template6 = forwardRef((props, ref) => {
             <p>{invoiceData.userTo.city} </p>
             <p>{invoiceData.userTo.zipCode} </p>
           </div>
+          <div className="text-right"></div>
           <div className="text-right">
             <p className="font-bold">Shipping Address:</p>
             <p>
@@ -58,10 +57,29 @@ const Template6 = forwardRef((props, ref) => {
               {invoiceData.userTo.zipCode}
             </p>
           </div>
-          {/* Order Details */}
-          <div className="mt-6">
-            {/* <p>Order Number: {invoiceData.no}</p> */}
-            <p>Order Date:{DateFormate(invoiceData.dueDate)}</p>
+          <div className="">
+            <p>
+              <span className="font-bold">Order Date: </span>
+              {DateFormate(invoiceData.dueDate)}
+            </p>
+          </div>
+          <div className=" text-right">
+            <p>
+              <span className="font-bold">Place of supply: </span>
+              {invoiceData.createdBy.city}
+            </p>
+            <p>
+              <span className="font-bold">Place of delivery: </span>
+              {invoiceData.userTo.city}
+            </p>
+            <p>
+              <span className="font-bold">InvoiceNumber : </span>
+              {invoiceData.no}
+            </p>
+            <p>
+              <span className="font-bold">Invoice Date : </span>
+              {DateFormate(invoiceData.invoiceDate)}
+            </p>
           </div>
         </div>
 
@@ -69,70 +87,69 @@ const Template6 = forwardRef((props, ref) => {
         <table className="w-full mt-5 text-sm">
           <thead>
             <tr className="bg-gray-300  text-center ">
-              <th className="border border-black pb-2">Sl. No</th>
-              <th className="border border-black pb-2">Description</th>
-              <th className="border border-black pb-2">Unit Price</th>
-              <th className="border border-black pb-2">Discount</th>
-              <th className="border border-black pb-2">Qty</th>
-              <th className="border border-black pb-2">Net Amount</th>
-              <th className="border border-black pb-2">Tax Rate</th>
-              <th className="border border-black pb-2">Tax Type</th>
-              <th className="border border-black pb-2">Tax Amount</th>
-              <th className="border border-black pb-2">Total Amount</th>
+              <th className="border border-black ">Sl. No</th>
+              <th className="border border-black ">Description</th>
+              <th className="border border-black ">Unit Price</th>
+              <th className="border border-black ">Discount</th>
+              <th className="border border-black ">Qty</th>
+              <th className="border border-black ">Net Amount</th>
+              <th className="border border-black ">Tax Rate</th>
+              <th className="border border-black ">Tax Type</th>
+              <th className="border border-black ">Tax Amount</th>
+              <th className="border border-black ">Total Amount</th>
             </tr>
           </thead>
           <tbody>
             {invoiceData.products.map((item, index) => (
               <tr key={index}>
-                <td className="border border-black pt-2 pb-2 pl-1">
-                  {index + 1}
-                </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
+                <td className="border border-black  pl-1">{index + 1}</td>
+                <td className="border border-black  pl-1">
                   {item.name}
                   {item.description && " | " + item.description}
                 </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
+                <td className="border border-black  pl-1">
                   {item.sellingPrice.toFixed(1)}
                 </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
+                <td className="border border-black  pl-1">
                   {item.discount.toFixed(1)}
                 </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.quantity}
-                </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
+                <td className="border border-black  pl-1">{item.quantity}</td>
+                <td className="border border-black  pl-1">
                   {item.sellingPrice.toFixed(1)}
                 </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
-                  {item.tax}%
-                </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
-                  CGST SGST
-                </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
+                <td className="border border-black  pl-1">{item.tax}%</td>
+                <td className="border border-black  pl-1">CGST SGST</td>
+                <td className="border border-black  pl-1">
                   {item.taxAmount.toFixed(2)}
                 </td>
-                <td className="border border-black pt-2 pb-2 pl-1">
+                <td className="border border-black  pl-1">
                   {item.totalAmount.toFixed(2)}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        {/* Total */}
-        <div className="mt-6 flex justify-end">
-          <div className="text-right">
-            <h3 className="text-lg font-bold">Total Amount: ₹74,900.00</h3>
-            <p className="text-sm text-gray-700">
-              Amount in Words: Seventy-four Thousand Nine Hundred only
-            </p>
-          </div>
+        <div className="flex justify-between border-x border-black border-b">
+          <div className="font-bold">Total:</div>
+          <div className="text-right">₹{+invoiceData.total?.toFixed(2)}</div>
+        </div>
+        <div className="text-end border-x font-bold border-black border-b">
+          <div className="">For {invoiceData.createdBy.name}:</div>
+          <div className="">Authorized Signatory</div>
         </div>
 
         {/* Footer */}
-        <div className="mt-6 text-sm text-gray-700">
-          <p>Whether tax is payable under reverse charge: No</p>
+        <div className="w-full text-sm">
+          <div>
+            <span className="font-bold">NOTE:</span>{" "}
+            {invoiceData.notes || "No notes"}
+          </div>
+          <div className="">
+            <p>
+              <span className="font-bold">Terms & Conditions: </span>
+              {invoiceData.terms || "No Terms & Conditions"}
+            </p>
+          </div>
         </div>
       </div>
     </div>
