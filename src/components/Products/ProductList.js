@@ -10,6 +10,7 @@ import {
   doc,
 } from "firebase/firestore";
 import CreateProduct from "./CreateProduct";
+import { useNavigate } from "react-router-dom";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -97,6 +98,12 @@ const ProductList = () => {
     setIsSideBarOpen(true);
   };
 
+  const navigate = useNavigate();
+
+  const handleProductClick = (productId) => {
+    navigate(`/products/${productId}`);
+  };
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -146,6 +153,7 @@ const ProductList = () => {
                   <tr
                     key={product.id}
                     className="hover:bg-gray-100 text-gray-600"
+                    onClick={() => handleProductClick(product.id)}
                   >
                     <td className="px-4 py-3">
                       <div className="flex justify-center items-center text-center">
@@ -156,11 +164,9 @@ const ProductList = () => {
                             className="w-12 h-12 rounded-full object-cover cursor-pointer"
                           />
                         ) : (
-                          <>
-                            <span className="bg-red-400 text-white rounded-full h-12 w-12 pb-2 flex justify-center items-center font-semibold text-center text-xl">
-                              {product.name.charAt(0)}
-                            </span>
-                          </>
+                          <span className="bg-red-400 text-white rounded-full h-12 w-12 pb-2 flex justify-center items-center font-semibold text-center text-xl">
+                            {product.name.charAt(0)}
+                          </span>
                         )}
                       </div>
                     </td>
