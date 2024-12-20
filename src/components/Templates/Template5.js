@@ -137,7 +137,7 @@ const Template5 = forwardRef((props, ref) => {
         </table>
 
         {/* Footer */}
-        <div className="flex justify-between">
+        <div className="flex justify-between my-3">
           <div className="w-full">
             <div>
               <span className="font-bold">NOTE:</span>{" "}
@@ -166,10 +166,10 @@ const Template5 = forwardRef((props, ref) => {
                 {invoiceData.tax}%
               </div>
             </div>
-            <p className="font-bold grid grid-cols-2 text-end pt-3">
+            <div className="font-bold grid grid-cols-2 text-end pt-3">
               <div>Total:</div>
               <div>₹{+invoiceData.total?.toFixed(2)}</div>
-            </p>
+            </div>
           </div>
         </div>
       </div>
