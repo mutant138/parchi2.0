@@ -7,7 +7,7 @@ import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Template from "../Template/Template";
 function PurchaseView({ purchase }) {
   const navigate = useNavigate();
@@ -226,7 +226,7 @@ function PurchaseView({ purchase }) {
           </div>
         </div>
       </div> */}
-<div
+      <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
         style={{ height: "64vh" }}
       >
@@ -303,9 +303,9 @@ function PurchaseView({ purchase }) {
                   </thead>
                   <tbody className="[&_tr:last-child]:border-1 ">
                     {purchase?.products?.length > 0 &&
-                      purchase?.products.map((item) => (
+                      purchase?.products.map((item, index) => (
                         <tr
-                          key={`purchase-description-${item.id}`}
+                          key={`purchase-description-${index}`}
                           className="border-b-2 p-3 [&_td:last-child]:text-end"
                         >
                           <td className="  text-gray-600 max-w-[200px] truncate p-3">

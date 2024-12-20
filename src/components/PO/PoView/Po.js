@@ -4,8 +4,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbEdit } from "react-icons/tb";
 import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
-import { db , storage} from "../../../firebase";
-import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
 import Template from "../Template/Template";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
@@ -55,27 +55,30 @@ function Po({ Po, bankDetails }) {
       console.error("Po ID is missing!");
       return;
     }
-  
+
     try {
       // Generate the PDF in-memory
       const doc = new jsPDF("p", "pt", "a4");
       doc.html(poRef.current, {
         callback: async function (doc) {
           const pdfBlob = doc.output("blob");
-  
+
           // Create a reference to the file in Firebase Storage
           const fileName = `Pos/${Po.id}.pdf`;
           const fileRef = ref(storage, fileName);
-  
+
           // Upload the file
           await uploadBytes(fileRef, pdfBlob);
-  
+
           // Generate a public download URL
           const downloadURL = await getDownloadURL(fileRef);
-  
+
           // Share the public link via WhatsApp
           const message = `Here is your Po for ${Po.vendorDetailsname}: ${downloadURL}`;
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, "_blank");
+          window.open(
+            `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`,
+            "_blank"
+          );
         },
         x: 0,
         y: 0,
@@ -84,36 +87,34 @@ function Po({ Po, bankDetails }) {
       console.error("Error uploading or sharing the PDF:", error);
     }
   };
-  
-  
 
   const handleEmailShare = async () => {
     if (!Po.id) {
       console.error("Po ID is missing!");
       return;
     }
-  
+
     try {
       // Generate the PDF in-memory
       const doc = new jsPDF("p", "pt", "a4");
       doc.html(poRef.current, {
         callback: async function (doc) {
           const pdfBlob = doc.output("blob");
-  
+
           // Create a reference to the file in Firebase Storage
           const fileName = `Pos/${Po.id}.pdf`;
           const fileRef = ref(storage, fileName);
-  
+
           // Upload the file to Firebase Storage
           await uploadBytes(fileRef, pdfBlob);
-  
+
           // Generate a public download URL
           const downloadURL = await getDownloadURL(fileRef);
-  
+
           // Construct the email subject and body
           const subject = `Po for ${Po.vendorDetailsname}`;
           const body = `Hi ${Po.vendorDetailsname},%0D%0A%0D%0AHere is your Po for the recent purchase.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
-  
+
           // Open the default email client with pre-filled subject and body
           window.location.href = `mailto:?subject=${subject}&body=${body}`;
         },
@@ -124,7 +125,6 @@ function Po({ Po, bankDetails }) {
       console.error("Error uploading or sharing the PDF:", error);
     }
   };
-  
 
   const handleDelete = async () => {
     try {
@@ -133,13 +133,7 @@ function Po({ Po, bankDetails }) {
         return;
       }
 
-      const PoDocRef = doc(
-        db,
-        "companies",
-        companyId,
-        "po",
-        Po.id
-      );
+      const PoDocRef = doc(db, "companies", companyId, "po", Po.id);
 
       const confirmDelete = window.confirm(
         "Are you sure you want to delete this Po?"
@@ -148,30 +142,28 @@ function Po({ Po, bankDetails }) {
       await deleteDoc(PoDocRef);
 
       if (Po.products && Po.products.length > 0) {
-        const updateInventoryPromises = Po.products.map(
-          (inventoryItem) => {
-            console.log("inventoryitem", inventoryItem);
-            if (
-              !inventoryItem.productRef ||
-              typeof inventoryItem.quantity !== "number"
-            ) {
-              console.error("Invalid inventory item:", inventoryItem);
-              return Promise.resolve();
-            }
-
-            const inventoryDocRef = doc(
-              db,
-              "companies",
-              companyId,
-              "products",
-              inventoryItem.productRef.id
-            );
-
-            return updateDoc(inventoryDocRef, {
-              stock: increment(-inventoryItem.quantity),
-            });
+        const updateInventoryPromises = Po.products.map((inventoryItem) => {
+          console.log("inventoryitem", inventoryItem);
+          if (
+            !inventoryItem.productRef ||
+            typeof inventoryItem.quantity !== "number"
+          ) {
+            console.error("Invalid inventory item:", inventoryItem);
+            return Promise.resolve();
           }
-        );
+
+          const inventoryDocRef = doc(
+            db,
+            "companies",
+            companyId,
+            "products",
+            inventoryItem.productRef.id
+          );
+
+          return updateDoc(inventoryDocRef, {
+            stock: increment(-inventoryItem.quantity),
+          });
+        });
         await Promise.all(updateInventoryPromises);
       }
       navigate("/po");
@@ -249,7 +241,6 @@ function Po({ Po, bankDetails }) {
           >
             <IoMdDownload /> &nbsp; download
           </button>
-  
         </div>
         {Po.orderStatus !== "Received" && (
           <div className="text-end">
@@ -335,7 +326,7 @@ function Po({ Po, bankDetails }) {
           </div>
         </div>
       </div> */}
-<div
+      <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
         style={{ height: "64vh" }}
       >
@@ -368,9 +359,7 @@ function Po({ Po, bankDetails }) {
                   <div className="text-4xl font-semibold text-gray-900">
                     Po #
                   </div>
-                  <div className="mt-1.5 text-xl  text-gray-600">
-                    {Po.PoNo}
-                  </div>
+                  <div className="mt-1.5 text-xl  text-gray-600">{Po.PoNo}</div>
                   <div className="mt-4  text-gray-600">
                     {Po.createdBy?.name} <br />
                     {Po.createdBy?.address} <br />
@@ -413,9 +402,9 @@ function Po({ Po, bankDetails }) {
                   </thead>
                   <tbody className="[&_tr:last-child]:border-1 ">
                     {Po?.products?.length > 0 &&
-                      Po?.products.map((item) => (
+                      Po?.products.map((item, index) => (
                         <tr
-                          key={`Po-description-${item.id}`}
+                          key={`Po-description-${index}`}
                           className="border-b-2 p-3 [&_td:last-child]:text-end"
                         >
                           <td className="  text-gray-600 max-w-[200px] truncate p-3">
@@ -487,9 +476,7 @@ function Po({ Po, bankDetails }) {
                 </div>
               </div>
               <div className="  text-gray-600 mt-6">Note:</div>
-              <div className=" text-gray-800">
-                {Po.notes || "No notes"}
-              </div>
+              <div className=" text-gray-800">{Po.notes || "No notes"}</div>
               <div className="mt-3.5   text-gray-600">Terms & Conditions:</div>
               <div className=" text-gray-800 mt-1">
                 {Po.terms || "No Terms and Conditions"}
@@ -498,8 +485,8 @@ function Po({ Po, bankDetails }) {
                 Thank You!
               </div>
               <div className="mt-1  text-gray-800">
-                If you have any questions concerning this Po, use the
-                following contact information:
+                If you have any questions concerning this Po, use the following
+                contact information:
               </div>
               <div className="text-xs text-gray-800 mt-2">
                 {userDetails.email}
@@ -535,11 +522,7 @@ function Po({ Po, bankDetails }) {
                     </div>
                   </div>
                 </div>
-                <Template
-                  ref={poRef}
-                  poData={Po}
-                  bankDetails={bankDetails}
-                />
+                <Template ref={poRef} poData={Po} bankDetails={bankDetails} />
               </div>
             </div>
           </div>

@@ -7,7 +7,9 @@ import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import Template from "../Template/Template";
+
 function POSViewHome({ POS }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
@@ -20,12 +22,12 @@ function POSViewHome({ POS }) {
   const POSRef = useRef();
 
   useEffect(() => {
-    if (POS.items) {
-      const tax = POS?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.sellingPrice.taxSlab;
+    if (POS.products) {
+      const tax = POS?.products.reduce((acc, cur) => {
+        return acc + cur?.tax;
       }, 0);
-      const discount = POS?.items.reduce((acc, cur) => {
-        return acc + cur.pricing?.discount.amount;
+      const discount = POS?.products.reduce((acc, cur) => {
+        return acc + cur?.amount;
       }, 0);
       setTotalTax(tax);
       setTotalDiscount(discount);
@@ -38,7 +40,7 @@ function POSViewHome({ POS }) {
     const doc = new jsPDF("p", "pt", "a4");
     doc.html(POSRef.current, {
       callback: function (doc) {
-        doc.save(`${POS.customerDetails.name}'s POS.pdf`);
+        doc.save(`${POS.customerDetails?.name}'s POS.pdf`);
       },
       x: 0,
       y: 0,
@@ -60,30 +62,30 @@ function POSViewHome({ POS }) {
       if (!confirmDelete) return;
       await deleteDoc(POSDocRef);
 
-      if (POS.items && POS.items.length > 0) {
-        const updateInventoryPromises = POS.items.map((inventoryItem) => {
-          if (
-            !inventoryItem.productRef ||
-            typeof inventoryItem.quantity !== "number"
-          ) {
-            console.error("Invalid inventory item:", inventoryItem);
-            return Promise.resolve();
-          }
+      // if (POS.items && POS.items.length > 0) {
+      //   const updateInventoryPromises = POS.items.map((inventoryItem) => {
+      //     if (
+      //       !inventoryItem.productRef ||
+      //       typeof inventoryItem.quantity !== "number"
+      //     ) {
+      //       console.error("Invalid inventory item:", inventoryItem);
+      //       return Promise.resolve();
+      //     }
 
-          const inventoryDocRef = doc(
-            db,
-            "companies",
-            companyId,
-            "inventories",
-            inventoryItem.productRef.id
-          );
+      //     const inventoryDocRef = doc(
+      //       db,
+      //       "companies",
+      //       companyId,
+      //       "products",
+      //       inventoryItem.productRef.id
+      //     );
 
-          return updateDoc(inventoryDocRef, {
-            "stock.quantity": increment(inventoryItem.quantity),
-          });
-        });
-        await Promise.all(updateInventoryPromises);
-      }
+      //     return updateDoc(inventoryDocRef, {
+      //       "stock.quantity": increment(inventoryItem.quantity),
+      //     });
+      //   });
+      //   await Promise.all(updateInventoryPromises);
+      // }
       navigate("/pos");
     } catch (error) {
       console.error("Error deleting POS:", error);
@@ -104,7 +106,32 @@ function POSViewHome({ POS }) {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-
+  const columns = [
+    {
+      id: 1,
+      label: "NAME",
+    },
+    {
+      id: 2,
+      label: "QUANTITY",
+    },
+    {
+      id: 3,
+      label: "DISCOUNT",
+    },
+    {
+      id: 4,
+      label: "TAX",
+    },
+    {
+      id: 5,
+      label: "isTax Included",
+    },
+    {
+      id: 6,
+      label: "PRICE",
+    },
+  ];
   return (
     <div className="">
       <div className="p-3 flex justify-between bg-white rounded-lg my-3">
@@ -121,6 +148,7 @@ function POSViewHome({ POS }) {
             className={
               "px-4 py-1 bg-red-300 text-white rounded-full flex items-center"
             }
+            onClick={() => navigate("edit-pos")}
           >
             <TbEdit /> &nbsp; Edit
           </button>
@@ -133,7 +161,7 @@ function POSViewHome({ POS }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {POS.paymentStatus !== "Paid" && (
+        {POS?.paymentStatus !== "Paid" && (
           <div className="text-end">
             <button
               className={"px-4 py-1 text-red-700 text-2xl"}
@@ -144,7 +172,7 @@ function POSViewHome({ POS }) {
           </div>
         )}
       </div>
-      <div className="space-y-2 ">
+      {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
           <div>
             <div>
@@ -159,8 +187,8 @@ function POSViewHome({ POS }) {
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
-          {POS?.items?.length > 0 &&
-            POS.items.map((ele, index) => (
+          {POS?.products?.length > 0 &&
+            POS.products.map((ele, index) => (
               <div key={index} className="flex justify-between border-b-2 py-3">
                 <div>
                   <div className="text-lg font-bold">{ele.name}</div>
@@ -168,9 +196,9 @@ function POSViewHome({ POS }) {
                   <div>Qty: {ele.quantity}</div>
                 </div>
                 <div className="text-end">
-                  <div>Price: ₹ {ele.pricing.sellingPrice.amount}</div>
-                  <div>Tax :{ele.pricing.sellingPrice.taxSlab}</div>
-                  <div>Discount :{ele.pricing.discount.amount}</div>
+                <div>Price: ₹{ele?.sellingPrice}</div>
+                  <div>Tax :{ele?.tax}%</div>
+                  <div>Discount :₹{ele?.discount}</div>
                 </div>
               </div>
             ))}
@@ -195,8 +223,181 @@ function POSViewHome({ POS }) {
             </div>
           </div>
         </div>
+      </div> */}
+      <div
+        className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
+        style={{ height: "64vh" }}
+      >
+        <div className="col-span-12 ">
+          <div className="p-5 bg-white rounded-lg my-3">
+            <div className="">
+              <div className="flex gap-6 flex-col md:flex-row pt-8">
+                <div className="flex-1">
+                  <Link href="#">
+                    <span className="text-3xl font-bold text-primary-600">
+                      {POS.createdBy?.name}
+                    </span>
+                  </Link>
+                  <div className="mt-5">
+                    <div className="text-lg font-semibold text-gray-900">
+                      Billing To:
+                    </div>
+                    <div className="text-lg  text-gray-800 mt-1">
+                      {POS.customerDetails?.name}
+                    </div>
+                    <div className=" text-gray-600 mt-2">
+                      {POS.customerDetails?.address} <br />
+                      {POS.customerDetails?.city} <br />
+                      {POS.customerDetails?.zipCode} <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-none md:text-end">
+                  <div className="text-4xl font-semibold text-gray-900">
+                    POS #
+                  </div>
+                  <div className="mt-1.5 text-xl  text-gray-600">
+                    {POS.POSNo}
+                  </div>
+                  <div className="mt-4  text-gray-600">
+                    {POS.createdBy?.name} <br />
+                    {POS.createdBy?.address} <br />
+                    {POS.createdBy?.city} <br />
+                    {POS.createdBy?.zipCode} <br />
+                  </div>
+                  <div className="mt-8">
+                    <div className="mb-2.5">
+                      <span className="mr-12  font-semibold text-gray-900">
+                        POS Date:
+                      </span>
+                      <span className="  text-gray-600">
+                        {DateFormate(POS?.posDate)}
+                      </span>
+                    </div>
+                    {/* <div>
+                      <span className="mr-12  font-semibold text-gray-900">
+                        Due Date:
+                      </span>
+                      <span className="  text-gray-600">
+                        {DateFormate(POS?.dueDate)}
+                      </span>
+                    </div> */}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 border-2  rounded-lg">
+                <table className="w-full ">
+                  <thead>
+                    <tr className="border-b-2 [&_th:last-child]:text-end">
+                      {columns.map((column) => (
+                        <th
+                          key={`POS-table-${column.id}`}
+                          className="text-start p-3 "
+                        >
+                          {column.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="[&_tr:last-child]:border-1 ">
+                    {POS?.products?.length > 0 &&
+                      POS?.products.map((item, index) => (
+                        <tr
+                          key={`POS-description-${index}`}
+                          className="border-b-2 p-3 [&_td:last-child]:text-end"
+                        >
+                          <td className="  text-gray-600 max-w-[200px] truncate p-3">
+                            {item.name}
+                          </td>
+                          <td className="  text-gray-600 p-3">
+                            {item.quantity} pcs
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.discount}
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.tax}%
+                          </td>
+                          <td className="  text-gray-600 whitespace-nowrap p-3">
+                            {item.sellingPriceTaxType ? "YES" : "NO"}
+                          </td>
+                          <td className="ltr:text-right rtl:text-left   text-gray-600 p-3">
+                            ₹{item.sellingPrice}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                <div className="mt-2 flex justify-end  p-6">
+                  <div>
+                    {[
+                      {
+                        label: "Sub Total",
+                        amount: POS.subTotal,
+                      },
+                      {
+                        label: "Extra Discount",
+                        amount:
+                          POS?.extraDiscountType === "percentage"
+                            ? `${POS?.extraDiscount || 0}%`
+                            : `₹${POS?.extraDiscount || 0}`,
+                      },
+                      {
+                        label: "TAX(%)",
+                        amount: totalTax,
+                      },
+                      {
+                        label: "Shipping",
+                        amount: "₹" + POS.shippingCharges,
+                      },
+                      {
+                        label: "Packaging",
+                        amount: "₹" + POS.packagingCharges,
+                      },
+                    ].map((item, index) => (
+                      <div
+                        key={`POS-item-${index}`}
+                        className="mb-3 text-end flex justify-end "
+                      >
+                        <span className="  text-gray-600 ">{item.label}:</span>
+                        <span className="  text-end w-[100px] md:w-[160px] block ">
+                          {item.amount}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="mb-3 text-end flex justify-end ">
+                      <span className="  text-gray-600 ">Total :</span>
+                      <span className="   text-end w-[100px] md:w-[160px] block  font-bold">
+                        {POS.total}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="  text-gray-600 mt-6">Note:</div>
+              <div className=" text-gray-800">{POS.notes || "No notes"}</div>
+              <div className="mt-3.5   text-gray-600">Terms & Conditions:</div>
+              <div className=" text-gray-800 mt-1">
+                {POS.terms || "No Terms and Conditions"}
+              </div>
+              <div className="mt-6 text-lg font-semibold text-gray-900">
+                Thank You!
+              </div>
+              <div className="mt-1  text-gray-800">
+                If you have any questions concerning this POS, use the following
+                contact information:
+              </div>
+              <div className="text-xs text-gray-800 mt-2">
+                {userDetails.email}
+              </div>
+              <div className="text-xs text-gray-800 mt-1">
+                {userDetails.phone}
+              </div>
+              <div className="mt-8 text-xs text-gray-800">© 2024 Sunya</div>
+            </div>
+          </div>
+        </div>
       </div>
-
       {POS.id && (
         <div
           className="fixed inset-0 z-20 "
@@ -220,7 +421,7 @@ function POSViewHome({ POS }) {
                     </div>
                   </div>
                 </div>
-                {/* <Template1 ref={POSRef} invoiceData={POS} /> */}
+                <Template ref={POSRef} posData={POS} />
               </div>
             </div>
           </div>

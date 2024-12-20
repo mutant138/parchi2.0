@@ -101,12 +101,20 @@ const Settings = () => {
 
         <div className="flex items-center space-x-4 mb-10">
           <div className="w-24 h-24 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative">
-            <label
-              htmlFor="image-upload"
-              className="absolute inset-0 flex items-center justify-center cursor-pointer text-gray-500 text-sm"
-            >
-              Upload
-            </label>
+            {formData.companyLogo ? (
+              <img
+                src={formData.companyLogo}
+                alt="Profile"
+                className="w-24 h-24 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative object-cover"
+              />
+            ) : (
+              <label
+                htmlFor="image-upload"
+                className="absolute inset-0 flex items-center justify-center cursor-pointer text-gray-500 text-sm"
+              >
+                Upload
+              </label>
+            )}
             <input
               id="image-upload"
               type="file"
@@ -163,19 +171,6 @@ const Settings = () => {
               placeholder="Company Email Address"
             />
           </div>
-          {/* <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Alternative Contact Number:
-            </label>
-            <input
-              type="text"
-              name="altContact"
-              value={formData.altContact}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Alternate contact numbers"
-            />
-          </div> */}
         </div>
         <div className="grid grid-cols-1 mb-10">
           <div>

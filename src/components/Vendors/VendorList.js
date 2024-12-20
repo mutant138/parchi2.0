@@ -120,9 +120,9 @@ const VendorList = () => {
               <th className="py-3 px-6 text-left font-semibold text-gray-600">
                 Email
               </th>
-              <th className="py-3 px-6 text-left font-semibold text-gray-600">
+              {/* <th className="py-3 px-6 text-left font-semibold text-gray-600">
                 Closing Balance
-              </th>
+              </th> */}
               <th className="py-3 px-6 text-center font-semibold text-gray-600 ">
                 Delete
               </th>
@@ -169,14 +169,14 @@ const VendorList = () => {
                   <td className="py-3 px-6">{vendor.phone || "N/A"}</td>
                   <td className="py-3 px-6">{vendor.email || "N/A"}</td>
 
-                  <td className="py-3 px-6">
+                  {/* <td className="py-3 px-6">
                     <div className="text-red-500 font-semibold">
                       ₹{" "}
                       {vendor.closingBalance
                         ? vendor.closingBalance.toFixed(2)
                         : "0.00"}
                     </div>
-                  </td>
+                  </td> */}
                   <td
                     className="py-3 px-6"
                     onClick={(e) => {

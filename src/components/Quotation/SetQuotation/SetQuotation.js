@@ -719,7 +719,7 @@ const SetQuotation = () => {
                       "Already quotation No. exist"{" "}
                     </span>
                   )}
-                  {Number(formData.quotationNo) == 0 && (
+                  {Number(formData.quotationNo) === 0 && (
                     <span className="text-red-800 text-xs">
                       "Kindly Enter valid quotation No."{" "}
                     </span>
