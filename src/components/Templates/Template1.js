@@ -37,12 +37,12 @@ const Template1 = forwardRef((props, ref) => {
       <div className="flex justify-between text-start">
         <div className="mt-2 text-start">
           <strong>Bill To :</strong>
-          <div>{invoiceData.customerDetails.name}</div>
-          <div>Ph : {invoiceData.customerDetails.phone}</div>
+          <div>{invoiceData.userTo.name}</div>
+          <div>Ph : {invoiceData.userTo.phone}</div>
         </div>
         <div>
           <div>
-            <strong>Invoice # :</strong> {invoiceData.invoiceNo}
+            <strong>Invoice # :</strong> {invoiceData.no}
           </div>
           <div>
             <strong>Invoice Date :</strong>{" "}
@@ -193,7 +193,7 @@ const Template1 = forwardRef((props, ref) => {
       </div>
       <hr />
       <div className="text-end font-bold">
-        <h3>Total : {+invoiceData.total?.toFixed(2)}</h3>
+        <h3>Total : ₹ {+invoiceData.total?.toFixed(2)}</h3>
       </div>
 
       <div className=" flex justify-between">
