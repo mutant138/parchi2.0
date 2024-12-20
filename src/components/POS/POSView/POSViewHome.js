@@ -224,7 +224,7 @@ function POSViewHome({ POS }) {
           </div>
         </div>
       </div> */}
-<div
+      <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
         style={{ height: "64vh" }}
       >
@@ -301,9 +301,9 @@ function POSViewHome({ POS }) {
                   </thead>
                   <tbody className="[&_tr:last-child]:border-1 ">
                     {POS?.products?.length > 0 &&
-                      POS?.products.map((item) => (
+                      POS?.products.map((item, index) => (
                         <tr
-                          key={`POS-description-${item.id}`}
+                          key={`POS-description-${index}`}
                           className="border-b-2 p-3 [&_td:last-child]:text-end"
                         >
                           <td className="  text-gray-600 max-w-[200px] truncate p-3">
@@ -375,9 +375,7 @@ function POSViewHome({ POS }) {
                 </div>
               </div>
               <div className="  text-gray-600 mt-6">Note:</div>
-              <div className=" text-gray-800">
-                {POS.notes || "No notes"}
-              </div>
+              <div className=" text-gray-800">{POS.notes || "No notes"}</div>
               <div className="mt-3.5   text-gray-600">Terms & Conditions:</div>
               <div className=" text-gray-800 mt-1">
                 {POS.terms || "No Terms and Conditions"}
@@ -386,8 +384,8 @@ function POSViewHome({ POS }) {
                 Thank You!
               </div>
               <div className="mt-1  text-gray-800">
-                If you have any questions concerning this POS, use the
-                following contact information:
+                If you have any questions concerning this POS, use the following
+                contact information:
               </div>
               <div className="text-xs text-gray-800 mt-2">
                 {userDetails.email}

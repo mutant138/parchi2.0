@@ -7,10 +7,6 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
-  orderBy,
-  query,
-  where,
 } from "firebase/firestore";
 import { db } from "../../../firebase";
 

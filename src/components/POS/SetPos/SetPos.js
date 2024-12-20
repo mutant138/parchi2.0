@@ -28,9 +28,7 @@ const SetPos = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [posDate, setPosDate] = useState(
-    Timestamp.fromDate(new Date())
-  );
+  const [posDate, setPosDate] = useState(Timestamp.fromDate(new Date()));
   // const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -43,12 +41,13 @@ const SetPos = () => {
 
   const [products, setProducts] = useState([]);
   const [prePosList, setPrePosList] = useState([]);
-  // const [books, setBooks] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    warehouse: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -86,11 +85,7 @@ const SetPos = () => {
 
   useEffect(() => {
     function addActionQty() {
-      if (
-        formData?.products?.length === 0 ||
-        products.length === 0 ||
-        !posId
-      ) {
+      if (formData?.products?.length === 0 || products.length === 0 || !posId) {
         return;
       }
       setIsProductSelected(true);
@@ -119,13 +114,9 @@ const SetPos = () => {
       const querySnapshot = await getDocs(
         collection(db, "companies", companyDetails.companyId, "pos")
       );
-      const noList = querySnapshot.docs.map(
-        (doc) => doc.data().posNo
-      );
+      const noList = querySnapshot.docs.map((doc) => doc.data().posNo);
       if (posId) {
-        setPrePosList(
-          noList.filter((ele) => ele !== formData.posNo)
-        );
+        setPrePosList(noList.filter((ele) => ele !== formData.posNo));
       } else {
         setPrePosList(noList);
         setFormData((val) => ({
@@ -234,25 +225,24 @@ const SetPos = () => {
         console.log("🚀 ~ fetchTDC ~ error:", error);
       }
     }
-
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    async function fetchWarehouse() {
+      try {
+        const bookRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "warehouses"
+        );
+        const getWarehouseData = await getDocs(bookRef);
+        const fetchWarehouses = getWarehouseData.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setWarehouses(fetchWarehouses);
+      } catch (error) {
+        console.log("🚀 ~ fetchBooks ~ error:", error);
+      }
+    }
 
     const fetchProducts = async () => {
       try {
@@ -320,7 +310,7 @@ const SetPos = () => {
     }
 
     fetchProducts();
-    // fetchBooks();
+    fetchWarehouse();
     fetchPosData();
     fetchTax();
     customerDetails();
@@ -562,23 +552,12 @@ const SetPos = () => {
 
       if (posId) {
         await updateDoc(
-          doc(
-            db,
-            "companies",
-            companyDetails.companyId,
-            "pos",
-            posId
-          ),
+          doc(db, "companies", companyDetails.companyId, "pos", posId),
           payload
         );
       } else {
         await addDoc(
-          collection(
-            db,
-            "companies",
-            companyDetails.companyId,
-            "pos"
-          ),
+          collection(db, "companies", companyDetails.companyId, "pos"),
           payload
         );
       }
@@ -602,11 +581,7 @@ const SetPos = () => {
         // });
       }
 
-      alert(
-        "Successfully " +
-          (posId ? "Updated" : "Created") +
-          " the Pos"
-      );
+      alert("Successfully " + (posId ? "Updated" : "Created") + " the Pos");
       navigate("/pos");
     } catch (err) {
       console.error(err);
@@ -623,22 +598,21 @@ const SetPos = () => {
 
     return `${getFullYear}-${getMonth}-${getDate}`;
   }
-  //   function onSelectBook(e) {
-  //     const { value } = e.target;
-  //     const data = books.find((ele) => ele.id === value);
-  //     console.log("🚀 ~ onSelectBook ~ data:", data);
-  //     const bookRef = doc(
-  //       db,
-  //       "companies",
-  //       companyDetails.companyId,
-  //       "books",
-  //       value
-  //     );
-  //     setFormData((val) => ({
-  //       ...val,
-  //       book: { name: data.name, bookRef },
-  //     }));
-  //   }
+  function onSelectWarehouse(e) {
+    const { value } = e.target;
+    const data = warehouses.find((ele) => ele.id === value);
+    const warehouseRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "warehouses",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      warehouse: { name: data.name, warehouseRef },
+    }));
+  }
 
   return (
     <div
@@ -652,9 +626,7 @@ const SetPos = () => {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">
-          {posId ? "Edit" : "Create"} Pos
-        </h1>
+        <h1 className="text-2xl font-bold">{posId ? "Edit" : "Create"} Pos</h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex gap-8 mb-6">
@@ -708,16 +680,14 @@ const SetPos = () => {
             <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
-                Pos Date <span className="text-red-500">*</span>
+                  Pos Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
                   value={DateFormate(posDate)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setPosDate(
-                      Timestamp.fromDate(new Date(e.target.value))
-                    );
+                    setPosDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />
@@ -738,9 +708,7 @@ const SetPos = () => {
               <div>
                 <label className="text-sm text-gray-600">
                   Pos No. <span className="text-red-500">*</span>
-                  {prePosList.includes(
-                    formData.posNo
-                  ) && (
+                  {prePosList.includes(formData.posNo) && (
                     <span className="text-red-800 text-xs">
                       {/* "Already DeliveryChallan No. exist"{" "} */}
                     </span>
@@ -886,13 +854,19 @@ const SetPos = () => {
                 <div className="w-full ">
                   <div>Dispatch From</div>
                   <select
-                    value=""
-                    onChange={() => {}}
+                    value={formData?.warehouse?.warehouseRef?.id || ""}
+                    onChange={onSelectWarehouse}
                     className="border p-2 rounded w-full"
                   >
                     <option value="" disabled>
                       Select WareHouse
                     </option>
+                    {warehouses.length > 0 &&
+                      warehouses.map((warehouse, index) => (
+                        <option value={warehouse.id} key={index}>
+                          {warehouse.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 {/* <div className="w-full ">
@@ -1229,8 +1203,7 @@ const SetPos = () => {
                 }
               }}
             >
-              <span className="text-lg">+</span>{" "}
-              {posId ? "Edit" : "Create"} Pos
+              <span className="text-lg">+</span> {posId ? "Edit" : "Create"} Pos
             </button>
           </div>
         </div>

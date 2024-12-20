@@ -136,9 +136,9 @@ const CustomerList = () => {
                 Contact Info
               </th>
               <th className="py-3 px-6 text-left font-semibold ">Email Id</th>
-              <th className="py-3 px-6 text-left font-semibold ">
+              {/* <th className="py-3 px-6 text-left font-semibold ">
                 Closing Balance
-              </th>
+              </th> */}
               <th className="py-3 px-6 text-center font-semibold ">Delete</th>
             </tr>
           </thead>
@@ -181,7 +181,7 @@ const CustomerList = () => {
                   <td className="py-3 px-6">{customer.phone || "N/A"}</td>
 
                   <td className="py-3 px-6">{customer.email || ""}</td>
-
+                  {/* 
                   <td className="py-3 px-6">
                     <div className="text-red-500 font-semibold">
                       ₹{" "}
@@ -189,7 +189,7 @@ const CustomerList = () => {
                         ? customer.closingBalance.toFixed(2)
                         : "0.00"}
                     </div>
-                  </td>
+                  </td> */}
                   <td
                     className="py-3 px-6"
                     onClick={(e) => {
