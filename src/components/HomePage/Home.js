@@ -69,7 +69,7 @@ import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 import Settings from "../Settings/Settings";
-import StaffHome from "../StaffDashboard/StaffHome";
+
 
 const Home = () => {
   const location = useLocation();
