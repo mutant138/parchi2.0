@@ -28,7 +28,7 @@ function Invoice({ invoice, bankDetails }) {
   const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const invoiceRef = useRef();
-  const [selectTemplate, setSelectTemplate] = useState("template1");
+  const [selectTemplate, setSelectTemplate] = useState("template6");
 
   const templatesComponents = {
     template1: (
