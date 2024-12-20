@@ -43,13 +43,13 @@ const SetDeliveryChallan = () => {
 
   const [products, setProducts] = useState([]);
   const [preDeliveryChallanList, setPreDeliveryChallanList] = useState([]);
-  const [books, setBooks] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    book: {},
+    warehouse: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -236,24 +236,24 @@ const SetDeliveryChallan = () => {
       }
     }
 
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    async function fetchWarehouse() {
+      try {
+        const bookRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "warehouses"
+        );
+        const getWarehouseData = await getDocs(bookRef);
+        const fetchWarehouses = getWarehouseData.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setWarehouses(fetchWarehouses);
+      } catch (error) {
+        console.log("🚀 ~ fetchBooks ~ error:", error);
+      }
+    }
 
     const fetchProducts = async () => {
       try {
@@ -321,7 +321,7 @@ const SetDeliveryChallan = () => {
     }
 
     fetchProducts();
-    // fetchBooks();
+    fetchWarehouse();
     fetchDeliveryChallanData();
     fetchTax();
     customerDetails();
@@ -641,6 +641,22 @@ const SetDeliveryChallan = () => {
   //     }));
   //   }
 
+  function onSelectWarehouse(e) {
+    const { value } = e.target;
+    const data = warehouses.find((ele) => ele.id === value);
+    const warehouseRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "warehouses",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      warehouse: { name: data.name, warehouseRef },
+    }));
+  }
+
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
@@ -812,8 +828,12 @@ const SetDeliveryChallan = () => {
                             <td className="px-4 py-2">
                               ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
-                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.discount.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-2">
+                              ₹{product.netAmount.toFixed(2)}
+                            </td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
@@ -887,13 +907,19 @@ const SetDeliveryChallan = () => {
                 <div className="w-full ">
                   <div>Dispatch From</div>
                   <select
-                    value=""
-                    onChange={() => {}}
+                    value={formData?.warehouse?.warehouseRef?.id || ""}
+                    onChange={onSelectWarehouse}
                     className="border p-2 rounded w-full"
                   >
                     <option value="" disabled>
                       Select WareHouse
                     </option>
+                    {warehouses.length > 0 &&
+                      warehouses.map((warehouse, index) => (
+                        <option value={warehouse.id} key={index}>
+                          {warehouse.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 {/* <div className="w-full ">
@@ -1106,7 +1132,7 @@ const SetDeliveryChallan = () => {
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount:e.target.value || 0
+                          extraDiscount: e.target.value || 0,
                         }));
                       }}
                     />
@@ -1116,7 +1142,7 @@ const SetDeliveryChallan = () => {
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscountType: e.target.value
+                          extraDiscountType: e.target.value,
                         }));
                       }}
                     >

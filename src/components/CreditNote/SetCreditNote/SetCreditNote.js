@@ -28,9 +28,7 @@ const SetCreditNote = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [date, setDate] = useState(
-    Timestamp.fromDate(new Date())
-  );
+  const [date, setDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -42,12 +40,13 @@ const SetCreditNote = () => {
 
   const [products, setProducts] = useState([]);
   const [preCreditNoteList, setPreCreditNoteList] = useState([]);
-  const [books, setBooks] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    warehouse: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -157,7 +156,7 @@ const SetCreditNote = () => {
         const getData = (await getDoc(docRef)).data();
 
         setDate(getData.date);
-        
+
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -232,24 +231,24 @@ const SetCreditNote = () => {
       }
     }
 
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    async function fetchWarehouse() {
+      try {
+        const bookRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "warehouses"
+        );
+        const getWarehouseData = await getDocs(bookRef);
+        const fetchWarehouses = getWarehouseData.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setWarehouses(fetchWarehouses);
+      } catch (error) {
+        console.log("🚀 ~ fetchBooks ~ error:", error);
+      }
+    }
 
     const fetchProducts = async () => {
       try {
@@ -317,7 +316,7 @@ const SetCreditNote = () => {
     }
 
     fetchProducts();
-    // fetchBooks();
+    fetchWarehouse();
     fetchCreditNoteData();
     fetchTax();
     customerDetails();
@@ -630,6 +629,21 @@ const SetCreditNote = () => {
   //       book: { name: data.name, bookRef },
   //     }));
   //   }
+  function onSelectWarehouse(e) {
+    const { value } = e.target;
+    const data = warehouses.find((ele) => ele.id === value);
+    const warehouseRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "warehouses",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      warehouse: { name: data.name, warehouseRef },
+    }));
+  }
 
   return (
     <div
@@ -706,9 +720,7 @@ const SetCreditNote = () => {
                   value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setDate(
-                      Timestamp.fromDate(new Date(e.target.value))
-                    );
+                    setDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />
@@ -787,8 +799,12 @@ const SetCreditNote = () => {
                             <td className="px-4 py-2">
                               ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
-                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.discount.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-2">
+                              ₹{product.netAmount.toFixed(2)}
+                            </td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
@@ -862,13 +878,19 @@ const SetCreditNote = () => {
                 <div className="w-full ">
                   <div>Dispatch From</div>
                   <select
-                    value=""
-                    onChange={() => {}}
+                    value={formData?.warehouse?.warehouseRef?.id || ""}
+                    onChange={onSelectWarehouse}
                     className="border p-2 rounded w-full"
                   >
                     <option value="" disabled>
                       Select WareHouse
                     </option>
+                    {warehouses.length > 0 &&
+                      warehouses.map((warehouse, index) => (
+                        <option value={warehouse.id} key={index}>
+                          {warehouse.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 {/* <div className="w-full ">

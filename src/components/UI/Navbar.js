@@ -9,6 +9,7 @@ import {
   updateUserDetails,
 } from "../../store/UserSlice";
 import SunyaLogo from "../../assets/SunyaLogo.jpg";
+import { IoMdSettings } from "react-icons/io";
 
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -239,6 +240,16 @@ const Navbar = () => {
                   onClick={handleEditClick}
                 >
                   Edit Profile
+                </button>
+                <button
+                  className="flex items-center space-x-2 text-gray-600 hover:text-black my-2"
+                  onClick={() => {
+                    navigate("/user");
+                    setIsProfileOpen(false);
+                  }}
+                >
+                  <IoMdSettings />
+                  <span>Settings</span>
                 </button>
                 <button
                   className="flex items-center space-x-2 text-gray-600 hover:text-black my-2"

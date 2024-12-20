@@ -69,6 +69,7 @@ import SetPos from "../POS/CreatePOS/SetPos";
 import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
+import Settings from "../Settings/Settings";
 
 const Home = () => {
   const location = useLocation();
@@ -247,6 +248,10 @@ const Home = () => {
               element={<SetCreditNote />}
             ></Route>
             <Route path="/vendor/po" element={<VendorPO />}></Route>
+            <Route
+              path="/user"
+              element={<Settings/>}
+            ></Route>
           </Routes>
           <Outlet />
         </div>

@@ -28,9 +28,7 @@ const SetProFormaInvoice = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [date, setDate] = useState(
-    Timestamp.fromDate(new Date())
-  );
+  const [date, setDate] = useState(Timestamp.fromDate(new Date()));
 
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -42,14 +40,14 @@ const SetProFormaInvoice = () => {
   const [isProductSelected, setIsProductSelected] = useState(false);
 
   const [products, setProducts] = useState([]);
-  const [preProFormaList , setPreProFormaList ] = useState([]);
-  const [books, setBooks] = useState([]);
+  const [preProFormaList, setPreProFormaList] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    book: {},
+    warehouse: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -122,11 +120,9 @@ const SetProFormaInvoice = () => {
       );
       const noList = querySnapshot.docs.map((doc) => doc.data().proFormaNo);
       if (proFormaId) {
-        setPreProFormaList (
-          noList.filter((ele) => ele !== formData.proFormaNo)
-        );
+        setPreProFormaList(noList.filter((ele) => ele !== formData.proFormaNo));
       } else {
-        setPreProFormaList (noList);
+        setPreProFormaList(noList);
         setFormData((val) => ({
           ...val,
           proFormaNo: String(noList.length + 1).padStart(4, 0),
@@ -159,7 +155,7 @@ const SetProFormaInvoice = () => {
         const getData = (await getDoc(docRef)).data();
 
         setDate(getData.date);
-    
+
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -234,24 +230,24 @@ const SetProFormaInvoice = () => {
       }
     }
 
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    async function fetchWarehouse() {
+      try {
+        const bookRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "warehouses"
+        );
+        const getWarehouseData = await getDocs(bookRef);
+        const fetchWarehouses = getWarehouseData.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setWarehouses(fetchWarehouses);
+      } catch (error) {
+        console.log("🚀 ~ fetchBooks ~ error:", error);
+      }
+    }
 
     const fetchProducts = async () => {
       try {
@@ -319,7 +315,7 @@ const SetProFormaInvoice = () => {
     }
 
     fetchProducts();
-    // fetchBooks();
+    fetchWarehouse();
     fetchProFormaData();
     fetchTax();
     customerDetails();
@@ -571,7 +567,12 @@ const SetProFormaInvoice = () => {
         );
       } else {
         await addDoc(
-          collection(db, "companies", companyDetails.companyId, "proFormaInvoice"),
+          collection(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "proFormaInvoice"
+          ),
           payload
         );
       }
@@ -632,7 +633,21 @@ const SetProFormaInvoice = () => {
   //       book: { name: data.name, bookRef },
   //     }));
   //   }
-
+  function onSelectWarehouse(e) {
+    const { value } = e.target;
+    const data = warehouses.find((ele) => ele.id === value);
+    const warehouseRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "warehouses",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      warehouse: { name: data.name, warehouseRef },
+    }));
+  }
   return (
     <div
       className="px-5 pb-5 bg-gray-100 overflow-y-auto"
@@ -708,18 +723,16 @@ const SetProFormaInvoice = () => {
                   value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setDate(
-                      Timestamp.fromDate(new Date(e.target.value))
-                    );
+                    setDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />
               </div>
-         
+
               <div>
                 <label className="text-sm text-gray-600">
                   ProForma Invoice No. <span className="text-red-500">*</span>
-                  {preProFormaList .includes(formData.proFormaNo) && (
+                  {preProFormaList.includes(formData.proFormaNo) && (
                     <span className="text-red-800 text-xs">
                       "Already ProForma Invoice No. exist"{" "}
                     </span>
@@ -790,8 +803,12 @@ const SetProFormaInvoice = () => {
                             <td className="px-4 py-2">
                               ₹{product.sellingPrice.toFixed(2)}
                             </td>
-                            <td className="px-4 py-2">₹{product.discount.toFixed(2)}</td>
-                            <td className="px-4 py-2">₹{product.netAmount.toFixed(2)}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.discount.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-2">
+                              ₹{product.netAmount.toFixed(2)}
+                            </td>
                             <td className="px-2 py-2">
                               {product.sellingPriceTaxType ? "Yes" : "No"}
                             </td>
@@ -865,13 +882,19 @@ const SetProFormaInvoice = () => {
                 <div className="w-full ">
                   <div>Dispatch From</div>
                   <select
-                    value=""
-                    onChange={() => {}}
+                    value={formData?.warehouse?.warehouseRef?.id || ""}
+                    onChange={onSelectWarehouse}
                     className="border p-2 rounded w-full"
                   >
                     <option value="" disabled>
                       Select WareHouse
                     </option>
+                    {warehouses.length > 0 &&
+                      warehouses.map((warehouse, index) => (
+                        <option value={warehouse.id} key={index}>
+                          {warehouse.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 {/* <div className="w-full ">
@@ -1084,7 +1107,7 @@ const SetProFormaInvoice = () => {
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: +e.target.value || 0
+                          extraDiscount: +e.target.value || 0,
                         }));
                       }}
                     />
@@ -1094,7 +1117,7 @@ const SetProFormaInvoice = () => {
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscountType: e.target.value 
+                          extraDiscountType: e.target.value,
                         }));
                       }}
                     >

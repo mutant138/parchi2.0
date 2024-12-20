@@ -29,7 +29,7 @@ const SetQuotation = () => {
   const phoneNo = userDetails.phone;
 
   const [date, setDate] = useState(Timestamp.fromDate(new Date()));
-
+  const [warehouses, setWarehouses] = useState([]);
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -47,6 +47,7 @@ const SetQuotation = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    warehouse: {},
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
@@ -231,24 +232,24 @@ const SetQuotation = () => {
       }
     }
 
-    // async function fetchBooks() {
-    //   try {
-    //     const bookRef = collection(
-    //       db,
-    //       "companies",
-    //       companyDetails.companyId,
-    //       "books"
-    //     );
-    //     const getBookData = await getDocs(bookRef);
-    //     const fetchBooks = getBookData.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setBooks(fetchBooks);
-    //   } catch (error) {
-    //     console.log("🚀 ~ fetchBooks ~ error:", error);
-    //   }
-    // }
+    async function fetchWarehouse() {
+      try {
+        const bookRef = collection(
+          db,
+          "companies",
+          companyDetails.companyId,
+          "warehouses"
+        );
+        const getWarehouseData = await getDocs(bookRef);
+        const fetchWarehouses = getWarehouseData.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setWarehouses(fetchWarehouses);
+      } catch (error) {
+        console.log("🚀 ~ fetchBooks ~ error:", error);
+      }
+    }
 
     const fetchProducts = async () => {
       try {
@@ -316,7 +317,7 @@ const SetQuotation = () => {
     }
 
     fetchProducts();
-    // fetchBooks();
+    fetchWarehouse();
     fetchQuotationData();
     fetchTax();
     customerDetails();
@@ -613,22 +614,21 @@ const SetQuotation = () => {
 
     return `${getFullYear}-${getMonth}-${getDate}`;
   }
-  //   function onSelectBook(e) {
-  //     const { value } = e.target;
-  //     const data = books.find((ele) => ele.id === value);
-  //     console.log("🚀 ~ onSelectBook ~ data:", data);
-  //     const bookRef = doc(
-  //       db,
-  //       "companies",
-  //       companyDetails.companyId,
-  //       "books",
-  //       value
-  //     );
-  //     setFormData((val) => ({
-  //       ...val,
-  //       book: { name: data.name, bookRef },
-  //     }));
-  //   }
+  function onSelectWarehouse(e) {
+    const { value } = e.target;
+    const data = warehouses.find((ele) => ele.id === value);
+    const warehouseRef = doc(
+      db,
+      "companies",
+      companyDetails.companyId,
+      "warehouses",
+      value
+    );
+    setFormData((val) => ({
+      ...val,
+      warehouse: { name: data.name, warehouseRef },
+    }));
+  }
 
   return (
     <div
@@ -864,13 +864,19 @@ const SetQuotation = () => {
                 <div className="w-full ">
                   <div>Dispatch From</div>
                   <select
-                    value=""
-                    onChange={() => {}}
+                    value={formData?.warehouse?.warehouseRef?.id || ""}
+                    onChange={onSelectWarehouse}
                     className="border p-2 rounded w-full"
                   >
                     <option value="" disabled>
                       Select WareHouse
                     </option>
+                    {warehouses.length > 0 &&
+                      warehouses.map((warehouse, index) => (
+                        <option value={warehouse.id} key={index}>
+                          {warehouse.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 {/* <div className="w-full ">
@@ -1083,7 +1089,7 @@ const SetQuotation = () => {
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscount: +e.target.value || 0
+                          extraDiscount: +e.target.value || 0,
                         }));
                       }}
                     />
@@ -1093,7 +1099,7 @@ const SetQuotation = () => {
                       onChange={(e) => {
                         setFormData((val) => ({
                           ...val,
-                          extraDiscountType: e.target.value 
+                          extraDiscountType: e.target.value,
                         }));
                       }}
                     >
