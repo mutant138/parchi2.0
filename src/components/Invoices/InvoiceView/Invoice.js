@@ -13,6 +13,10 @@ import Template1 from "../../Templates/Template1";
 import Template2 from "../../Templates/Template2";
 import Template3 from "../../Templates/Template3";
 import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
@@ -39,7 +43,7 @@ function Invoice({ invoice, bankDetails }) {
     const doc = new jsPDF("p", "pt", "a4");
     doc.html(invoiceRef.current, {
       callback: function (doc) {
-        doc.save(`${invoice.customerDetails.name}'s invoice.pdf`);
+        doc.save(`${invoice.userTo.name}'s invoice.pdf`);
       },
       x: 0,
       y: 0,
@@ -70,7 +74,7 @@ function Invoice({ invoice, bankDetails }) {
           const downloadURL = await getDownloadURL(fileRef);
 
           // Share the public link via WhatsApp
-          const message = `Here is your invoice for ${invoice.customerDetails.name}: ${downloadURL}`;
+          const message = `Here is your invoice for ${invoice.userTo.name}: ${downloadURL}`;
           window.open(
             `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`,
             "_blank"
@@ -108,8 +112,8 @@ function Invoice({ invoice, bankDetails }) {
           const downloadURL = await getDownloadURL(fileRef);
 
           // Construct the email subject and body
-          const subject = `Invoice for ${invoice.customerDetails.name}`;
-          const body = `Hi ${invoice.customerDetails.name},%0D%0A%0D%0AHere is your invoice for the recent purchase.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
+          const subject = `Invoice for ${invoice.userTo.name}`;
+          const body = `Hi ${invoice.userTo.name},%0D%0A%0D%0AHere is your invoice for the recent purchase.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
 
           // Open the default email client with pre-filled subject and body
           window.location.href = `mailto:?subject=${subject}&body=${body}`;
@@ -289,12 +293,12 @@ function Invoice({ invoice, bankDetails }) {
                       Billing To:
                     </div>
                     <div className="text-lg  text-gray-800 mt-1">
-                      {invoice.customerDetails?.name}
+                      {invoice.userTo?.name}
                     </div>
                     <div className=" text-gray-600 mt-2">
-                      {invoice.customerDetails?.address} <br />
-                      {invoice.customerDetails?.city} <br />
-                      {invoice.customerDetails?.zipCode} <br />
+                      {invoice.userTo?.address} <br />
+                      {invoice.userTo?.city} <br />
+                      {invoice.userTo?.zipCode} <br />
                     </div>
                   </div>
                 </div>
@@ -303,7 +307,7 @@ function Invoice({ invoice, bankDetails }) {
                     Invoice #
                   </div>
                   <div className="mt-1.5 text-xl  text-gray-600">
-                    {invoice.invoiceNo}
+                    {invoice.no}
                   </div>
                   <div className="mt-4  text-gray-600">
                     {invoice.createdBy?.name} <br />
@@ -470,17 +474,7 @@ function Invoice({ invoice, bankDetails }) {
                     </div>
                   </div>
                 </div>
-                {/* <Template2
-                  ref={invoiceRef}
-                  invoiceData={invoice}
-                  bankDetails={bankDetails}
-                /> */}
-                {/* <Template3
-                  ref={invoiceRef}
-                  invoiceData={invoice}
-                  bankDetails={bankDetails}
-                /> */}
-                <Template2
+                <Template7
                   ref={invoiceRef}
                   invoiceData={invoice}
                   bankDetails={bankDetails}

@@ -1,161 +1,193 @@
 import React, { forwardRef } from "react";
-import SunyaLogo from "../../assets/SunyaLogo.jpg";
 
 const Template4 = forwardRef((props, ref) => {
+  const { invoiceData, bankDetails } = props;
+  if (!invoiceData) {
+    return;
+  }
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
+
+    return `${getDate}/${getMonth}/${getFullYear}`;
+  }
   return (
-    <div className="bg-gray-50 p-10 font-sans">
-      <div className="border border-gray-300 p-8 bg-white max-w-3xl mx-auto shadow-md">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">H.R. ENTERPRISE</h1>
-          <p className="text-sm">
-            12, VRUNDAVAN NAGAR, ODHAV RIND ROAD, B/H GAURI CINEMA, ODHAV,
-            AHMEDABAD-382415, INDIA.
-          </p>
-        </div>
-
-        {/* Invoice Details */}
-        <div className="flex justify-between mb-4">
-          <div>
-            <p>
-              <strong>M/s.:</strong> Smith Rhodes
-            </p>
-            <p>15 Hodges Mews,</p>
-            <p>High Wycombe</p>
-            <p>HP12 3JL</p>
-            <p>Thailand</p>
-          </div>
-          <div>
-            <p>
-              <strong>Invoice No:</strong> 56
-            </p>
-            <p>
-              <strong>Date:</strong> 03/10/2023
+    <div
+      className=" bg-white border border-gray-300 rounded-md shadow-md overflow-y-auto"
+      style={{ height: "80vh" }}
+    >
+      <div ref={ref} style={{ width: "595px", padding: "20px" }}>
+        <div className="border border-black ">
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-2xl font-bold bg-gray-100 border-black py-1  border-b">
+              {invoiceData?.createdBy?.name}
+            </h1>
+            <p className=" border-black py-2 border-b ">
+              {invoiceData.createdBy.address} {invoiceData.createdBy.city}
+              {invoiceData.createdBy.zipCode} {invoiceData.createdBy.email}
+              {invoiceData.createdBy.phoneNo}
             </p>
           </div>
-        </div>
+          <div className="flex justify-between border-black py-1 border-b px-3">
+            <div>Debit Memo</div>
+            <div className="font-semibold">TAX INVOICE</div>
+            <div>Original</div>
+          </div>
+          {/* Invoice Details */}
+          <div className="flex justify-between border-black  border-b">
+            <div className="w-full py-1 px-3">
+              <p>
+                <strong>M/s.:</strong> {invoiceData?.userTo?.name}
+              </p>
+              <p>{invoiceData.userTo.address} </p>
+              <p> {invoiceData.userTo.city} </p>
+              <p> {invoiceData.userTo.zipCode}</p>
+              <p>{invoiceData.userTo.phone}</p>
+              <p>{invoiceData.userTo.email}</p>
+            </div>
+            <div className="border-s border-black bg-gray-100 p-2 w-3/4">
+              <p>
+                <strong>Invoice No:</strong> {invoiceData.no}
+              </p>
+              <p>
+                <strong>Date:</strong> {DateFormate(invoiceData.dueDate)}
+              </p>
+            </div>
+          </div>
 
-        {/* Product Table */}
-        <table className="w-full border-collapse border border-gray-400 text-sm">
-          <thead>
-            <tr>
-              <th className="border border-gray-400 px-2 py-1">SrNo</th>
-              <th className="border border-gray-400 px-2 py-1">Product Name</th>
-              <th className="border border-gray-400 px-2 py-1">Qty</th>
-              <th className="border border-gray-400 px-2 py-1">Rate</th>
-              <th className="border border-gray-400 px-2 py-1">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                1
-              </td>
-              <td className="border border-gray-400 px-2 py-1">
-                STYLE KERATIN SH. 250ML
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                3
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $25.75
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $77.25
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                2
-              </td>
-              <td className="border border-gray-400 px-2 py-1">
-                SEASOUL GOLD MOROCCAN ANTI AGEING KIT
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                1
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $40.12
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $40.12
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                3
-              </td>
-              <td className="border border-gray-400 px-2 py-1">
-                KERASOUL ONION SH-200ML
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                6
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $12.00
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $72.00
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                4
-              </td>
-              <td className="border border-gray-400 px-2 py-1">
-                KERASOUL ONION MASK-200GM
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-center">
-                4
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $13.50
-              </td>
-              <td className="border border-gray-400 px-2 py-1 text-right">
-                $54.00
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          {/* Product Table */}
+          <table className="w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="text-left py-2 pl-1">SrNo</th>
+                <th className=" text-left py-2 pl-1">Product</th>
+                <th className=" text-left py-2 pl-1">Qty</th>
+                <th className=" text-left py-2 pl-1">Rate</th>
+                <th className=" text-left py-2 pl-1">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoiceData.products.map((item, index) => (
+                <tr key={index} className="border-t-2">
+                  <td className="py-2 pl-1">{index + 1}</td>
+                  <td className="py-2 pl-1">{item.name}</td>
+                  <td className="py-2 pl-1">{item.quantity}</td>
+                  <td className="py-2 pl-1">{item.netAmount.toFixed(2)}</td>
+                  <td className="py-2 pl-1">{item.totalAmount.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        {/* Totals */}
-        <div className="mt-4 text-sm">
-          <p>
-            <strong>GSTIN No.:</strong> 26AKJPG9221EIW5
-          </p>
-          <div className="flex justify-between border-t border-gray-400 pt-2">
-            <p>Sub Total:</p>
-            <p>$243.37</p>
+          {/* Totals */}
+          <div className="border-y border-black flex justify-between">
+            <div>
+              {/* <p>
+                <strong>GSTIN No.:</strong> 26AKJPG9221EIW5
+              </p> */}
+            </div>
+            <div className="flex justify-between border-gray-400 pt-2 px-3">
+              <p>Sub Total:</p>
+              <p>₹{+invoiceData.subTotal?.toFixed(2)}</p>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <p>Central Tax (9.00%):</p>
-            <p>$21.09</p>
+          <div className="border-b border-black flex justify-between">
+            <div className="border-e border-black w-full px-3">
+              <strong>Bill Amount:</strong> ₹{+invoiceData.total?.toFixed(2)}{" "}
+              Onlys
+            </div>
+            <div className="w-3/4">
+              {invoiceData.tcs.isTcsApplicable && (
+                <div>
+                  TCS :
+                  <span className="ml-5">
+                    {invoiceData.tcs.tcs_amount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.tds.isTdsApplicable && (
+                <div>
+                  TDS :
+                  <span className="ml-5">
+                    {invoiceData.tds.tds_amount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.totalCgstAmount_9 > 0 && (
+                <div>
+                  CGST 9.0% :
+                  <span className="ml-5">
+                    {invoiceData.totalCgstAmount_9.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.totalSgstAmount_9 > 0 && (
+                <div>
+                  SGST 9.0% :
+                  <span className="ml-5">
+                    {invoiceData.totalSgstAmount_9.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.totalCgstAmount_6 > 0 && (
+                <div>
+                  CGST 6.0% :
+                  <span className="ml-5">
+                    {invoiceData.totalCgstAmount_6.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.totalSgstAmount_6 > 0 && (
+                <div>
+                  SGST 6.0% :
+                  <span className="ml-5">
+                    {invoiceData.totalSgstAmount_6.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.totalCgstAmount_2_5 > 0 && (
+                <div>
+                  CGST 2.5% :
+                  <span className="ml-5">
+                    {invoiceData.totalCgstAmount_2_5.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {invoiceData.totalSgstAmount_2_5 > 0 && (
+                <div>
+                  SGST 2.5% :
+                  <span className="ml-5">
+                    {invoiceData.totalSgstAmount_2_5.toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex justify-between">
-            <p>State Tax (9.00%):</p>
-            <p>$21.09</p>
-          </div>
-          <div className="flex justify-between font-bold border-t border-gray-400 pt-2">
-            <p>Grand Total:</p>
-            <p>$285.55</p>
-          </div>
-        </div>
 
-        {/* Footer */}
-        <div className="mt-6 text-sm">
-          <p>
-            <strong>Bill Amount:</strong> Thirty Thousand Forty Four Only
-          </p>
-          <p className="mt-4">
-            <strong>Terms & Condition:</strong>
-          </p>
-          <ul className="list-disc list-inside">
-            <li>Goods once sold will not be taken back.</li>
-            <li>Our risk and responsibility ceases as soon.</li>
-          </ul>
-          <div className="text-right mt-6">
-            <p>For, H.R. ENTERPRISE</p>
-            <p className="mt-8">(Authorised Signatory)</p>
+          <div className="flex justify-between border-b border-black w-full">
+            <div className="w-full border-e border-black py-2 px-3">
+              <span className="font-bold">Note: </span>
+              <span>{invoiceData.notes || "No notes"}</span>
+            </div>
+            <div className="w-3/4 flex justify-between font-bold py-2 ">
+              <div className="px-2">Grand Total:</div>
+              <div className="px-2">$285.55</div>
+            </div>
+          </div>
+          <div className="flex justify-between border-b border-black  ">
+            <div className="w-full border-e border-black py-2 px-3">
+              <span className="font-bold">Terms & Condition: </span>
+              <span>{invoiceData.terms || "No Terms & Condition"}</span>
+            </div>
+            <div className="w-3/4 text-end py-2">
+              <p className=" px-3">For,{invoiceData?.createdBy?.name}</p>
+              <p className="mt-8  px-3">(Authorised Signatory)</p>
+            </div>
           </div>
         </div>
       </div>

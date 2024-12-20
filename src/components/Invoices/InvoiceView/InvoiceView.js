@@ -35,11 +35,16 @@ function InvoiceView() {
       let totalCgstAmount_6 = 0;
       let totalSgstAmount_9 = 0;
       let totalCgstAmount_9 = 0;
+      let tax = 0;
       const invoiceRef = doc(db, "companies", companyId, "invoices", id);
-      const resData = (await getDoc(invoiceRef)).data();
+      const { customerDetails, invoiceNo, ...resData } = (
+        await getDoc(invoiceRef)
+      ).data();
       const invoicesData = {
         id,
         ...resData,
+        no: invoiceNo,
+        userTo: customerDetails,
         products: resData.products.map((item) => {
           let discount = +item.discount || 0;
 
@@ -53,7 +58,7 @@ function InvoiceView() {
           const taxAmount = netAmount * (taxRate / 100);
           const sgstAmount = netAmount * (sgst / 100);
           const cgstAmount = netAmount * (cgst / 100);
-
+          tax += item.tax || 0;
           item.returnQty = 0;
           if (returnData.length > 0) {
             const returnProductQty = returnData.reduce((acc, cur) => {
@@ -83,6 +88,7 @@ function InvoiceView() {
             netAmount,
           };
         }),
+        tax,
         totalTaxableAmount,
         totalSgstAmount_2_5,
         totalCgstAmount_2_5,
@@ -157,7 +163,7 @@ function InvoiceView() {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">{invoice.invoiceNo}</h1>
+        <h1 className="text-2xl font-bold">{invoice.no}</h1>
       </header>
       <hr />
       <div>

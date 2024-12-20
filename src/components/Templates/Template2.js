@@ -2,7 +2,6 @@ import React, { forwardRef } from "react";
 
 const Template2 = forwardRef((props, ref) => {
   const { invoiceData, bankDetails } = props;
-  console.log("🚀 ~ Template1 ~ invoiceData:", invoiceData);
   if (!invoiceData) {
     return;
   }
@@ -31,8 +30,7 @@ const Template2 = forwardRef((props, ref) => {
           <div className="text-right">
             <h1 className="text-xl font-bold"># Invoice</h1>
             <p>
-              Invoice:{" "}
-              <span className="font-medium">{invoiceData.invoiceNo}</span>
+              Invoice: <span className="font-medium">{invoiceData.no}</span>
             </p>
             <p>
               Date:{" "}
@@ -64,14 +62,14 @@ const Template2 = forwardRef((props, ref) => {
               Buyer
             </h2>
             <div className="p-4">
-              <p>{invoiceData?.customerDetails?.name}</p>
+              <p>{invoiceData?.userTo?.name}</p>
               <p>
-                {invoiceData.customerDetails.address}
-                {invoiceData.customerDetails.city}
-                {invoiceData.customerDetails.zipCode}
+                {invoiceData.userTo.address}
+                {invoiceData.userTo.city}
+                {invoiceData.userTo.zipCode}
               </p>
-              <p>{invoiceData.customerDetails.phone}</p>
-              <p>{invoiceData.customerDetails.email}</p>
+              <p>{invoiceData.userTo.phone}</p>
+              <p>{invoiceData.userTo.email}</p>
             </div>
           </div>
         </div>
@@ -175,9 +173,30 @@ const Template2 = forwardRef((props, ref) => {
         </div>
 
         {/* Footer */}
-        <div className="border-t pt-4 text-sm text-gray-600">
-          <p>Terms & Conditions</p>
-          <p>{invoiceData.terms || "No Terms & Conditions"}</p>
+        <div className="border-t pt-4 flex justify-between">
+          <div className=" text-gray-600">
+            <p>Terms & Conditions</p>
+            <p>{invoiceData.terms || "No Terms & Conditions"}</p>
+          </div>
+          <div className="pe-3">
+            <div>
+              <strong>Bank Details</strong>
+            </div>
+            <div>
+              Bank : <span className="font-bold">{bankDetails.bankName}</span>{" "}
+            </div>
+            <div>
+              Account # :{" "}
+              <span className="font-bold">{bankDetails.accountNo}</span>
+            </div>
+            <div>
+              IFSC Code :{" "}
+              <span className="font-bold">{bankDetails.ifscCode}</span>
+            </div>
+            <div>
+              Branch : <span className="font-bold">{bankDetails.branch}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

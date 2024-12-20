@@ -1,121 +1,141 @@
-import React from "react";
-import SunyaLogo from "../../assets/SunyaLogo.jpg";
+import React, { forwardRef } from "react";
 
-const Template3 = () => {
+const Template3 = forwardRef((props, ref) => {
+  const { invoiceData, bankDetails } = props;
+  if (!invoiceData) {
+    return;
+  }
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
+
+    return `${getDate}/${getMonth}/${getFullYear}`;
+  }
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md">
-      {/* Header */}
-      <header className="flex justify-between items-center border-b pb-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-blue-500">KOICE</h1>
+    <div
+      className=" bg-white border border-gray-300 rounded-md shadow-md overflow-y-auto"
+      style={{ height: "80vh" }}
+    >
+      <div ref={ref} style={{ width: "595px", padding: "20px" }}>
+        {/* Header */}
+        <header className="flex justify-between items-center border-b pb-4 mb-3">
+          <div>
+            <h1 className="text-3xl font-bold text-blue-500">
+              {invoiceData?.createdBy?.name}
+            </h1>
+          </div>
+          <div className="text-right">
+            <h2 className="text-xl font-bold">Invoice</h2>
+          </div>
+        </header>
+        <div className="flex justify-between items-center  border-b pb-4 mb-3">
+          <div>
+            <span className="font-bold"> Date:</span>{" "}
+            {DateFormate(invoiceData.dueDate)}
+          </div>
+          <div>
+            <span className="font-bold">Invoice No:</span> {invoiceData.no}
+          </div>
         </div>
-        <div className="text-right">
-          <h2 className="text-xl font-bold">Invoice</h2>
-          <p>Invoice No: 16835</p>
+
+        {/* Invoice Details */}
+        <section className="flex justify-between  mb-3">
+          <div>
+            <h3 className="font-bold">Invoiced To:</h3>
+            <p>{invoiceData?.userTo?.name}</p>
+            <p>
+              {invoiceData.userTo.address}
+              {invoiceData.userTo.city}
+              {invoiceData.userTo.zipCode}
+            </p>
+            <p>{invoiceData.userTo.phone}</p>
+            <p>{invoiceData.userTo.email}</p>
+          </div>
+          <div className="text-right">
+            <h3 className="font-bold">Pay To:</h3>
+            <p> {invoiceData?.createdBy?.name}</p>
+            <p>
+              {invoiceData.createdBy.address}
+              {invoiceData.createdBy.city}
+              {invoiceData.createdBy.zipCode}
+            </p>
+            <p>{invoiceData.createdBy.email}</p>
+            <p>{invoiceData.createdBy.phoneNo}</p>
+          </div>
+        </section>
+
+        {/* Table */}
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="text-left py-2 pl-1">#</th>
+              <th className=" text-left py-2 pl-1">Product</th>
+              <th className=" text-left py-2 pl-1">Quantity</th>
+              <th className=" text-left py-2 pl-1">MRP</th>
+              <th className=" text-left py-2 pl-1">Unit Price</th>
+              <th className=" text-left py-2 pl-1">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoiceData.products.map((item, index) => (
+              <tr key={index} className="border-t-2">
+                <td className="py-2 pl-1">{index + 1}</td>
+                <td className="py-2 pl-1">{item.name}</td>
+                <td className="py-2 pl-1">{item.quantity}</td>
+                <td className="py-2 pl-1">{item.sellingPrice.toFixed(1)}</td>
+                <td className="py-2 pl-1">{item.netAmount.toFixed(2)}</td>
+                <td className="py-2 pl-1">{item.totalAmount.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {invoiceData.tcs.isTcsApplicable && (
+          <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
+            <span className="font-bold">TCS :</span>
+            <span className="ml-5">
+              {invoiceData.tcs.tcs_amount.toFixed(2)}
+            </span>
+          </div>
+        )}
+        {invoiceData.tds.isTdsApplicable && (
+          <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
+            <span className="font-bold">TDS :</span>
+            <span className="ml-5">
+              {invoiceData.tds.tds_amount.toFixed(2)}
+            </span>
+          </div>
+        )}
+
+        <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
+          <span className="font-bold">Tax :</span>
+          <span className="ml-5">{invoiceData.tax}</span>
         </div>
-      </header>
 
-      {/* Invoice Details */}
-      <section className="flex justify-between text-sm mb-6">
-        <div>
-          <h3 className="font-bold">Invoiced To:</h3>
-          <p>Smith Rhodes</p>
-          <p>15 Hodges Mews, High Wycombe</p>
-          <p>HP12 3JL, United Kingdom</p>
+        <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
+          <span className="font-bold">Total :</span>₹
+          {+invoiceData.total?.toFixed(2)}
         </div>
-        <div className="text-right">
-          <h3 className="font-bold">Pay To:</h3>
-          <p>Koice Inc</p>
-          <p>2705 N. Enterprise St</p>
-          <p>Orange, CA 92865</p>
-          <p>contact@koiceinc.com</p>
-        </div>
-      </section>
 
-      {/* Table */}
-      <table className="w-full text-sm border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Service
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Description
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-right">
-              Rate
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-right">QTY</th>
-            <th className="border border-gray-300 px-4 py-2 text-right">
-              Amount
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">Design</td>
-            <td className="border border-gray-300 px-4 py-2">
-              Creating a website design
-            </td>
-            <td className="border border-gray-300 px-4 py-2 text-right">
-              $50.00
-            </td>
-            <td className="border border-gray-300 px-4 py-2 text-right">10</td>
-            <td className="border border-gray-300 px-4 py-2 text-right">
-              $500.00
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">Development</td>
-            <td className="border border-gray-300 px-4 py-2">
-              Website Development
-            </td>
-            <td className="border border-gray-300 px-4 py-2 text-right">
-              $120.00
-            </td>
-            <td className="border border-gray-300 px-4 py-2 text-right">10</td>
-            <td className="border border-gray-300 px-4 py-2 text-right">
-              $1200.00
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-gray-300 px-4 py-2">SEO</td>
-            <td className="border border-gray-300 px-4 py-2">
-              Optimize the site for search engines (SEO)
-            </td>
-            <td className="border border-gray-300 px-4 py-2 text-right">
-              $450.00
-            </td>
-            <td className="border border-gray-300 px-4 py-2 text-right">1</td>
-            <td className="border border-gray-300 px-4 py-2 text-right">
-              $450.00
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Summary */}
-      <section className="text-right mt-6 text-sm">
-        <p>
-          Sub Total: <span className="font-bold">$2150.00</span>
-        </p>
-        <p>
-          Tax: <span className="font-bold">$215.00</span>
-        </p>
-        <p>
-          Total: <span className="font-bold text-lg">$2365.00</span>
-        </p>
-      </section>
-
-      {/* Note */}
-      <footer className="mt-6 text-center text-gray-500 text-xs">
-        <p>
-          NOTE: This is a computer-generated receipt and does not require a
-          physical signature.
-        </p>
-      </footer>
+        {/* Note */}
+        <footer className="mt-6  text-gray-500 text-xs">
+          <div>
+            <span className="font-bold">NOTE:</span>{" "}
+            {invoiceData.notes || "No notes"}
+          </div>
+          <div className=" text-gray-600">
+            <p>
+              <span className="font-bold">Terms & Conditions: </span>
+              {invoiceData.terms || "No Terms & Conditions"}
+            </p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
-};
+});
 
 export default Template3;
