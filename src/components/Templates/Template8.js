@@ -23,10 +23,10 @@ const Template8 = forwardRef((props, ref) => {
       <div ref={ref} style={{ width: "595px", padding: "20px" }}>
         <div className="border border-black ">
           {/* Header */}
-          <div className="flex justify-center items-center border-b border-black px-2 pb-4">
-            <h1 className="text-3xl flex justify-start  w-30 font-bold text-green-500">
+          <div className="relative flex justify-center items-center border-b border-black px-2 pb-4">
+            <div className="absolute text-3xl left-1  w-30 font-bold text-green-500">
               {invoiceData?.createdBy?.name}
-            </h1>
+            </div>
             <div className="text-center w-full">
               <p className="text-gray-800">
                 <p className="font-bold uppercase">
