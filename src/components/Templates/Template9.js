@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 
-const Template7 = forwardRef((props, ref) => {
+const Template9 = forwardRef((props, ref) => {
   const { invoiceData, bankDetails } = props;
   if (!invoiceData) {
     return;
@@ -22,26 +22,25 @@ const Template7 = forwardRef((props, ref) => {
     >
       <div ref={ref} style={{ width: "595px", padding: "20px" }}>
         {/* Header */}
-        <div className="flex justify-between items-center border-b pb-4">
-          <div>
-            <h1 className=" text-gray-800">
-              <span className="font-bold">Invoice No:</span> #{invoiceData.no}
-            </h1>
-            <p className="text-gray-600">
-              <span className="font-bold"> Date:</span>{" "}
-              {DateFormate(invoiceData.dueDate)}
-            </p>
-          </div>
+        <div className="flex justify-between items-center pb-4">
           <h1 className="text-3xl font-bold text-green-500">
             {invoiceData?.createdBy?.name}
           </h1>
-          {/* <img src="/ivonne-logo.png" alt="Ivonne Logo" className="h-12" /> */}
+          <h1 className="text-xl">Invoice</h1>
+        </div>
+        <div className="flex justify-end bg-blue-50 p-2 rounded-lg">
+          <div className="text-end grid grid-cols-2 w-1/3">
+            <span className="font-bold"> Date:</span>
+            <span>{DateFormate(invoiceData.dueDate)}</span>
+            <span className="font-bold">Invoice No:</span>
+            <span> #{invoiceData.no}</span>
+          </div>
         </div>
 
         {/* Billing & Pay To Section */}
         <div className="grid grid-cols-2 gap-6 mt-6 text-sm text-gray-800">
           <div>
-            <h3 className="font-bold">Invoice To:</h3>
+            <h3 className="font-bold">To:</h3>
             <p>{invoiceData?.userTo?.name}</p>
             <p>
               {invoiceData.userTo.address}
@@ -51,8 +50,8 @@ const Template7 = forwardRef((props, ref) => {
             <p>{invoiceData.userTo.phone}</p>
             <p>{invoiceData.userTo.email}</p>
           </div>
-          <div className="text-right">
-            <h3 className="font-bold">Pay To:</h3>
+          <div className="">
+            <h3 className="font-bold">Author:</h3>
             <p> {invoiceData?.createdBy?.name}</p>
             <p>
               {invoiceData.createdBy.address}
@@ -68,55 +67,30 @@ const Template7 = forwardRef((props, ref) => {
         <div className="mt-6">
           <table className="w-full mt-5 border">
             <thead>
-              <tr className="bg-gray-200  text-start ">
+              <tr className="bg-blue-50  text-start ">
                 <th className=" text-start pl-1 pb-2">Item</th>
-                <th className=" text-start pl-1 pb-2">Rate</th>
-                <th className=" text-start pl-1 pb-2">Discount</th>
-                <th className=" text-start pl-1 pb-2">Unit Price</th>
+                <th className=" text-start pl-1 pb-2">Description</th>
                 <th className=" text-start pl-1 pb-2">Qty</th>
-                <th className=" text-start pl-1 pb-2">Tax Type</th>
-                <th className=" text-start pl-1 pb-2">Tax Amount</th>
-                <th className=" text-start pl-1 pb-2">Total</th>
+                <th className=" text-end pr-1 pb-2">Amount</th>
               </tr>
             </thead>
             <tbody>
               {invoiceData.products.map((item, index) => (
                 <tr key={index} className="border-t-2">
                   <td className=" pt-2 pb-2 pl-1">{item.name}</td>
-                  <td className=" pt-2 pb-2 pl-1">{item.tax}%</td>
-                  <td className=" pt-2 pb-2 pl-1">
-                    {item.discount.toFixed(1)}
-                  </td>
-                  <td className=" pt-2 pb-2 pl-1">
-                    {item.sellingPrice.toFixed(1)}
-                  </td>
+                  <td className=" pt-2 pb-2 pl-1">{item.description}</td>
                   <td className=" pt-2 pb-2 pl-1">{item.quantity}</td>
-                  <td className=" pt-2 pb-2 pl-1">CGST SGST</td>
-                  <td className=" pt-2 pb-2 pl-1">
-                    {item.taxAmount.toFixed(2)}
-                  </td>
-                  <td className=" pt-2 pb-2 pl-1">
+                  <td className="text-end  pt-2 pb-2 pr-1">
                     {item.totalAmount.toFixed(2)}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className="flex justify-end">
-            <div className="w-1/2 bg-gray-100">
-              <div className="flex justify-between border py-2">
-                <span className="font-semibold">Subtotal:</span>
-                <span> ₹{+invoiceData.subTotal?.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between border py-2">
-                <span className="font-semibold">Tax:</span>
-                <span>{invoiceData.tax}%</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end font-bold text-gray-800 pt-2">
-            <div className="w-1/2 flex justify-between ">
-              <span>Total Amount:</span>
+
+          <div className="flex justify-end bg-blue-50 border font-bold text-gray-800">
+            <div className="w-1/3 flex justify-between px-1 py-1">
+              <span>Total :</span>
               <span> ₹{+invoiceData.total?.toFixed(2)}</span>
             </div>
           </div>
@@ -140,4 +114,4 @@ const Template7 = forwardRef((props, ref) => {
   );
 });
 
-export default Template7;
+export default Template9;

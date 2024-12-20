@@ -78,27 +78,27 @@ const Template2 = forwardRef((props, ref) => {
         <table className="w-full border border-collapse mb-6">
           <thead>
             <tr className="bg-gray-800 border text-white">
-              <th className="border ">#</th>
-              <th className="border ">Product</th>
-              <th className="border ">Quantity</th>
-              <th className="border ">MRP</th>
-              <th className="border ">Unit Price</th>
-              <th className="border ">Total</th>
+              <th className="border">#</th>
+              <th className="border">Product</th>
+              <th className="border">Quantity</th>
+              <th className="border">MRP</th>
+              <th className="border">Unit Price</th>
+              <th className="border">Total</th>
             </tr>
           </thead>
           <tbody>
             {invoiceData.products.map((item, index) => (
               <tr key={index}>
-                <td className="border  py-2 pl-1">{index + 1}</td>
-                <td className="border  py-2 pl-1">{item.name}</td>
-                <td className="border  py-2 pl-1">{item.quantity}</td>
-                <td className="border  py-2 pl-1">
+                <td className="border py-2 pl-1">{index + 1}</td>
+                <td className="border py-2 pl-1">{item.name}</td>
+                <td className="border py-2 pl-1">{item.quantity}</td>
+                <td className="border py-2 pl-1">
                   {item.sellingPrice.toFixed(1)}
                 </td>
-                <td className="border   py-2 pl-1">
+                <td className="border py-2 pl-1">
                   {item.netAmount.toFixed(2)}
                 </td>
-                <td className="border   py-2 pl-1">
+                <td className="border  py-2 pl-1">
                   {item.totalAmount.toFixed(2)}
                 </td>
               </tr>
@@ -120,47 +120,48 @@ const Template2 = forwardRef((props, ref) => {
           {/* Total and Summary */}
           <div className="">
             <table className="">
-              <tr>
-                <td className="border px-2 py-1"> Subtotal</td>
-                <td className="border px-2 py-1">₹{invoiceData.subTotal}</td>
-              </tr>
-              <tr>
-                <td className="border px-2 py-1"> Tax </td>
-                <td className="border px-2 py-1">{invoiceData.tax}%</td>
-              </tr>
-              <tr>
-                <td className="border px-2 py-1"> Discount </td>
-                <td className="border px-2 py-1">
-                  {!invoiceData.extraDiscountType && "₹"}
-                  {invoiceData.extraDiscount}
-                  {invoiceData.extraDiscountType && "%"}
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td className="border px-2 py-1"> Subtotal</td>
+                  <td className="border px-2 py-1">₹{invoiceData.subTotal}</td>
+                </tr>
+                <tr>
+                  <td className="border px-2 py-1"> Tax </td>
+                  <td className="border px-2 py-1">{invoiceData.tax}%</td>
+                </tr>
+                <tr>
+                  <td className="border px-2 py-1"> Discount </td>
+                  <td className="border px-2 py-1">
+                    {!invoiceData.extraDiscountType && "₹"}
+                    {invoiceData.extraDiscount}
+                    {invoiceData.extraDiscountType && "%"}
+                  </td>
+                </tr>
 
-              {invoiceData.packagingCharges > 0 && (
-                <tr>
-                  <td className="border px-2 py-1">Packaging </td>
+                {invoiceData.packagingCharges > 0 && (
+                  <tr>
+                    <td className="border px-2 py-1">Packaging </td>
+                    <td className="border px-2 py-1">
+                      ₹{invoiceData.packagingCharges}
+                    </td>
+                  </tr>
+                )}
+                {invoiceData.shippingCharges > 0 && (
+                  <tr>
+                    <td className="border px-2 py-1"> Shipping </td>
+                    <td className="border px-2 py-1">
+                      {" "}
+                      ₹{invoiceData.shippingCharges}
+                    </td>
+                  </tr>
+                )}
+                <tr className="font-semibold border">
+                  <td className="border px-2 py-1">Total </td>
                   <td className="border px-2 py-1">
-                    {" "}
-                    ₹{invoiceData.packagingCharges}
+                    ₹{+invoiceData.total?.toFixed(2)}
                   </td>
                 </tr>
-              )}
-              {invoiceData.shippingCharges > 0 && (
-                <tr>
-                  <td className="border px-2 py-1"> Shipping </td>
-                  <td className="border px-2 py-1">
-                    {" "}
-                    ₹{invoiceData.shippingCharges}
-                  </td>
-                </tr>
-              )}
-              <tr className="font-semibold border">
-                <td className="border px-2 py-1">Total </td>
-                <td className="border px-2 py-1">
-                  ₹{+invoiceData.total?.toFixed(2)}
-                </td>
-              </tr>
+              </tbody>
             </table>
           </div>
         </div>

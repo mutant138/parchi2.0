@@ -71,6 +71,7 @@ import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 import Settings from "../Settings/Settings";
 import ProductView from "../Products/ProductView";
 
+
 const Home = () => {
   const location = useLocation();
 

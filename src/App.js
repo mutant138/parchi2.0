@@ -6,6 +6,7 @@ import { Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import CustomerHome from "./components/HomePage/CustomerHome";
 import VendorHome from "./components/HomePage/VendorHome";
+import StaffHome from "./components/HomePage/StaffHome";
 
 function App() {
   const usersDetails = useSelector((state) => state.users);
@@ -22,6 +23,9 @@ function App() {
         )}
         {isAuthenticated && usersDetails.selectedDashboard === "vendor" && (
           <Route path="/vendor/*" element={<VendorHome />}></Route>
+        )}
+        {isAuthenticated && usersDetails.selectedDashboard === "staff" && (
+          <Route path="/staff/*" element={<StaffHome />}></Route>
         )}
       </Routes>
     </div>

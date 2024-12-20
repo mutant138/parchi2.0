@@ -17,6 +17,8 @@ import Template5 from "../../Templates/Template5";
 import Template6 from "../../Templates/Template6";
 import Template7 from "../../Templates/Template7";
 import Template8 from "../../Templates/Template8";
+import Template9 from "../../Templates/Template9";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
@@ -24,9 +26,80 @@ function Invoice({ invoice, bankDetails }) {
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const invoiceRef = useRef();
+  const [selectTemplate, setSelectTemplate] = useState("template9");
 
+  const templatesComponents = {
+    template1: (
+      <Template1
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template2: (
+      <Template2
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template3: (
+      <Template3
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template4: (
+      <Template4
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+    template5: (
+      <Template5
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template6: (
+      <Template6
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+    template7: (
+      <Template7
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+    template8: (
+      <Template8
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+    template9: (
+      <Template9
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+  };
   useEffect(() => {
     if (invoice.products) {
       const tax = invoice?.products.reduce((acc, cur) => {
@@ -266,6 +339,12 @@ function Invoice({ invoice, bankDetails }) {
         {invoice.paymentStatus !== "Paid" && (
           <div className="text-end">
             <button
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
+            >
+              Change Template
+            </button>
+            <button
               className={"px-4 py-1 text-red-700 text-2xl"}
               onClick={handleDelete}
             >
@@ -276,7 +355,7 @@ function Invoice({ invoice, bankDetails }) {
       </div>
       <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
-        style={{ height: "64vh" }}
+        style={{ height: "62vh" }}
       >
         <div className="col-span-12 ">
           <div className="p-5 bg-white rounded-lg my-3">
@@ -353,7 +432,7 @@ function Invoice({ invoice, bankDetails }) {
                     {invoice?.products?.length > 0 &&
                       invoice?.products.map((item) => (
                         <tr
-                          key={`invoice-description-${item.id}`}
+                          key={`invoice-description-${item.productRef.id}`}
                           className="border-b-2 p-3 [&_td:last-child]:text-end"
                         >
                           <td className="  text-gray-600 max-w-[200px] truncate p-3">
@@ -445,7 +524,9 @@ function Invoice({ invoice, bankDetails }) {
               <div className="text-xs text-gray-800 mt-1">
                 {userDetails.phone}
               </div>
-              <div className="mt-8 text-xs text-gray-800">© 2024 Sunya</div>
+              <div className="mt-8 text-xs text-gray-800">
+                © 2024 {invoice?.createdBy?.name}
+              </div>
             </div>
           </div>
         </div>
@@ -474,16 +555,27 @@ function Invoice({ invoice, bankDetails }) {
                     </div>
                   </div>
                 </div>
-                <Template7
+                {templatesComponents[selectTemplate]}
+                {/* <Template7
                   ref={invoiceRef}
                   invoiceData={invoice}
                   bankDetails={bankDetails}
-                />
+                /> */}
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 }
