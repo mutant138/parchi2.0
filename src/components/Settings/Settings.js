@@ -50,6 +50,13 @@ const Settings = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "phone" || name === "altContact") {
+      if (!/^\d{0,10}$/.test(value)) {
+        return;
+      }
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
@@ -107,7 +114,7 @@ const Settings = () => {
         </div>
 
         <div className="flex items-center space-x-4 mb-6">
-          <div className="w-36 h-36 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative">
+          <div className="w-36 h-36 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative hover:border-blue-500">
             {formData.companyLogo ? (
               <img
                 src={formData.companyLogo}
