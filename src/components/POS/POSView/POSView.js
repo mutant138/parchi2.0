@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Returns from "./Returns";
+import POSViewHome from "./POSViewHome";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useSelector } from "react-redux";
@@ -45,7 +45,7 @@ function POSView() {
       </header>
       <hr />
       <div>
-        <nav className="flex space-x-4 mt-3 mb-3">
+        {/* <nav className="flex space-x-4 mt-3 mb-3">
           <button
             className={
               "px-4 py-1" +
@@ -68,20 +68,20 @@ function POSView() {
           >
             Returns
           </button>
-        </nav>
+        </nav> */}
       </div>
       <hr />
       <div className="w-full">
         {activeTab === "POS" && (
           <div>
-            <POS POS={POS} />
+           <POSViewHome POS={POS} />
           </div>
         )}
-        {activeTab === "Returns" && (
+        {/* {activeTab === "Returns" && (
           <div>
             <Returns />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

@@ -7,22 +7,31 @@ import {
   updateDoc,
   where,
   Timestamp,
+  getDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../../firebase";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineArrowLeft } from "react-icons/ai";
+import Sidebar from "./Sidebar";
+import { setAllCustomersDetails } from "../../../store/CustomerSlice";
 
-const CreatePOS = () => {
+const SetPos = () => {
+  const { posId } = useParams();
+
   const userDetails = useSelector((state) => state.users);
-
+  const customersDetails = useSelector((state) => state.customers).data;
+  const dispatch = useDispatch();
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
 
   const phoneNo = userDetails.phone;
 
-  const [POSDate, setPOSDate] = useState(new Date());
+  const [posDate, setPosDate] = useState(
+    Timestamp.fromDate(new Date())
+  );
+  // const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -30,9 +39,11 @@ const CreatePOS = () => {
     tds: [],
     tcs: [],
   });
+  const [isProductSelected, setIsProductSelected] = useState(false);
 
   const [products, setProducts] = useState([]);
-  const [prePOSList, setPrePOSList] = useState([]);
+  const [prePosList, setPrePosList] = useState([]);
+  // const [books, setBooks] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -41,7 +52,7 @@ const CreatePOS = () => {
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
-    POSNo: "",
+    posNo: "",
     packagingCharges: 0,
     subTotal: 0,
     tds: {},
@@ -51,6 +62,9 @@ const CreatePOS = () => {
     attachments: [],
     tcs: {},
     terms: "",
+    mode: "Cash",
+    extraDiscount: 0,
+    extraDiscountType: "percentage",
   });
 
   const [totalAmounts, setTotalAmounts] = useState({
@@ -64,80 +78,123 @@ const CreatePOS = () => {
     totalAmount: 0,
   });
 
-  const [customersData, setCustomersData] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState({
     name: "",
   });
-
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    function addActionQty() {
+      if (
+        formData?.products?.length === 0 ||
+        products.length === 0 ||
+        !posId
+      ) {
+        return;
+      }
+      setIsProductSelected(true);
+      let productData = products;
+      for (let ele of formData.products) {
+        productData = products.map((pro) => {
+          if (pro.id === ele.productRef.id) {
+            pro.actionQty = ele.quantity;
+            pro.quantity += ele.quantity;
+            pro.totalAmount = ele.quantity * pro.netAmount;
+          }
+          return pro;
+        });
+      }
+      setProducts(productData);
+      calculateProduct(productData);
+    }
+    addActionQty();
+    if (posId) {
+      fetchPosNumbers();
+    }
+  }, [formData.products]);
+
+  const fetchPosNumbers = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(db, "companies", companyDetails.companyId, "pos")
+      );
+      const noList = querySnapshot.docs.map(
+        (doc) => doc.data().posNo
+      );
+      if (posId) {
+        setPrePosList(
+          noList.filter((ele) => ele !== formData.posNo)
+        );
+      } else {
+        setPrePosList(noList);
+        setFormData((val) => ({
+          ...val,
+          posNo: String(noList.length + 1).padStart(4, 0),
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  function onSelect_TDS_TCS(e) {
+    const taxId = e.target.value;
+    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
+    setSelectedTaxDetails(taxDetails);
+  }
+
+  useEffect(() => {
+    async function fetchPosData() {
+      if (!posId) {
+        return;
+      }
       try {
-        const productRef = collection(
+        const docRef = doc(
           db,
           "companies",
           companyDetails.companyId,
-          "inventories"
+          "pos",
+          posId
         );
-        const querySnapshot = await getDocs(productRef);
-        const productsData = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const netAmount =
-            +data.pricing.sellingPrice?.amount -
-            (+data.pricing.discount?.amount || 0);
-          const taxRate = data.pricing.gstTax || 0;
-          const sgst = taxRate / 2;
-          const cgst = taxRate / 2;
-          const taxAmount = netAmount * (taxRate / 100);
-          const sgstAmount = netAmount * (sgst / 100);
-          const cgstAmount = netAmount * (cgst / 100);
+        const getData = (await getDoc(docRef)).data();
 
-          return {
-            id: doc.id,
-            itemName: data.itemName || "N/A",
-            quantity: data.stock?.quantity ?? 0,
-            unitPrice: data.pricing.sellingPrice?.amount ?? 0,
-            discount: data.pricing.discount?.amount ?? 0,
-            gstTax: data.pricing.gstTax,
-            fieldValue: data.pricing.discount?.fieldValue ?? 0,
-            actionQty: 0,
-            totalAmount: 0,
-            netAmount: netAmount,
-            sgst,
-            cgst,
-            sgstAmount,
-            cgstAmount,
-            taxAmount,
-            taxSlab: data.pricing.sellingPrice?.taxSlab,
-          };
+        setPosDate(getData.posDate);
+        // setDueDate(getData.dueDate);
+        const customerData = (
+          await getDoc(getData.customerDetails.customerRef)
+        ).data();
+        handleSelectCustomer({
+          id: getData.customerDetails.customerRef.id,
+          ...customerData,
         });
-        setProducts(productsData);
+        setFormData(getData);
       } catch (error) {
-        console.error("Error fetching POSs:", error);
+        console.log("🚀 ~ fetchPosData ~ error:", error);
       }
-    };
+    }
 
     async function customerDetails() {
+      if (customersDetails.length !== 0) {
+        return;
+      }
+
       try {
         const customersRef = collection(db, "customers");
-        const q = query(
-          customersRef,
-          where(
-            "companyRef",
-            "==",
-            doc(db, "companies", companyDetails.companyId)
-          )
-        );
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const q = query(customersRef, where("companyRef", "==", companyRef));
         const company = await getDocs(q);
-        const customerData = company.docs.map((doc) => ({
-          customerId: doc.id,
-          ...doc.data(),
-        }));
-        setCustomersData(customerData);
-        setSuggestions(customerData);
+        const customersData = company.docs.map((doc) => {
+          const { createdAt, companyRef, ...data } = doc.data();
+          return {
+            id: doc.id,
+            createdAt: JSON.stringify(createdAt),
+            companyRef: JSON.stringify(companyRef),
+            ...data,
+          };
+        });
+        dispatch(setAllCustomersDetails(customersData));
+        setSuggestions(customersData);
       } catch (error) {
         console.log("🚀 ~ customerDetails ~ error:", error);
       }
@@ -178,58 +235,108 @@ const CreatePOS = () => {
       }
     }
 
-    const fetchPOSNumbers = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "POSs")
-        );
+    // async function fetchBooks() {
+    //   try {
+    //     const bookRef = collection(
+    //       db,
+    //       "companies",
+    //       companyDetails.companyId,
+    //       "books"
+    //     );
+    //     const getBookData = await getDocs(bookRef);
+    //     const fetchBooks = getBookData.docs.map((doc) => ({
+    //       id: doc.id,
+    //       ...doc.data(),
+    //     }));
+    //     setBooks(fetchBooks);
+    //   } catch (error) {
+    //     console.log("🚀 ~ fetchBooks ~ error:", error);
+    //   }
+    // }
 
-        const noList = querySnapshot.docs.map((doc) => doc.data().POSNo);
-        setPrePOSList(noList);
-        setFormData((val) => ({
-          ...val,
-          POSNo: String(noList.length + 1).padStart(4, 0),
-        }));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    async function fetchBooks() {
+    const fetchProducts = async () => {
       try {
-        const bookRef = collection(
+        const companyRef = doc(db, "companies", companyDetails.companyId);
+        const productRef = collection(
           db,
           "companies",
           companyDetails.companyId,
-          "books"
+          "products"
         );
-        const getBookData = await getDocs(bookRef);
-        const fetchBooks = getBookData.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBooks(fetchBooks);
+        const q = query(productRef, where("companyRef", "==", companyRef));
+        const querySnapshot = await getDocs(q);
+
+        const productsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          let discount = +data.discount || 0;
+
+          if (data.discountType) {
+            discount = (+data.sellingPrice / 100) * data.discount;
+          }
+          const netAmount = +data.sellingPrice - discount;
+          const taxRate = data.tax || 0;
+          let sgst = 0;
+          let cgst = 0;
+          let taxAmount = 0;
+          let sgstAmount = 0;
+          let cgstAmount = 0;
+
+          sgst = taxRate / 2;
+          cgst = taxRate / 2;
+          taxAmount = netAmount * (taxRate / 100);
+          sgstAmount = netAmount * (sgst / 100);
+          cgstAmount = netAmount * (cgst / 100);
+
+          return {
+            id: doc.id,
+            description: data.description ?? "",
+            name: data.name ?? "N/A",
+            quantity: data.stock ?? 0,
+            sellingPrice: data.sellingPrice ?? 0,
+            sellingPriceTaxType: data.sellingPriceTaxType,
+            purchasePrice: data.purchasePrice ?? 0,
+            purchasePriceTaxType: data.purchasePriceTaxType,
+            discount: discount ?? 0,
+            discountType: data.discountType,
+            tax: data.tax,
+            actionQty: 0,
+            totalAmount: 0,
+            netAmount: netAmount,
+            sgst,
+            cgst,
+            sgstAmount,
+            cgstAmount,
+            taxAmount,
+          };
+        });
+        setProducts(productsData);
       } catch (error) {
-        console.log("🚀 ~ fetchBooks ~ error:", error);
+        console.error("Error fetching Pos:", error);
       }
+    };
+
+    if (!posId) {
+      fetchPosNumbers();
     }
-    fetchBooks();
-    fetchPOSNumbers();
+
+    fetchProducts();
+    // fetchBooks();
+    fetchPosData();
     fetchTax();
     customerDetails();
-    fetchProducts();
   }, [companyDetails]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setSelectedCustomerData({ name: e.target.value });
+    setSelectedCustomerData({ name: value });
     if (value) {
-      const filteredSuggestions = customersData.filter((item) =>
+      const filteredSuggestions = customersDetails.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
       setIsDropdownVisible(true);
     } else {
-      setSuggestions(customersData);
+      setSuggestions(customersDetails);
     }
   };
 
@@ -239,8 +346,10 @@ const CreatePOS = () => {
   };
 
   function handleActionQty(op, productId) {
+    let countOfSelect = 0;
     let updatedProducts = products.map((product) => {
       if (product.id === productId) {
+        // Update action quantity
         if (op === "+") {
           if (product.quantity > product.actionQty) {
             ++product.actionQty;
@@ -250,25 +359,35 @@ const CreatePOS = () => {
             --product.actionQty;
           }
         }
-        product.actionQty = Math.max(product.actionQty, 0);
+        product.actionQty = Math.max(product.actionQty, 0); // Prevent negative quantity
+        // Calculate total amount for each product based on quantity
         product.totalAmount = product.netAmount * product.actionQty;
       }
-
+      if (product.actionQty !== 0) ++countOfSelect;
       return product;
     });
-    const totalTaxableAmount = updatedProducts.reduce(
-      (sum, product) => sum + product.netAmount * product.actionQty,
-      0
-    );
+    setIsProductSelected(countOfSelect > 0);
+    calculateProduct(updatedProducts);
+    // Calculate totals based on updated quantities
+  }
+  function calculateProduct(products) {
+    const totalTaxableAmount = products.reduce((sum, product) => {
+      const cal =
+        sum + (product.netAmount - product.taxAmount) * product.actionQty;
+      if (!product.sellingPriceTaxType) {
+        return sum + product.netAmount * product.actionQty;
+      }
+      return cal;
+    }, 0);
 
-    const totalSgstAmount_2_5 = updatedProducts.reduce(
+    const totalSgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.sgst === 2.5
           ? sum + product.sgstAmount * product.actionQty
           : sum,
       0
     );
-    const totalCgstAmount_2_5 = updatedProducts.reduce(
+    const totalCgstAmount_2_5 = products.reduce(
       (sum, product) =>
         product.cgst === 2.5
           ? sum + product.cgstAmount * product.actionQty
@@ -276,23 +395,24 @@ const CreatePOS = () => {
       0
     );
 
-    const totalSgstAmount_6 = updatedProducts.reduce(
+    const totalSgstAmount_6 = products.reduce(
       (sum, product) =>
         product.sgst === 6 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_6 = updatedProducts.reduce(
+    const totalCgstAmount_6 = products.reduce(
       (sum, product) =>
         product.cgst === 6 ? sum + product.cgstAmount * product.actionQty : sum,
       0
     );
 
-    const totalSgstAmount_9 = updatedProducts.reduce(
+    const totalSgstAmount_9 = products.reduce(
       (sum, product) =>
         product.sgst === 9 ? sum + product.sgstAmount * product.actionQty : sum,
       0
     );
-    const totalCgstAmount_9 = updatedProducts.reduce(
+
+    const totalCgstAmount_9 = products.reduce(
       (sum, product) =>
         product.cgst === 9 ? sum + product.cgstAmount * product.actionQty : sum,
       0
@@ -307,7 +427,7 @@ const CreatePOS = () => {
       totalSgstAmount_9 +
       totalCgstAmount_9;
 
-    setProducts(updatedProducts);
+    setProducts(products);
     setTotalAmounts({
       totalTaxableAmount,
       totalSgstAmount_2_5,
@@ -319,6 +439,22 @@ const CreatePOS = () => {
       totalAmount,
     });
   }
+
+  const calculateTotal = () => {
+    const discountAmount =
+      formData.extraDiscountType === "percentage"
+        ? (+totalAmounts.totalAmount * formData.extraDiscount) / 100
+        : formData.extraDiscount || 0;
+
+    const total =
+      totalAmounts.totalAmount +
+      formData.shippingCharges +
+      formData.packagingCharges +
+      total_Tax_Amount -
+      (isProductSelected ? discountAmount : 0);
+
+    return total.toFixed(2);
+  };
 
   function total_TCS_TDS_Amount() {
     const totalQty = products.reduce((acc, cur) => {
@@ -336,32 +472,16 @@ const CreatePOS = () => {
     setTotal_Tax_Amount(totalTaxAmount);
   }
 
-  function onSelectBook(e) {
-    const { value } = e.target;
-    const data = books.find((ele) => ele.id === value);
-    const bookRef = doc(
-      db,
-      "companies",
-      companyDetails.companyId,
-      "books",
-      value
-    );
-    setFormData((val) => ({
-      ...val,
-      book: { id: value, name: data.name, bookRef },
-    }));
-  }
-
   useEffect(() => {
     total_TCS_TDS_Amount();
   }, [products, selectedTaxDetails]);
 
-  async function onCreatePOS() {
+  async function onSetPos() {
     try {
-      if (!selectedCustomerData.customerId) {
+      if (!selectedCustomerData.id) {
         return;
       }
-      const customerRef = doc(db, "customers", selectedCustomerData.customerId);
+      const customerRef = doc(db, "customers", selectedCustomerData.id);
       const companyRef = doc(db, "companies", companyDetails.companyId);
       let subTotal = 0;
       const items = [];
@@ -373,36 +493,25 @@ const CreatePOS = () => {
           db,
           "companies",
           companyDetails.companyId,
-          "inventories",
+          "products",
           product.id
         );
         subTotal += product.totalAmount;
         items.push({
+          name: product.name,
+          description: product.description,
+          discount: product.discount,
+          discountType: product.discountType,
+          purchasePrice: product.purchasePrice,
+          purchasePriceTaxType: product.purchasePriceTaxType,
+          sellingPrice: product.sellingPrice,
+          sellingPriceTaxType: product.sellingPriceTaxType,
+          tax: product.tax,
           quantity: product.actionQty,
-          desc: "",
-          pricing: {
-            gstTax: product.gstTax,
-            purchasePrice: {
-              includingTax: true,
-              amount: product.unitPrice,
-              taxSlab: product.taxSlab,
-            },
-            sellingPrice: {
-              amount: product.unitPrice,
-              taxAmount: product.totalAmount,
-              taxSlab: product.taxSlab,
-              includingTax: true,
-            },
-            discount: {
-              amount: product.discount,
-              fieldValue: product.fieldValue,
-              type: "Percentage",
-            },
-          },
-          name: product.itemName,
           productRef: productRef,
         });
       }
+
       let tcs = {
         isTcsApplicable: Boolean(taxSelect === "tcs"),
         tax: taxSelect === "tcs" ? selectedTaxDetails.tax : "",
@@ -427,33 +536,52 @@ const CreatePOS = () => {
         ...formData,
         tds,
         tcs,
-        date: Timestamp.fromDate(POSDate),
+        posDate,
+        // dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
-          address: {},
+          address: companyDetails.address ?? "",
+          city: companyDetails.city ?? "",
+          zipCode: companyDetails.zipCode ?? "",
           phoneNo: phoneNo,
         },
         subTotal: +subTotal,
-        total:
-          +totalAmounts.totalAmount +
-          formData.shippingCharges +
-          formData.packagingCharges +
-          total_Tax_Amount,
-        items: items,
+        total: +calculateTotal(),
+        products: items,
         customerDetails: {
-          gstNumber: "",
-          custRef: customerRef,
-          address: selectedCustomerData.address,
-          phoneNumber: selectedCustomerData.phone,
+          gstNumber: selectedCustomerData.gstNumber ?? "",
+          customerRef: customerRef,
+          address: selectedCustomerData.address ?? "",
+          city: selectedCustomerData.city ?? "",
+          zipCode: selectedCustomerData.zipCode ?? "",
+          phone: selectedCustomerData.phone ?? "",
           name: selectedCustomerData.name,
         },
       };
 
-      await addDoc(
-        collection(db, "companies", companyDetails.companyId, "pos"),
-        payload
-      );
+      if (posId) {
+        await updateDoc(
+          doc(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "pos",
+            posId
+          ),
+          payload
+        );
+      } else {
+        await addDoc(
+          collection(
+            db,
+            "companies",
+            companyDetails.companyId,
+            "pos"
+          ),
+          payload
+        );
+      }
 
       for (const item of items) {
         if (item.quantity === 0) {
@@ -461,7 +589,7 @@ const CreatePOS = () => {
         }
 
         const currentQuantity = products.find(
-          (val) => val.itemName === item.name
+          (val) => val.name === item.name
         ).quantity;
 
         if (currentQuantity <= 0) {
@@ -469,30 +597,48 @@ const CreatePOS = () => {
           throw new Error("Product is out of stock!");
         }
 
-        await updateDoc(item.productRef, {
-          "stock.quantity": currentQuantity - item.quantity,
-        });
+        // await updateDoc(item.productRef, {
+        //   stock: currentQuantity - item.quantity,
+        // });
       }
 
-      alert("Successfully Created the POS");
+      alert(
+        "Successfully " +
+          (posId ? "Updated" : "Created") +
+          " the Pos"
+      );
       navigate("/pos");
     } catch (err) {
       console.error(err);
     }
   }
 
-  function onSelect_TDS_TCS(e) {
-    const taxId = e.target.value;
-    let taxDetails = taxTypeOptions[taxSelect].find((ele) => ele.id === taxId);
-    setSelectedTaxDetails(taxDetails);
-  }
+  function DateFormate(timestamp) {
+    const milliseconds =
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const getDate = String(date.getDate()).padStart(2, "0");
+    const getMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const getFullYear = date.getFullYear();
 
-  function setCurrentDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${getFullYear}-${getMonth}-${getDate}`;
   }
+  //   function onSelectBook(e) {
+  //     const { value } = e.target;
+  //     const data = books.find((ele) => ele.id === value);
+  //     console.log("🚀 ~ onSelectBook ~ data:", data);
+  //     const bookRef = doc(
+  //       db,
+  //       "companies",
+  //       companyDetails.companyId,
+  //       "books",
+  //       value
+  //     );
+  //     setFormData((val) => ({
+  //       ...val,
+  //       book: { name: data.name, bookRef },
+  //     }));
+  //   }
 
   return (
     <div
@@ -506,14 +652,18 @@ const CreatePOS = () => {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">Create POS</h1>
+        <h1 className="text-2xl font-bold">
+          {posId ? "Edit" : "Create"} Pos
+        </h1>
       </header>
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex gap-8 mb-6">
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Customer Details</h2>
             <div className="bg-blue-50 p-4 rounded-lg">
-              <label className="text-sm text-gray-600">Select Customer</label>
+              <label className="text-sm text-gray-600">
+                Select Customer <span className="text-red-500">*</span>{" "}
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -523,17 +673,18 @@ const CreatePOS = () => {
                   onChange={handleInputChange}
                   onFocus={() => setIsDropdownVisible(true)}
                   onBlur={() => {
-                    if (!selectedCustomerData.customerId) {
+                    if (!selectedCustomerData.id) {
                       setSelectedCustomerData({ name: "" });
                     }
                     setIsDropdownVisible(false);
                   }}
+                  required
                 />
                 {isDropdownVisible && suggestions.length > 0 && (
                   <div className="absolute z-20 bg-white border border-gray-300 rounded-lg shadow-md max-h-60 overflow-y-auto w-full">
                     {suggestions.map((item) => (
                       <div
-                        key={item.customerId}
+                        key={item.id}
                         onMouseDown={() => handleSelectCustomer(item)}
                         className="flex flex-col px-4 py-3 text-gray-800 hover:bg-blue-50 cursor-pointer transition-all duration-150 ease-in-out"
                       >
@@ -556,42 +707,63 @@ const CreatePOS = () => {
             <h2 className="font-semibold mb-2">Other Details</h2>
             <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
-                <label className="text-sm text-gray-600">POS Date</label>
+                <label className="text-sm text-gray-600">
+                Pos Date <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="date"
-                  value={setCurrentDate(POSDate)}
+                  value={DateFormate(posDate)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setPOSDate(new Date(e.target.value));
+                    setPosDate(
+                      Timestamp.fromDate(new Date(e.target.value))
+                    );
                   }}
+                  required
                 />
               </div>
+              {/* <div>
+                <label className="text-sm text-gray-600">
+                  Due Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={DateFormate(dueDate)}
+                  className="border p-1 rounded w-full mt-1"
+                  onChange={(e) => {
+                    setDueDate(Timestamp.fromDate(new Date(e.target.value)));
+                  }}
+                />
+              </div> */}
               <div>
                 <label className="text-sm text-gray-600">
-                  POS No.{" "}
-                  {prePOSList.includes(formData.POSNo) && (
+                  Pos No. <span className="text-red-500">*</span>
+                  {prePosList.includes(
+                    formData.posNo
+                  ) && (
                     <span className="text-red-800 text-xs">
-                      "Already POS No. exist"{" "}
+                      {/* "Already DeliveryChallan No. exist"{" "} */}
                     </span>
                   )}
-                  {Number(formData.POSNo) == 0 && (
+                  {Number(formData.posNo) == 0 && (
                     <span className="text-red-800 text-xs">
-                      "Kindly Enter valid POS No."{" "}
+                      "Kindly Enter valid Pos No."{" "}
                     </span>
                   )}
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter POS No. "
+                  placeholder="Enter Pos No. "
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.POSNo}
+                  value={formData.posNo}
                   onChange={(e) => {
                     const { value } = e.target;
                     setFormData((val) => ({
                       ...val,
-                      POSNo: value,
+                      posNo: value,
                     }));
                   }}
+                  required
                 />
               </div>
             </div>
@@ -600,31 +772,17 @@ const CreatePOS = () => {
 
         <div className="flex justify-between">
           <h2 className="font-semibold mb-2">Products & Services</h2>
-          <button
+          <div className="flex justify-between items-center gap-4 mb-4"></div>
+        </div>
+        <div className="bg-blue-50 p-4 rounded-lg shadow-inner mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold flex-grow">Items</h2>
+            <button
               className="bg-blue-500 text-white py-1 px-4 rounded mt-1 ml-auto"
               onClick={() => setIsSidebarOpen(true)}
             >
               + Add Items
             </button>
-        </div>
-        <div className="bg-blue-50 p-4 rounded-lg shadow-inner mb-6">
-          <div className="flex justify-between items-center mb-4 space-x-4">
-            <div className="w-full">
-              <label className="text-sm text-gray-600">Categories</label>
-              <select className="border p-1 rounded w-full">
-                <option disabled value="">
-                  Select Category
-                </option>
-              </select>
-            </div>
-            <div className="w-full">
-              <label className="text-sm text-gray-600">Search</label>
-              <input
-                type="text"
-                className="border p-1 rounded w-full"
-                placeholder="Search..."
-              />
-            </div>
           </div>
 
           <div className="bg-white">
@@ -637,51 +795,91 @@ const CreatePOS = () => {
                     <th className="px-4 py-2">Unit Price</th>
                     <th className="px-4 py-2">Discount</th>
                     <th className="px-4 py-2">Net Amount</th>
+                    <th className="px-2 py-2">Is Tax Included</th>
                     <th className="px-4 py-2">Total Amount</th>
                     <th className="px-4 py-2">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {products.length > 0 ? (
-                    products.map((product) => (
-                      <tr key={product.id}>
-                        <td className="px-4 py-2">{product.itemName}</td>
-                        <td className="px-4 py-2">{product.quantity}</td>
-                        <td className="px-4 py-2">₹{product.unitPrice}</td>
-                        <td className="px-4 py-2">₹{product.discount}</td>
-                        <td className="px-4 py-2">₹{product.netAmount}</td>
-                        <td className="px-4 py-2">₹{product.totalAmount}</td>
-                        <td className="px-4 py-2">
-                          {product.actionQty >= 1 && (
-                            <>
+                  {products.length > 0 && isProductSelected ? (
+                    products.map(
+                      (product) =>
+                        product.actionQty > 0 && (
+                          <tr key={product.id}>
+                            <td className="px-4 py-2">{product.name}</td>
+                            <td className="px-4 py-2">{product.quantity}</td>
+                            <td className="px-4 py-2">
+                              ₹{product.sellingPrice}
+                            </td>
+                            <td className="px-4 py-2">₹{product.discount}</td>
+                            <td className="px-4 py-2">₹{product.netAmount}</td>
+                            <td className="px-2 py-2">
+                              {product.sellingPriceTaxType ? "Yes" : "No"}
+                            </td>
+                            <td className="px-4 py-2">
+                              ₹{product.totalAmount}
+                            </td>
+                            <td className="px-4 py-2">
+                              {product.actionQty >= 1 && (
+                                <>
+                                  <button
+                                    className="bg-blue-500 text-white rounded w-1/5"
+                                    onClick={() =>
+                                      handleActionQty("-", product.id)
+                                    }
+                                  >
+                                    -
+                                  </button>
+                                  <span className="px-2">
+                                    {product.actionQty}
+                                  </span>{" "}
+                                </>
+                              )}
                               <button
-                                className="bg-blue-500 text-white rounded w-1/5"
-                                onClick={() => handleActionQty("-", product.id)}
+                                className="bg-blue-500 text-white  rounded w-1/5 "
+                                onClick={() => handleActionQty("+", product.id)}
+                                disabled={product.quantity === 0}
                               >
-                                -
+                                +
                               </button>
-                              <span className="px-2">{product.actionQty}</span>{" "}
-                            </>
-                          )}
-                          <button
-                            className="bg-blue-500 text-white  rounded w-1/5 "
-                            onClick={() => handleActionQty("+", product.id)}
-                            disabled={product.quantity === 0}
-                          >
-                            +
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                            </td>
+                          </tr>
+                        )
+                    )
                   ) : (
                     <tr>
                       <td colSpan="7" className="py-10 text-center">
                         No Product Selected
                       </td>
                     </tr>
+                    // <tr>
+                    //   <td colSpan="7" className="py-10 text-center">
+                    //     <div className="flex flex-col items-center">
+                    //       <p>
+                    //         Search existing products to add to this list or add
+                    //         a new product to get started!
+                    //       </p>
+                    //       <button
+                    //         className="bg-blue-500 text-white py-1 px-4 rounded mt-4"
+                    //         onClick={() => setIsSidebarOpen(true)}
+                    //       >
+                    //         + Add Items
+                    //       </button>
+                    //     </div>
+                    //   </td>
+                    // </tr>
                   )}
                 </tbody>
               </table>
+              {isSidebarOpen && (
+                <Sidebar
+                  isOpen={isSidebarOpen}
+                  onClose={() => setIsSidebarOpen(false)}
+                  productList={products}
+                  handleActionQty={handleActionQty}
+                  totalAmount={+totalAmounts.totalAmount}
+                />
+              )}
             </div>
             <div className="w-full mt-4 border-t pt-4 bg-gray-50 p-4 ">
               <div className="w-full grid grid-cols-3 gap-4">
@@ -697,10 +895,10 @@ const CreatePOS = () => {
                     </option>
                   </select>
                 </div>
-                <div className="w-full ">
+                {/* <div className="w-full ">
                   <div>Bank/Book</div>
                   <select
-                    defaultValue=""
+                    value={formData.book.bookRef?.id || ""}
                     onChange={onSelectBook}
                     className="border p-2 rounded w-full"
                   >
@@ -708,13 +906,13 @@ const CreatePOS = () => {
                       Select Bank/Book
                     </option>
                     {books.length > 0 &&
-                      books.map((book) => (
-                        <option value={book.id} key={book.id}>
+                      books.map((book, index) => (
+                        <option value={book.id} key={index}>
                           {`${book.name} - ${book.bankName} - ${book.branch}`}
                         </option>
                       ))}
                   </select>
-                </div>
+                </div> */}
                 <div className="w-full ">
                   <div>Sign</div>
                   <select
@@ -728,9 +926,21 @@ const CreatePOS = () => {
                   </select>
                 </div>
                 <div className="w-full ">
+                  <div>Attach Files</div>
+
+                  <input
+                    type="file"
+                    className="flex h-10 w-full rounded-md border border-input
+                  bg-white px-3 py-2 text-sm text-gray-400 file:border-0
+                  file:bg-transparent file:text-gray-600 file:text-sm
+                  file:font-medium"
+                  />
+                </div>
+                <div className="w-full ">
                   <div>Shipping Charges</div>
                   <input
                     type="number"
+                    value={formData.shippingCharges || ""}
                     placeholder="Shipping Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -745,6 +955,7 @@ const CreatePOS = () => {
                   <div>Packaging Charges</div>
                   <input
                     type="number"
+                    value={formData.packagingCharges || ""}
                     placeholder="Packaging Charges"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -756,20 +967,10 @@ const CreatePOS = () => {
                   />
                 </div>
                 <div className="w-full ">
-                  <div>Attach Files</div>
-
-                  <input
-                    type="file"
-                    className="flex h-10 w-full rounded-md border border-input
-                  bg-white px-3 py-2 text-sm text-gray-400 file:border-0
-                  file:bg-transparent file:text-gray-600 file:text-sm
-                  file:font-medium"
-                  />
-                </div>
-                <div className="w-full ">
                   <div>Notes</div>
                   <input
                     type="text"
+                    value={formData.notes}
                     placeholder="Notes"
                     className="border p-2 rounded w-full"
                     onChange={(e) => {
@@ -784,6 +985,7 @@ const CreatePOS = () => {
                   <div>Terms</div>
                   <textarea
                     type="text"
+                    value={formData.terms}
                     className="border p-2 rounded w-full max-h-16 min-h-16"
                     onChange={(e) => {
                       setFormData((val) => ({
@@ -793,7 +995,7 @@ const CreatePOS = () => {
                     }}
                   />
                 </div>
-                <div className="w-full flex justify-between items-center">
+                <div className="w-full flex justify-between items-center mt-5 space-x-3">
                   <div>TDS</div>
                   <div>
                     <label className="relative inline-block w-14 h-8">
@@ -830,9 +1032,10 @@ const CreatePOS = () => {
                       <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
                     </label>
                   </div>
-                  <div>
+                  <div className="w-full">
                     <select
                       className="border p-2 rounded w-full"
+                      value={formData.mode}
                       onChange={(e) =>
                         setFormData((val) => ({ ...val, mode: e.target.value }))
                       }
@@ -891,30 +1094,37 @@ const CreatePOS = () => {
               </div>
             </div>
             <div className="flex justify-end items-center mt-4 border-t pt-4 bg-gray-50 p-4 ">
-              {/* <div className="flex items-center gap-2">
-                <label className="text-gray-600">
-                  Apply discount (%) to all items?
-                </label>
-                <input
-                  type="text"
-                  className="border border-green-500 p-1 rounded w-16"
-                  placeholder="%"
-                  onChange={(e) =>
-                    setFormData((val) => ({ ...val, discount: e.target.value }))
-                  }
-                />
-              </div> */}
-
-              <div className="flex flex-col justify-between">
-                <div className=" p-6" style={{ width: "600px" }}>
-                  {/* <div className="flex items-center mb-4">
-                    <label className="mr-2">Extra Discount</label>
+              <div className="flex justify-between">
+                <div className="flex space-x-3 items-center">
+                  <div className=""> Extra Discount: </div>
+                  <div>
                     <input
-                      type="text"
-                      placeholder="%"
-                      className="border p-1 rounded w-16 text-center"
+                      type="number"
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscount || ""}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscount: +e.target.value || 0,
+                        }));
+                      }}
                     />
-                  </div> */}
+                    <select
+                      className="border p-2 rounded"
+                      value={formData?.extraDiscountType || "percentage"}
+                      onChange={(e) => {
+                        setFormData((val) => ({
+                          ...val,
+                          extraDiscountType: e.target.value,
+                        }));
+                      }}
+                    >
+                      <option value="percentage">%</option>
+                      <option value="fixed">Fixed</option>
+                    </select>
+                  </div>
+                </div>
+                <div className=" p-6" style={{ width: "600px" }}>
                   {formData.shippingCharges > 0 && (
                     <div className="flex justify-between text-gray-700 mb-2">
                       <span>Shipping Charges</span>
@@ -982,18 +1192,22 @@ const CreatePOS = () => {
                       <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                     </div>
                   )}
-
+                  {formData?.extraDiscount?.amount > 0 && isProductSelected && (
+                    <div className="flex justify-between text-gray-700 mb-2">
+                      <span>Extra Discount Amount</span>
+                      <span>
+                        ₹{" "}
+                        {formData.extraDiscountType === "percentage"
+                          ? (+totalAmounts.totalAmount *
+                              formData?.extraDiscount) /
+                            100
+                          : formData?.extraDiscount}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-xl mb-2">
                     <span>Total Amount</span>
-                    <span>
-                      ₹{" "}
-                      {(
-                        totalAmounts.totalAmount +
-                        formData.shippingCharges +
-                        formData.packagingCharges +
-                        total_Tax_Amount
-                      ).toFixed(2)}
-                    </span>
+                    <span>₹ {calculateTotal()}</span>
                   </div>
                 </div>
               </div>
@@ -1002,11 +1216,21 @@ const CreatePOS = () => {
         </div>
         <div className="mt-6 flex justify-end">
           <div className="flex gap-2">
+            {/* <button className="border border-blue-500 text-blue-500 py-1 px-4 rounded-lg flex items-center gap-1">
+              <span className="text-lg">+</span> Add to Product
+            </button> */}
             <button
               className="bg-blue-500 text-white py-1 px-4 rounded-lg flex items-center gap-1"
-              onClick={onCreatePOS}
+              onClick={() => {
+                {
+                  products.length > 0 && isProductSelected
+                    ? onSetPos()
+                    : alert("Please select items to proceed.");
+                }
+              }}
             >
-              <span className="text-lg">+</span> Create POS
+              <span className="text-lg">+</span>{" "}
+              {posId ? "Edit" : "Create"} Pos
             </button>
           </div>
         </div>
@@ -1015,4 +1239,4 @@ const CreatePOS = () => {
   );
 };
 
-export default CreatePOS;
+export default SetPos;

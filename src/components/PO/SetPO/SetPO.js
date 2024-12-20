@@ -45,7 +45,7 @@ import {
       const [prePoList, setPrePoList] = useState([]);
       const [books, setBooks] = useState([]);
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
+      const [existQuantity, setExistQuantity] = useState({});
       const navigate = useNavigate();
     
       const [formData, setFormData] = useState({
@@ -64,10 +64,8 @@ import {
         tcs: {},
         terms: "",
         mode: "Cash",
-        extraDiscount: {
-          amount: 0,
-          type: "percentage",
-        },
+        extraDiscount: 0,
+        extraDiscountType: "percentage",
       });
     
       const [totalAmounts, setTotalAmounts] = useState({
@@ -86,7 +84,7 @@ import {
       });
       const [suggestions, setSuggestions] = useState([]);
       const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-    
+     console.log("existquantity", existQuantity)
       useEffect(() => {
         function addActionQty() {
           if (
@@ -102,12 +100,18 @@ import {
             productData = products.map((pro) => {
               if (pro.id === ele.productRef.id) {
                 pro.actionQty = ele.quantity;
-                pro.quantity += ele.quantity;
+                // pro.quantity += ele.quantity;
                 pro.totalAmount = ele.quantity * pro.netAmount;
               }
+          
               return pro;
             });
+            setExistQuantity((prev) => ({
+              ...prev,
+              [ele.name]: ele.quantity, 
+            }));
           }
+          
           setProducts(productData);
           calculateProduct(productData);
         }
@@ -168,6 +172,7 @@ import {
               ...vendorData,
             });
             setFormData(getData);
+            console.log("formdata", formData)
           } catch (error) {
             console.log("🚀 ~ fetchPoData ~ error:", error);
           }
@@ -441,9 +446,9 @@ import {
     
       const calculateTotal = () => {
         const discountAmount =
-          formData.extraDiscount.type === "percentage"
-            ? (+totalAmounts.totalAmount * formData.extraDiscount.amount) / 100
-            : formData.extraDiscount.amount || 0;
+          formData.extraDiscountType === "percentage"
+            ? (+totalAmounts.totalAmount * formData.extraDiscount) / 100
+            : formData.extraDiscount || 0;
     
         const total =
           totalAmounts.totalAmount +
@@ -574,21 +579,25 @@ import {
             if (item.quantity === 0) {
               continue;
             }
-    
+           
             const currentQuantity = products.find(
               (val) => val.name === item.name
             ).quantity;
     
-            if (currentQuantity <= 0) {
-              alert("Product is out of stock!");
-              throw new Error("Product is out of stock!");
-            }
-    
+            // if (currentQuantity <= 0) {
+            //   alert("Product is out of stock!");
+            //   throw new Error("Product is out of stock!");
+            // }
+
+            const existingQuantity = existQuantity[item.name] || 0; 
+          const updatedStock = currentQuantity - existingQuantity + item.quantity;
+            // console.log("existingquantity", existingQuantity,item.name)
+            // console.log("items", item)
             await updateDoc(item.productRef, {
-              stock: currentQuantity + item.quantity,
+              stock: updatedStock,
             });
           }
-    
+
           alert(
             "Successfully " + (poId ? "Updated" : "Created") + " the PO"
           );
@@ -1072,27 +1081,21 @@ import {
                         <input
                           type="number"
                           className="border p-2 rounded"
-                          value={formData?.extraDiscount?.amount || ""}
+                          value={formData?.extraDiscount || ""}
                           onChange={(e) => {
                             setFormData((val) => ({
                               ...val,
-                              extraDiscount: {
-                                ...val.extraDiscount,
-                                amount: +e.target.value || 0,
-                              },
+                              extraDiscount: +e.target.value || 0
                             }));
                           }}
                         />
                         <select
                           className="border p-2 rounded"
-                          value={formData?.extraDiscount?.type || "percentage"}
+                          value={formData?.extraDiscountType || "percentage"}
                           onChange={(e) => {
                             setFormData((val) => ({
                               ...val,
-                              extraDiscount: {
-                                ...val.extraDiscount,
-                                type: e.target.value,
-                              },
+                              extraDiscountType: e.target.value 
                             }));
                           }}
                         >
@@ -1169,16 +1172,16 @@ import {
                           <span>₹ {totalAmounts.totalCgstAmount_9.toFixed(2)}</span>
                         </div>
                       )}
-                      {formData?.extraDiscount?.amount > 0 && isProductSelected && (
+                      {formData?.extraDiscount > 0 && isProductSelected && (
                         <div className="flex justify-between text-gray-700 mb-2">
                           <span>Extra Discount Amount</span>
                           <span>
                             ₹{" "}
-                            {formData.extraDiscount.type === "percentage"
+                            {formData.extraDiscountType === "percentage"
                               ? (+totalAmounts.totalAmount *
-                                  formData?.extraDiscount?.amount) /
+                                  formData?.extraDiscount) /
                                 100
-                              : formData?.extraDiscount?.amount}
+                              : formData?.extraDiscount}
                           </span>
                         </div>
                       )}

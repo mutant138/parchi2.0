@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template = forwardRef((props, ref) => {
-  const { deliveryChallanData } = props;
-  if (!deliveryChallanData) {
+  const { posData } = props;
+  if (!posData) {
     return;
   }
   function DateFormate(timestamp) {
@@ -15,9 +15,9 @@ const Template = forwardRef((props, ref) => {
 
     return `${getDate}/${getMonth}/${getFullYear}`;
   }
-  const ModifiedDeliveryChallanData = {
-    ...deliveryChallanData,
-    items: deliveryChallanData.products.map((item) => {
+  const ModifiedposData = {
+    ...posData,
+    items: posData.products.map((item) => {
       let discount = +item.discount || 0;
 
       if (item.discountType) {
@@ -43,42 +43,42 @@ const Template = forwardRef((props, ref) => {
     }),
   };
 
-  const totalTaxableAmount = ModifiedDeliveryChallanData.items.reduce(
+  const totalTaxableAmount = ModifiedposData.items.reduce(
     (sum, product) => sum + product.netAmount * product.quantity,
     0
   );
 
-  const totalSgstAmount_2_5 = ModifiedDeliveryChallanData.items.reduce(
+  const totalSgstAmount_2_5 = ModifiedposData.items.reduce(
     (sum, product) =>
       product.sgst === 2.5 ? sum + product.sgstAmount * product.quantity : sum,
     0
   );
 
-  const totalCgstAmount_2_5 = ModifiedDeliveryChallanData.items.reduce(
+  const totalCgstAmount_2_5 = ModifiedposData.items.reduce(
     (sum, product) =>
       product.cgst === 2.5 ? sum + product.cgstAmount * product.quantity : sum,
     0
   );
 
-  const totalSgstAmount_6 = ModifiedDeliveryChallanData.items.reduce(
+  const totalSgstAmount_6 = ModifiedposData.items.reduce(
     (sum, product) =>
       product.sgst === 6 ? sum + product.sgstAmount * product.quantity : sum,
     0
   );
 
-  const totalCgstAmount_6 = ModifiedDeliveryChallanData.items.reduce(
+  const totalCgstAmount_6 = ModifiedposData.items.reduce(
     (sum, product) =>
       product.cgst === 6 ? sum + product.cgstAmount * product.quantity : sum,
     0
   );
 
-  const totalSgstAmount_9 = ModifiedDeliveryChallanData.items.reduce(
+  const totalSgstAmount_9 = ModifiedposData.items.reduce(
     (sum, product) =>
       product.sgst === 9 ? sum + product.sgstAmount * product.quantity : sum,
     0
   );
 
-  const totalCgstAmount_9 = ModifiedDeliveryChallanData.items.reduce(
+  const totalCgstAmount_9 = ModifiedposData.items.reduce(
     (sum, product) =>
       product.cgst === 9 ? sum + product.cgstAmount * product.quantity : sum,
     0
@@ -102,9 +102,9 @@ const Template = forwardRef((props, ref) => {
       <div className="flex justify-between">
         <div>
           <div className="text-lg font-bold text-start">
-            {ModifiedDeliveryChallanData?.createdBy?.name}
+            {ModifiedposData?.createdBy?.name}
           </div>
-          <div>Mobile : {ModifiedDeliveryChallanData?.createdBy?.phoneNo}</div>
+          <div>Mobile : {ModifiedposData?.createdBy?.phoneNo}</div>
         </div>
         <div>
           <h3 className="font-bold">TAX INVOICE</h3>
@@ -113,22 +113,19 @@ const Template = forwardRef((props, ref) => {
       <div className="flex justify-between text-start">
         <div className="mt-2 text-start">
           <strong>Bill To :</strong>
-          <div>{ModifiedDeliveryChallanData.customerDetails.name}</div>
-          <div>Ph : {ModifiedDeliveryChallanData.customerDetails.phone}</div>
+          <div>{ModifiedposData.customerDetails.name}</div>
+          <div>Ph : {ModifiedposData.customerDetails.phone}</div>
         </div>
         <div>
           <div>
-            <strong>DeliveryChallan # :</strong>{" "}
-            {ModifiedDeliveryChallanData.deliveryChallanNo}
+            <strong>pos # :</strong>{" "}
+            {ModifiedposData.posNo}
           </div>
           <div>
-            <strong>DeliveryChallan Date :</strong>{" "}
-            {DateFormate(ModifiedDeliveryChallanData.deliveryChallanDate)}
+            <strong>pos Date :</strong>{" "}
+            {DateFormate(ModifiedposData.posDate)}
           </div>
-          {/* <div>
-            <strong>Due Date :</strong>{" "}
-            {DateFormate(ModifiedDeliveryChallanData?.dueDate)}
-          </div> */}
+       
           <div>
             <strong>Place of Supply :</strong> -
           </div>
@@ -151,7 +148,7 @@ const Template = forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {ModifiedDeliveryChallanData.items.map((item, index) => (
+            {ModifiedposData.items.map((item, index) => (
               <tr key={index}>
                 <td className="border border-black pt-2 pb-2 pl-1">
                   {index + 1}
@@ -189,40 +186,40 @@ const Template = forwardRef((props, ref) => {
         </table>
       </div>
       <div className="mt-4 text-end">
-        {ModifiedDeliveryChallanData.shippingCharges > 0 && (
+        {ModifiedposData.shippingCharges > 0 && (
           <div>
             Delivery/Shipping Charges :
             <span className="ml-5">
               {" "}
-              {ModifiedDeliveryChallanData.shippingCharges}
+              {ModifiedposData.shippingCharges}
             </span>
           </div>
         )}
-        {ModifiedDeliveryChallanData.packagingCharges > 0 && (
+        {ModifiedposData.packagingCharges > 0 && (
           <div>
             Packaging Charges :
             <span className="ml-5">
               {" "}
-              {ModifiedDeliveryChallanData.packagingCharges}
+              {ModifiedposData.packagingCharges}
             </span>
           </div>
         )}
       </div>
 
       <div className="mt-4 mb-3 text-end">
-        {ModifiedDeliveryChallanData.tcs.isTcsApplicable && (
+        {ModifiedposData.tcs.isTcsApplicable && (
           <div>
             TCS :
             <span className="ml-5">
-              {ModifiedDeliveryChallanData.tcs.tcs_amount.toFixed(2)}
+              {ModifiedposData.tcs.tcs_amount.toFixed(2)}
             </span>
           </div>
         )}
-        {ModifiedDeliveryChallanData.tds.isTdsApplicable && (
+        {ModifiedposData.tds.isTdsApplicable && (
           <div>
             TDS :
             <span className="ml-5">
-              {ModifiedDeliveryChallanData.tds.tds_amount.toFixed(2)}
+              {ModifiedposData.tds.tds_amount.toFixed(2)}
             </span>
           </div>
         )}
@@ -253,7 +250,7 @@ const Template = forwardRef((props, ref) => {
       </div>
       <hr />
       <div className="text-end font-bold">
-        <h3>Total : {+ModifiedDeliveryChallanData.total?.toFixed(2)}</h3>
+        <h3>Total : {+ModifiedposData.total?.toFixed(2)}</h3>
       </div>
 
       <div className=" flex justify-between">
