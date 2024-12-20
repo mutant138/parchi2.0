@@ -9,13 +9,19 @@ const Settings = () => {
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [formData, setFormData] = useState({
+    userName: "",
     name: "",
     phone: "",
     email: "",
     altContact: "",
     website: "",
-    pan: "",
+    panNumber: "",
     companyLogo: "",
+    gst: "",
+    tagline: "",
+    address: "",
+    city: "",
+    zipCode: "",
   });
 
   useEffect(() => {
@@ -82,8 +88,9 @@ const Settings = () => {
 
   const handleSave = async () => {
     try {
-      const docRef = await updateDoc(doc(db, "companies", companyId), formData);
-      alert("Details saved successfully! Document ID: ");
+      const { id, ...payload } = formData;
+      await updateDoc(doc(db, "companies", companyId), payload);
+      alert("Details saved successfully! ");
     } catch (e) {
       console.error("Error adding document: ", e);
       alert("Failed to save details.");
@@ -99,13 +106,13 @@ const Settings = () => {
           </h1>
         </div>
 
-        <div className="flex items-center space-x-4 mb-10">
-          <div className="w-24 h-24 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative">
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="w-36 h-36 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative">
             {formData.companyLogo ? (
               <img
                 src={formData.companyLogo}
                 alt="Profile"
-                className="w-24 h-24 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative object-cover"
+                className="w-36 h-36 bg-gray-200 border border-dashed border-gray-400 flex items-center justify-center rounded relative object-cover"
               />
             ) : (
               <label
@@ -130,21 +137,35 @@ const Settings = () => {
           <div className="flex-grow">
             <div>
               <label className="block text-sm font-medium text-gray-600">
-                Company Name:
+                User Name:
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="userName"
+                value={formData.userName}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md pt-2 border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="YOUR BUSINESS NAME"
+                className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+                placeholder="User Name"
               />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              Company Name:
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              placeholder="YOUR BUSINESS NAME"
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Company Phone:
@@ -154,10 +175,28 @@ const Settings = () => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md pt-2 border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="phone number..."
             />
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              Tagline:
+            </label>
+            <textarea
+              type="text"
+              name="tagline"
+              value={formData.tagline}
+              onChange={handleChange}
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              placeholder="Enter your tagline..."
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Company Email:
@@ -167,12 +206,10 @@ const Settings = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md pt-2 border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Company Email Address"
             />
           </div>
-        </div>
-        <div className="grid grid-cols-1 mb-10">
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Alternative Contact Number:
@@ -182,12 +219,55 @@ const Settings = () => {
               name="altContact"
               value={formData.altContact}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md pt-2 border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Alternate contact number"
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-10 mb-6">
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              Address:
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              placeholder="Address"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              PIN Code:
+            </label>
+            <input
+              type="text"
+              name="zipCode"
+              value={formData.zipCode}
+              onChange={handleChange}
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              placeholder="PIN Code"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4  mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              City:
+            </label>
+            <input
+              type="text"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              placeholder="City"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Website:
@@ -197,8 +277,23 @@ const Settings = () => {
               name="website"
               value={formData.website}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md pt-2 border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Website"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-600">
+              GST:
+            </label>
+            <input
+              type="text"
+              name="gst"
+              value={formData.gst}
+              onChange={handleChange}
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              placeholder="GST"
             />
           </div>
           <div>
@@ -207,10 +302,10 @@ const Settings = () => {
             </label>
             <input
               type="text"
-              name="pan"
-              value={formData.pan}
+              name="panNumber"
+              value={formData.panNumber}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md pt-2 border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg  focus:outline-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="PAN Number"
             />
           </div>
