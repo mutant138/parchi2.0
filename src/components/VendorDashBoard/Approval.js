@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase"; // Ensure Firebase is configured correctly
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useSelector } from "react-redux";
@@ -27,6 +27,7 @@ const Approval = () => {
 
     setApprovals(approvalsData);
   };
+
   useEffect(() => {
     fetchApprovals();
   }, [projectId]);
@@ -44,14 +45,34 @@ const Approval = () => {
       </div>
       <div className="space-y-4">
         {approvals.map((approval) => (
-          <ApprovalCard key={approval.id} approval={approval} />
+          <ApprovalCard
+            key={approval.id}
+            approval={approval}
+            projectId={projectId}
+            onUpdate={fetchApprovals}
+          />
         ))}
       </div>
     </div>
   );
 };
 
-const ApprovalCard = ({ approval, isSideBarOpen }) => {
+const ApprovalCard = ({ approval, projectId, onUpdate }) => {
+  const [status, setStatus] = useState(approval.status);
+
+  const handleStatusChange = async (e) => {
+    const newStatus = e.target.value;
+    setStatus(newStatus);
+
+    try {
+      const approvalRef = doc(db, `projects/${projectId}/approvals`, approval.id);
+      await updateDoc(approvalRef, { status: newStatus });
+      onUpdate(); // Refresh the approvals list after the update
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
   return (
     <div className="bg-white p-4 rounded shadow flex justify-between items-center">
       <div className="flex items-center">
@@ -65,16 +86,19 @@ const ApprovalCard = ({ approval, isSideBarOpen }) => {
           <p className="text-gray-500 text-sm">
             Approver: {approval.approvalBelongsTo}
           </p>
-          <p
-            className={`text-sm ${
-              approval.status === "Pending"
-                ? "text-yellow-500"
-                : "text-green-500"
-            }`}
-          >
-            Status: {approval.status}
-          </p>
+          <p className="text-gray-500 text-sm">Status: {status}</p>
         </div>
+      </div>
+      <div>
+        <select
+          className="border border-gray-300 rounded px-2 py-1"
+          value={status}
+          onChange={handleStatusChange}
+        >
+          <option value="Pending">Pending</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
+        </select>
       </div>
     </div>
   );
