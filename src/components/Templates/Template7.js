@@ -66,46 +66,40 @@ const Template7 = forwardRef((props, ref) => {
 
         {/* Items Table */}
         <div className="mt-6">
-          <table className="w-full text-sm border-collapse border border-gray-300">
+          <table className="w-full mt-5 border">
             <thead>
-              <tr className="bg-gray-100 text-gray-600">
-                <th className="border border-gray-300 p-2 text-left">Item</th>
-                <th className="border border-gray-300 p-2 text-left">
-                  Description
-                </th>
-                <th className="border border-gray-300 p-2 text-center">Qty</th>
-                <th className="border border-gray-300 p-2 text-right">Price</th>
-                <th className="border border-gray-300 p-2 text-right">Total</th>
+              <tr className="bg-gray-200  text-start ">
+                <th className=" text-start pl-1 pb-2">Item</th>
+                <th className=" text-start pl-1 pb-2">Rate</th>
+                <th className=" text-start pl-1 pb-2">Discount</th>
+                <th className=" text-start pl-1 pb-2">Unit Price</th>
+                <th className=" text-start pl-1 pb-2">Qty</th>
+                <th className=" text-start pl-1 pb-2">Tax Type</th>
+                <th className=" text-start pl-1 pb-2">Tax Amount</th>
+                <th className=" text-start pl-1 pb-2">Total</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="border border-gray-300 p-2">App Development</td>
-                <td className="border border-gray-300 p-2">
-                  Mobile & iOS Application Development
-                </td>
-                <td className="border border-gray-300 p-2 text-center">2</td>
-                <td className="border border-gray-300 p-2 text-right">$460</td>
-                <td className="border border-gray-300 p-2 text-right">$920</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 p-2">UI/UX Design</td>
-                <td className="border border-gray-300 p-2">
-                  Mobile & iOS Mobile App Design, Product Design
-                </td>
-                <td className="border border-gray-300 p-2 text-center">1</td>
-                <td className="border border-gray-300 p-2 text-right">$220</td>
-                <td className="border border-gray-300 p-2 text-right">$220</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 p-2">Web Design</td>
-                <td className="border border-gray-300 p-2">
-                  Web Design & Development
-                </td>
-                <td className="border border-gray-300 p-2 text-center">2</td>
-                <td className="border border-gray-300 p-2 text-right">$120</td>
-                <td className="border border-gray-300 p-2 text-right">$240</td>
-              </tr>
+              {invoiceData.products.map((item, index) => (
+                <tr key={index} className="border-t-2">
+                  <td className=" pt-2 pb-2 pl-1">{item.name}</td>
+                  <td className=" pt-2 pb-2 pl-1">{item.tax}%</td>
+                  <td className=" pt-2 pb-2 pl-1">
+                    {item.discount.toFixed(1)}
+                  </td>
+                  <td className=" pt-2 pb-2 pl-1">
+                    {item.sellingPrice.toFixed(1)}
+                  </td>
+                  <td className=" pt-2 pb-2 pl-1">{item.quantity}</td>
+                  <td className=" pt-2 pb-2 pl-1">CGST SGST</td>
+                  <td className=" pt-2 pb-2 pl-1">
+                    {item.taxAmount.toFixed(2)}
+                  </td>
+                  <td className=" pt-2 pb-2 pl-1">
+                    {item.totalAmount.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
           <div className="flex justify-end">

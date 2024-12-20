@@ -118,7 +118,7 @@ const Template5 = forwardRef((props, ref) => {
           </thead>
           <tbody>
             {invoiceData.products.map((item, index) => (
-              <tr key={index}>
+              <tr key={index} className="border-t-2">
                 <td className=" pt-2 pb-2 pl-1">{item.name}</td>
                 <td className=" pt-2 pb-2 pl-1">{item.tax}%</td>
                 <td className=" pt-2 pb-2 pl-1">{item.discount.toFixed(1)}</td>

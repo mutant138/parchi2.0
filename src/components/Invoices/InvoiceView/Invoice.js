@@ -28,7 +28,7 @@ function Invoice({ invoice, bankDetails }) {
   const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const invoiceRef = useRef();
-  const [selectTemplate, setSelectTemplate] = useState("template6");
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   const templatesComponents = {
     template1: (
@@ -347,7 +347,7 @@ function Invoice({ invoice, bankDetails }) {
       </div>
       <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
-        style={{ height: "64vh" }}
+        style={{ height: "62vh" }}
       >
         <div className="col-span-12 ">
           <div className="p-5 bg-white rounded-lg my-3">
@@ -424,7 +424,7 @@ function Invoice({ invoice, bankDetails }) {
                     {invoice?.products?.length > 0 &&
                       invoice?.products.map((item) => (
                         <tr
-                          key={`invoice-description-${item.id}`}
+                          key={`invoice-description-${item.productRef.id}`}
                           className="border-b-2 p-3 [&_td:last-child]:text-end"
                         >
                           <td className="  text-gray-600 max-w-[200px] truncate p-3">

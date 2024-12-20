@@ -19,7 +19,9 @@ function SelectTemplateSideBar({
     { id: "template3", img: template3 },
     { id: "template4", img: template4 },
     { id: "template5", img: template5 },
+    { id: "template6", img: template5 },
     { id: "template7", img: template7 },
+    { id: "template8", img: template7 },
   ];
 
   return (
@@ -50,7 +52,7 @@ function SelectTemplateSideBar({
         <div>
           <div
             className="grid grid-cols-3 gap-4  mt-4 overflow-y-auto"
-            style={{ height: "76vh" }}
+            style={{ height: "75vh" }}
           >
             {templatesImg.map((template) => (
               <div
