@@ -25,6 +25,7 @@ const SetPurchase = () => {
     userDetails.companies[userDetails.selectedCompanyIndex];
 
   const phoneNo = userDetails.phone;
+  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
 
   const [date, setDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
@@ -153,6 +154,7 @@ const SetPurchase = () => {
         const getData = (await getDoc(docRef)).data();
 
         setDate(getData.date);
+        setDueDate(getData.dueDate);
 
         const vendorData = (
           await getDoc(getData.vendorDetails.vendorRef)
@@ -541,6 +543,7 @@ const SetPurchase = () => {
         tds,
         tcs,
         date,
+        dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -716,7 +719,7 @@ const SetPurchase = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
                   Purchase Date <span className="text-red-500">*</span>
@@ -729,6 +732,19 @@ const SetPurchase = () => {
                     setDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  Due Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={DateFormate(dueDate)}
+                  className="border p-1 rounded w-full mt-1"
+                  onChange={(e) => {
+                    setDueDate(Timestamp.fromDate(new Date(e.target.value)));
+                  }}
                 />
               </div>
               <div>

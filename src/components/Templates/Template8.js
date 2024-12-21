@@ -39,7 +39,7 @@ const Template8 = forwardRef((props, ref) => {
               </p>
             </div>
           </div>
-          {/* Invoice Details */}
+          {/* {dataSet.type} Details */}
           <div className="grid grid-cols-2 px-2 gap-4 border-b border-black">
             <div className="border-r border-black">
               <h3 className="font-bold text-gray-800">User Details:</h3>
@@ -49,11 +49,13 @@ const Template8 = forwardRef((props, ref) => {
               <p>{dataSet.userTo.zipCode} </p>
             </div>
             <div>
-              <h3 className="font-bold text-gray-800">Invoice Details:</h3>
+              <h3 className="font-bold text-gray-800">
+                {dataSet.type} Details:
+              </h3>
               <div className="grid grid-cols-2">
-                <div>Invoice #:</div>
+                <div>{dataSet.type} #:</div>
                 <div> {dataSet.no}</div>
-                <div>Invoice Date:</div>
+                <div>{dataSet.type} Date:</div>
                 <div> {DateFormate(dataSet.date)}</div>
                 <div>Due Date:</div>
                 <div>{DateFormate(dataSet.dueDate)}</div>

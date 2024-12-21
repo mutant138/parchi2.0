@@ -264,7 +264,7 @@ function Po({ Po, bankDetails }) {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(Po?.poDate)}</div>
+            <div>Date: {DateFormate(Po?.date)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
@@ -372,7 +372,7 @@ function Po({ Po, bankDetails }) {
                         Po Date:
                       </span>
                       <span className="  text-gray-600">
-                        {DateFormate(Po?.poDate)}
+                        {DateFormate(Po?.date)}
                       </span>
                     </div>
                     {/* <div>

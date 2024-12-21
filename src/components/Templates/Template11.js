@@ -23,7 +23,7 @@ const Template11 = forwardRef((props, ref) => {
       <div ref={ref} style={{ width: "595px" }}>
         <div className="bg-white" style={{ padding: "20px" }}>
           <header className="flex justify-between items-center mb-3">
-            <h1 className="text-3xl font-bold text-gray-700">Invoice</h1>
+            <h1 className="text-3xl font-bold text-gray-700">{dataSet.type}</h1>
             <div className="">
               <span className="text-3xl font-bold text-primary-600">
                 {dataSet?.createdBy?.name}
@@ -33,8 +33,8 @@ const Template11 = forwardRef((props, ref) => {
 
           <section className="grid grid-cols-2 gap-8 mb-3">
             <div>
-              <h2 className="text-sm font-bold text-gray-600">
-                INVOICE NUMBER
+              <h2 className="text-sm font-bold text-gray-600 uppercase">
+                {dataSet.type} NUMBER
               </h2>
               <p className="text-sm text-gray-700 bg-blue-100 w-fit pe-3">
                 {dataSet.no}
@@ -138,7 +138,7 @@ const Template11 = forwardRef((props, ref) => {
           </section>
           <div className="flex justify-end text-gray-900">
             <div className="  text-gray-900">
-              <div className="w-full">INVOICE TOTAL</div>
+              <div className="w-full uppercase">{dataSet.type} TOTAL</div>
               <div className="bg-blue-100 text-end">
                 ₹{+dataSet.total?.toFixed(2)}
               </div>

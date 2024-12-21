@@ -29,7 +29,7 @@ const Template5 = forwardRef((props, ref) => {
             </h1>
             <div>
               <div className=" font-bold ">
-                {dataSet?.createdBy?.name} Invoice
+                {dataSet?.createdBy?.name} {dataSet.type}
               </div>
               {/* <p><span></span>GSTIN: 4828E9B55BD92X6</p>
             <p>State: Ontario, Toronto</p>
@@ -42,20 +42,22 @@ const Template5 = forwardRef((props, ref) => {
               {+dataSet.total?.toFixed(2)}
             </p>
             <p>
-              <span className="font-bold">Invoice Date:</span>
+              <span className="font-bold">{dataSet.type} Date:</span>
               {DateFormate(dataSet.dueDate)}
             </p>
             <p>
-              <span className="font-bold">Invoice No:</span> {dataSet.no}
+              <span className="font-bold">{dataSet.type} No:</span> {dataSet.no}
             </p>
           </div>
         </div>
         <div className="flex justify-between items-center my-3">
           <div className="border w-full"></div>
-          <div className="text-green-500 w-full text-center">TAX INVOICE</div>
+          <div className="text-green-500 w-full text-center uppercase">
+            TAX {dataSet.type}
+          </div>
           <div className="border w-full"></div>
         </div>
-        {/* Tax Invoice Details */}
+        {/* Tax {dataSet.type} Details */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div>
             <p className="font-bold">User Name:</p>
@@ -102,7 +104,7 @@ const Template5 = forwardRef((props, ref) => {
           </div>
         </div>
 
-        {/* Invoice Table */}
+        {/* {dataSet.type} Table */}
         <table className="w-full mt-5 border">
           <thead>
             <tr className="bg-gray-200  text-start ">

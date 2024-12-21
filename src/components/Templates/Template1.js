@@ -31,7 +31,7 @@ const Template1 = forwardRef((props, ref) => {
             <div>Mobile : {dataSet?.createdBy?.phoneNo}</div>
           </div>
           <div>
-            <h3 className="font-bold">TAX INVOICE</h3>
+            <h3 className="font-bold uppercase">TAX {dataSet.type}</h3>
           </div>
         </div>
         <div className="flex justify-between text-start">
@@ -42,10 +42,10 @@ const Template1 = forwardRef((props, ref) => {
           </div>
           <div>
             <div>
-              <strong>Invoice # :</strong> {dataSet.no}
+              <strong>{dataSet.type} # :</strong> {dataSet.no}
             </div>
             <div>
-              <strong>Invoice Date :</strong> {DateFormate(dataSet.date)}
+              <strong>{dataSet.type} Date :</strong> {DateFormate(dataSet.date)}
             </div>
             <div>
               <strong>Due Date :</strong> {DateFormate(dataSet.dueDate)}

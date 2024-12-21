@@ -22,7 +22,7 @@ const CreatePo = () => {
     userDetails.companies[userDetails.selectedCompanyIndex];
 
   const phoneNo = userDetails.phone;
-  const [poDate, setPoDate] = useState(new Date());
+  const [date, setDate] = useState(new Date());
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -433,7 +433,7 @@ const CreatePo = () => {
         ...formData,
         tds,
         tcs,
-        poDate,
+        date,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -563,10 +563,10 @@ const CreatePo = () => {
                 <label className="text-sm text-gray-600">PO Date</label>
                 <input
                   type="date"
-                  value={setCurrentDate(poDate)}
+                  value={setCurrentDate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setPoDate(new Date(e.target.value));
+                    setDate(new Date(e.target.value));
                   }}
                 />
               </div>

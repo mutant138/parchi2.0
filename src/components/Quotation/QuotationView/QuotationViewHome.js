@@ -32,6 +32,7 @@ function QuotationViewHome() {
       ).data();
       const quotationsData = {
         id,
+        type: "Quotation",
         ...resData,
         no: quotationNo,
         userTo: customerDetails,

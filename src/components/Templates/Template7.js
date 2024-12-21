@@ -25,7 +25,8 @@ const Template7 = forwardRef((props, ref) => {
         <div className="flex justify-between items-center border-b pb-4">
           <div>
             <h1 className=" text-gray-800">
-              <span className="font-bold">Invoice No:</span> #{dataSet.no}
+              <span className="font-bold">{dataSet.type} No:</span> #
+              {dataSet.no}
             </h1>
             <p className="text-gray-600">
               <span className="font-bold"> Date:</span>{" "}
@@ -41,7 +42,7 @@ const Template7 = forwardRef((props, ref) => {
         {/* Billing & Pay To Section */}
         <div className="grid grid-cols-2 gap-6 mt-6 text-sm text-gray-800">
           <div>
-            <h3 className="font-bold">Invoice To:</h3>
+            <h3 className="font-bold">{dataSet.type} To:</h3>
             <p>{dataSet?.userTo?.name}</p>
             <p>
               {dataSet.userTo.address}

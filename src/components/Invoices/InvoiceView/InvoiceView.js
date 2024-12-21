@@ -43,6 +43,7 @@ function InvoiceView() {
       const invoicesData = {
         id,
         ...resData,
+        type: "Invoice",
         no: invoiceNo,
         userTo: customerDetails,
         products: resData.products.map((item) => {

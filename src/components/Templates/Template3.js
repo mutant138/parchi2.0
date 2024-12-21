@@ -29,7 +29,7 @@ const Template3 = forwardRef((props, ref) => {
             </h1>
           </div>
           <div className="text-right">
-            <h2 className="text-xl font-bold">Invoice</h2>
+            <h2 className="text-xl font-bold">{dataSet.type}</h2>
           </div>
         </header>
         <div className="flex justify-between items-center  border-b pb-4 mb-3">
@@ -38,14 +38,14 @@ const Template3 = forwardRef((props, ref) => {
             {DateFormate(dataSet.dueDate)}
           </div>
           <div>
-            <span className="font-bold">Invoice No:</span> {dataSet.no}
+            <span className="font-bold">{dataSet.type} No:</span> {dataSet.no}
           </div>
         </div>
 
-        {/* Invoice Details */}
+        {/* {dataSet.type} Details */}
         <section className="flex justify-between  mb-3">
           <div>
-            <h3 className="font-bold">Invoiced To:</h3>
+            <h3 className="font-bold">{dataSet.type}d To:</h3>
             <p>{dataSet?.userTo?.name}</p>
             <p>
               {dataSet.userTo.address}

@@ -35,10 +35,10 @@ const Template4 = forwardRef((props, ref) => {
           </div>
           <div className="flex justify-between border-black py-1 border-b px-3">
             <div>Debit Memo</div>
-            <div className="font-semibold">TAX INVOICE</div>
+            <div className="font-semibold uppercase">TAX {dataSet.type}</div>
             <div>Original</div>
           </div>
-          {/* Invoice Details */}
+          {/* {dataSet.type} Details */}
           <div className="flex justify-between border-black  border-b">
             <div className="w-full py-1 px-3">
               <p>
@@ -52,7 +52,7 @@ const Template4 = forwardRef((props, ref) => {
             </div>
             <div className="border-s border-black bg-gray-100 p-2 w-3/4">
               <p>
-                <strong>Invoice No:</strong> {dataSet.no}
+                <strong>{dataSet.type} No:</strong> {dataSet.no}
               </p>
               <p>
                 <strong>Date:</strong> {DateFormate(dataSet.dueDate)}
