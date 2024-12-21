@@ -147,11 +147,17 @@ const Roles = () => {
                   {ele.isExpand &&
                     [
                       "CreateInvoice",
+                      "CreateServices",
                       "CreateQuotation",
                       "CreatePurchase",
                       "CreateCustomers",
                       "CreateVendors",
                       "CreateProject",
+                      "CreatePo",
+                      "CreatePOS",
+                      "CreateProFormaInvoice",
+                      "CreateCreditNote",
+                      "CreateDeliveryChallan",
                     ].map((roleName, index) => (
                       <div key={roleName} className="flex justify-between">
                         <div>{roleName}</div>

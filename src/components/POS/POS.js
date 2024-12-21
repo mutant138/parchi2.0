@@ -8,32 +8,30 @@ import { FaRegEye } from "react-icons/fa";
 import { IoMdClose, IoMdDownload } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 
-const POS = () => {
+const POS = ({ companyDetails, isStaff }) => {
   const [pos, setPos] = useState([]);
   const [isPosOpen, setIsPosOpen] = useState(false);
   const posRef = useRef();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPosData, setSelectedPosData] =
-    useState(null);
+  const [selectedPosData, setSelectedPosData] = useState(null);
   const [filterStatus, setFilterStatus] = useState("All");
 
   const userDetails = useSelector((state) => state.users);
-
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPos = async () => {
       setLoading(true);
       try {
-        const posRef = collection(
-          db,
-          "companies",
-          companyId,
-          "pos"
-        );
+        const posRef = collection(db, "companies", companyId, "pos");
         const querySnapshot = await getDocs(posRef);
         const posData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -71,19 +69,11 @@ const POS = () => {
 
   const handleStatusChange = async (posId, newStatus) => {
     try {
-      const posDoc = doc(
-        db,
-        "companies",
-        companyId,
-        "pos",
-        posId
-      );
+      const posDoc = doc(db, "companies", companyId, "pos", posId);
       await updateDoc(posDoc, { paymentStatus: newStatus });
       setPos((prevpos) =>
         prevpos.map((pos) =>
-          pos.id === posId
-            ? { ...pos, paymentStatus: newStatus }
-            : pos
+          pos.id === posId ? { ...pos, paymentStatus: newStatus } : pos
         )
       );
     } catch (error) {
@@ -96,10 +86,7 @@ const POS = () => {
     const customerName = customerDetails?.name || "";
     const matchesSearch =
       customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      posNo
-        ?.toString()
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
+      posNo?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
       customerDetails?.phone
         .toString()
         .toLowerCase()
@@ -111,10 +98,7 @@ const POS = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const totalAmount = filteredPos.reduce(
-    (sum, pos) => sum + pos.total,
-    0
-  );
+  const totalAmount = filteredPos.reduce((sum, pos) => sum + pos.total, 0);
 
   const paidAmount = filteredPos
     .filter((pos) => pos.paymentStatus === "Paid")
@@ -127,9 +111,7 @@ const POS = () => {
     const doc = new jsPDF("p", "pt", "a4");
     doc.html(posRef.current, {
       callback: function (doc) {
-        doc.save(
-          `${pos.customerDetails.name}'s pos.pdf`
-        );
+        doc.save(`${pos.customerDetails.name}'s pos.pdf`);
       },
       x: 0,
       y: 0,
@@ -242,9 +224,7 @@ const POS = () => {
                             {pos.customerDetails.phone}
                           </span>
                         </td>
-                        <td className="py-3">{`₹ ${pos.total.toFixed(
-                          2
-                        )}`}</td>
+                        <td className="py-3">{`₹ ${pos.total.toFixed(2)}`}</td>
                         <td
                           className="py-3"
                           onClick={(e) => e.stopPropagation()}
@@ -252,10 +232,7 @@ const POS = () => {
                           <select
                             value={pos.paymentStatus}
                             onChange={(e) => {
-                              handleStatusChange(
-                                pos.id,
-                                e.target.value
-                              );
+                              handleStatusChange(pos.id, e.target.value);
                             }}
                             className={`border p-1 rounded ${
                               pos.paymentStatus === "Paid"
@@ -270,24 +247,16 @@ const POS = () => {
                             <option value="UnPaid">UnPaid</option>
                           </select>
                         </td>
-                        <td className="py-3">
-                          {pos.mode || "Online"}
-                        </td>
-                        <td className="py-3">
-                          {pos.posNo}
-                        </td>
+                        <td className="py-3">{pos.mode || "Online"}</td>
+                        <td className="py-3">{pos.posNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
                               pos?.posDate.seconds &&
-                              typeof pos.posDate
-                                .seconds === "number"
+                              typeof pos.posDate.seconds === "number"
                             ) {
-                              const date = new Date(
-                                pos.posDate.seconds *
-                                  1000
-                              );
+                              const date = new Date(pos.posDate.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -

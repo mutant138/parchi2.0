@@ -5,7 +5,7 @@ import { db } from "../../firebase";
 import { useSelector } from "react-redux";
 import { IoSearch } from "react-icons/io5";
 
-const ProFormaInvoice = () => {
+const ProFormaInvoice = ({ companyDetails, isStaff }) => {
   const [proForma, setProForma] = useState([]);
   const [isProFormaOpen, setIsProFormaOpen] = useState(false);
   const invoiceRef = useRef();
@@ -16,8 +16,13 @@ const ProFormaInvoice = () => {
 
   const userDetails = useSelector((state) => state.users);
 
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
   const navigate = useNavigate();
   useEffect(() => {
     const fetchProForma = async () => {

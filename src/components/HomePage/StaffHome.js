@@ -42,6 +42,24 @@ import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 import Projects from "../Projects/Projects";
+import PO from "../PO/PO";
+import PoView from "../PO/PoView/PoView";
+import SetPO from "../PO/SetPO/SetPO";
+import Services from "../Services/Services";
+import CreateService from "../Services/CreateService/CreateService";
+import EditService from "../Services/CreateService/EditService";
+import DeliveryChallanList from "../DeliveryChallan/DeliveryChallanList";
+import DeliveryChallanView from "../DeliveryChallan/DeliveryChallanView/DeliveryChallanView";
+import SetDeliveryChallan from "../DeliveryChallan/SetDeliveryChallan/SetDeliveryChallan";
+import CreditNoteList from "../CreditNote/CreditNoteList";
+import CreditNoteView from "../CreditNote/CreditNoteView/CreditNoteView";
+import SetCreditNote from "../CreditNote/SetCreditNote/SetCreditNote";
+import POS from "../POS/POS";
+import POSView from "../POS/POSView/POSView";
+import SetPos from "../POS/SetPos/SetPos";
+import ProFormaInvoice from "../ProFormaInvoice/ProFormaInvoice";
+import ProFormaView from "../ProFormaInvoice/ProFormaInvoiceView/ProFormaView";
+import SetProFormaInvoice from "../ProFormaInvoice/SetProFormaInvoice/SetProFormaInvoice";
 
 const Modal = ({
   companyDetails,
@@ -309,6 +327,95 @@ const StaffHome = () => {
                   }
                 ></Route>
                 <Route path="/vendors/:id" element={<VendorView />}></Route>
+              </>
+            )}
+
+            {roles.length > 0 && roles[0].includes("CreatePo") && (
+              <>
+                <Route path="/po" element={<PO />}></Route>
+
+                <Route path="/po/:id" element={<PoView />}></Route>
+                <Route path="/po/create-po" element={<SetPO />}></Route>
+                <Route path="/po/:poId/edit-po" element={<SetPO />}></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateServices") && (
+              <>
+                <Route path="/services" element={<Services />}></Route>
+                <Route
+                  path="/services/create-service"
+                  element={<CreateService />}
+                ></Route>
+                <Route
+                  path="/services/:id/edit-service"
+                  element={<EditService />}
+                ></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateDeliveryChallan") && (
+              <>
+                <Route
+                  path="/delivery-challan"
+                  element={<DeliveryChallanList />}
+                ></Route>
+                <Route
+                  path="/delivery-challan/:id"
+                  element={<DeliveryChallanView />}
+                ></Route>
+                <Route
+                  path="/delivery-challan/create-deliverychallan"
+                  element={<SetDeliveryChallan />}
+                ></Route>
+                <Route
+                  path="/delivery-challan/:deliverychallanId/edit-deliverychallan"
+                  element={<SetDeliveryChallan />}
+                ></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateCreditNote") && (
+              <>
+                <Route path="/credit-note" element={<CreditNoteList />}></Route>
+                <Route
+                  path="/credit-note/:id"
+                  element={<CreditNoteView />}
+                ></Route>
+                <Route
+                  path="/credit-note/create-creditnote"
+                  element={<SetCreditNote />}
+                ></Route>
+                <Route
+                  path="/credit-note/:creditnoteId/edit-creditnote"
+                  element={<SetCreditNote />}
+                ></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreatePOS") && (
+              <>
+                <Route path="/pos" element={<POS />}></Route>
+                <Route path="/pos/:id" element={<POSView />}></Route>
+                <Route path="/pos/create-pos" element={<SetPos />}></Route>
+                <Route path="/pos/:posId/edit-pos" element={<SetPos />}></Route>
+              </>
+            )}
+
+            {roles.length > 0 && roles[0].includes("CreateProFormaInvoice") && (
+              <>
+                <Route
+                  path="/pro-forma-invoice"
+                  element={<ProFormaInvoice />}
+                ></Route>
+                <Route
+                  path="/pro-forma-invoice/:id"
+                  element={<ProFormaView />}
+                ></Route>
+                <Route
+                  path="/pro-forma-invoice/create-proForma-invoice"
+                  element={<SetProFormaInvoice />}
+                ></Route>
+                <Route
+                  path="/pro-forma-invoice/:proFormaId/edit-proForma-invoice"
+                  element={<SetProFormaInvoice />}
+                ></Route>
               </>
             )}
           </Routes>

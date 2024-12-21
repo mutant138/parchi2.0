@@ -7,12 +7,17 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 
-function PO() {
+function PO({ companyDetails, isStaff }) {
   const [filterStatus, setFilterStatus] = useState("All");
   const [loading, setLoading] = useState(!true);
   const userDetails = useSelector((state) => state.users);
-  const companyDetails =
-    userDetails.companies[userDetails.selectedCompanyIndex];
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
 
   const selectedDashboardUser = userDetails.selectedDashboard;
   const navigate = useNavigate();
@@ -44,7 +49,7 @@ function PO() {
       setLoading(true);
       try {
         const getData = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "po")
+          collection(db, "companies", companyId, "po")
         );
         let receivedCount = 0;
         let totalPrice = 0;
@@ -75,7 +80,7 @@ function PO() {
 
   async function onStatusUpdate(value, poId) {
     try {
-      const docRef = doc(db, "companies", companyDetails.companyId, "po", poId);
+      const docRef = doc(db, "companies", companyId, "po", poId);
       await updateDoc(docRef, { orderStatus: value });
       const UpdatedData = POList.map((ele) => {
         if (ele.id === poId) {

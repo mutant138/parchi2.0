@@ -12,15 +12,20 @@ import { db } from "../../firebase";
 import { useSelector } from "react-redux";
 import { RiDeleteBin6Line, RiEditFill } from "react-icons/ri";
 
-function Services() {
+function Services({ companyDetails, isStaff }) {
   const [filterStatus, setFilterStatus] = useState("All");
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const userDetails = useSelector((state) => state.users);
   const navigator = useNavigate();
-  const companyDetails =
-    userDetails.companies[userDetails.selectedCompanyIndex];
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
 
   const filteredServices = services.filter((service) => {
     const { customerDetails, status, serviceNo } = service;
@@ -54,7 +59,7 @@ function Services() {
       try {
         setLoading(true);
         const getData = await getDocs(
-          collection(db, "companies", companyDetails.companyId, "services")
+          collection(db, "companies", companyId, "services")
         );
 
         const serviceData = getData.docs.map((doc) => {
@@ -77,13 +82,7 @@ function Services() {
 
   async function onUpdateStatus(id, newStatus) {
     try {
-      const serviceDoc = doc(
-        db,
-        "companies",
-        companyDetails.companyId,
-        "services",
-        id
-      );
+      const serviceDoc = doc(db, "companies", companyId, "services", id);
       await updateDoc(serviceDoc, { status: newStatus });
       setServices((pre) =>
         pre.map((service) =>
@@ -100,13 +99,7 @@ function Services() {
         return;
       }
 
-      const ServiceDocRef = doc(
-        db,
-        "companies",
-        companyDetails.companyId,
-        "services",
-        id
-      );
+      const ServiceDocRef = doc(db, "companies", companyId, "services", id);
 
       const confirmDelete = window.confirm(
         "Are you sure you want to delete this service?"

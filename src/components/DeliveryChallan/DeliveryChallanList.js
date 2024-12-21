@@ -8,7 +8,7 @@ import { FaRegEye } from "react-icons/fa";
 import { IoMdClose, IoMdDownload } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 
-const DeliveryChallanList = () => {
+const DeliveryChallanList = ({ companyDetails, isStaff }) => {
   const [deliveryChallan, setDeliveryChallan] = useState([]);
   const [isDeliveryChallanOpen, setIsDeliveryChallanOpen] = useState(false);
   const deliveryChallanRef = useRef();
@@ -20,8 +20,13 @@ const DeliveryChallanList = () => {
 
   const userDetails = useSelector((state) => state.users);
 
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
   const navigate = useNavigate();
 
   useEffect(() => {
