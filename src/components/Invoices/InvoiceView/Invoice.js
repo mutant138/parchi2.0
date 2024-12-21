@@ -203,7 +203,6 @@ function Invoice({ invoice, bankDetails }) {
       if (invoice.products && invoice.products.length > 0) {
         const updateInventoryPromises = invoice.products.map(
           (inventoryItem) => {
-            console.log("inventoryitem", inventoryItem);
             if (
               !inventoryItem.productRef ||
               typeof inventoryItem.quantity !== "number"

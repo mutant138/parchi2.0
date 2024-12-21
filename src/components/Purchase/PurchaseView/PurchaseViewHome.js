@@ -11,18 +11,79 @@ function PurchaseViewHome() {
   const [activeTab, setActiveTab] = useState("purchase");
   const [purchase, setPurchase] = useState({});
   const userDetails = useSelector((state) => state.users);
+  const [bankDetails, setBankDetails] = useState({});
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
 
   const fetchPurchases = async () => {
     try {
+      let totalTaxableAmount = 0;
+      let totalSgstAmount_2_5 = 0;
+      let totalCgstAmount_2_5 = 0;
+      let totalSgstAmount_6 = 0;
+      let totalCgstAmount_6 = 0;
+      let totalSgstAmount_9 = 0;
+      let totalCgstAmount_9 = 0;
+      let tax = 0;
       const purchaseRef = doc(db, "companies", companyId, "purchases", id);
-      const resData = await getDoc(purchaseRef);
+      const { vendorDetails, purchaseNo, ...resData } = (
+        await getDoc(purchaseRef)
+      ).data();
       const purchasesData = {
-        id: resData.id,
-        ...resData.data(),
+        id,
+        ...resData,
+        type: "Purchase",
+        no: purchaseNo,
+        userTo: vendorDetails,
+        products: resData.products.map((item) => {
+          let discount = +item.discount || 0;
+
+          if (item.discountType) {
+            discount = (+item.sellingPrice / 100) * item.discount;
+          }
+          const netAmount = item.sellingPrice - (discount || 0);
+          const taxRate = item.tax || 0;
+          const sgst = taxRate / 2;
+          const cgst = taxRate / 2;
+          const taxAmount = netAmount * (taxRate / 100);
+          const sgstAmount = netAmount * (sgst / 100);
+          const cgstAmount = netAmount * (cgst / 100);
+          tax += item.tax || 0;
+          item.returnQty = 0;
+
+          totalTaxableAmount += netAmount * item.quantity;
+          totalSgstAmount_2_5 += sgst === 2.5 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_2_5 += cgst === 2.5 ? cgstAmount * item.quantity : 0;
+          totalSgstAmount_6 += sgst === 6 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_6 += cgst === 6 ? cgstAmount * item.quantity : 0;
+          totalSgstAmount_9 += sgst === 9 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_9 += cgst === 9 ? cgstAmount * item.quantity : 0;
+          return {
+            ...item,
+            sgst,
+            cgst,
+            taxAmount,
+            sgstAmount,
+            cgstAmount,
+            totalAmount: netAmount * item.quantity,
+            netAmount,
+          };
+        }),
+        tax,
+        totalTaxableAmount,
+        totalSgstAmount_2_5,
+        totalCgstAmount_2_5,
+        totalSgstAmount_6,
+        totalCgstAmount_6,
+        totalSgstAmount_9,
+        totalCgstAmount_9,
       };
+
+      if (purchasesData.book?.bookRef) {
+        const bankData = (await getDoc(purchasesData.book.bookRef)).data();
+        setBankDetails(bankData);
+      }
       setPurchase(purchasesData);
     } catch (error) {
       console.error("Error fetching purchases:", error);
@@ -74,7 +135,7 @@ function PurchaseViewHome() {
       <div className="w-full">
         {activeTab === "purchase" && (
           <div>
-            <PurchaseView purchase={purchase} />
+            <PurchaseView purchase={purchase} bankDetails={bankDetails} />
           </div>
         )}
         {/* {activeTab === "Returns" && (

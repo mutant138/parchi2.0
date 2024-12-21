@@ -31,24 +31,25 @@ const Template1 = forwardRef((props, ref) => {
             <div>Mobile : {dataSet?.createdBy?.phoneNo}</div>
           </div>
           <div>
-            <h3 className="font-bold uppercase">TAX {dataSet.type}</h3>
+            <h3 className="font-bold uppercase">TAX {dataSet?.type}</h3>
           </div>
         </div>
         <div className="flex justify-between text-start">
           <div className="mt-2 text-start">
             <strong>Bill To :</strong>
-            <div>{dataSet.userTo.name}</div>
-            <div>Ph : {dataSet.userTo.phone}</div>
+            <div>{dataSet?.userTo.name}</div>
+            <div>Ph : {dataSet?.userTo.phone}</div>
           </div>
           <div>
             <div>
-              <strong>{dataSet.type} # :</strong> {dataSet.no}
+              <strong>{dataSet?.type} # :</strong> {dataSet?.no}
             </div>
             <div>
-              <strong>{dataSet.type} Date :</strong> {DateFormate(dataSet.date)}
+              <strong>{dataSet?.type} Date :</strong>{" "}
+              {DateFormate(dataSet?.date)}
             </div>
             <div>
-              <strong>Due Date :</strong> {DateFormate(dataSet.dueDate)}
+              <strong>Due Date :</strong> {DateFormate(dataSet?.dueDate)}
             </div>
             <div>
               <strong>Place of Supply :</strong> -
@@ -72,7 +73,7 @@ const Template1 = forwardRef((props, ref) => {
               </tr>
             </thead>
             <tbody>
-              {dataSet.products.map((item, index) => (
+              {dataSet?.products.map((item, index) => (
                 <tr key={index}>
                   <td className="border border-black pt-2 pb-2 pl-1">
                     {index + 1}
@@ -110,85 +111,85 @@ const Template1 = forwardRef((props, ref) => {
           </table>
         </div>
         <div className="mt-4 text-end">
-          {dataSet.shippingCharges > 0 && (
+          {dataSet?.shippingCharges > 0 && (
             <div>
               Delivery/Shipping Charges :
-              <span className="ml-5"> {dataSet.shippingCharges}</span>
+              <span className="ml-5"> {dataSet?.shippingCharges}</span>
             </div>
           )}
-          {dataSet.packagingCharges > 0 && (
+          {dataSet?.packagingCharges > 0 && (
             <div>
               Packaging Charges :
-              <span className="ml-5"> {dataSet.packagingCharges}</span>
+              <span className="ml-5"> {dataSet?.packagingCharges}</span>
             </div>
           )}
         </div>
 
         <div className="mt-4 mb-3 text-end">
-          {dataSet.tcs.isTcsApplicable && (
+          {dataSet?.tcs.isTcsApplicable && (
             <div>
               TCS :
-              <span className="ml-5">{dataSet.tcs.tcs_amount.toFixed(2)}</span>
+              <span className="ml-5">{dataSet?.tcs.tcs_amount.toFixed(2)}</span>
             </div>
           )}
-          {dataSet.tds.isTdsApplicable && (
+          {dataSet?.tds.isTdsApplicable && (
             <div>
               TDS :
-              <span className="ml-5">{dataSet.tds.tds_amount.toFixed(2)}</span>
+              <span className="ml-5">{dataSet?.tds.tds_amount.toFixed(2)}</span>
             </div>
           )}
-          {dataSet.totalCgstAmount_9 > 0 && (
+          {dataSet?.totalCgstAmount_9 > 0 && (
             <div>
               CGST 9.0% :
               <span className="ml-5">
-                {dataSet.totalCgstAmount_9.toFixed(2)}
+                {dataSet?.totalCgstAmount_9.toFixed(2)}
               </span>
             </div>
           )}
-          {dataSet.totalSgstAmount_9 > 0 && (
+          {dataSet?.totalSgstAmount_9 > 0 && (
             <div>
               SGST 9.0% :
               <span className="ml-5">
-                {dataSet.totalSgstAmount_9.toFixed(2)}
+                {dataSet?.totalSgstAmount_9.toFixed(2)}
               </span>
             </div>
           )}
-          {dataSet.totalCgstAmount_6 > 0 && (
+          {dataSet?.totalCgstAmount_6 > 0 && (
             <div>
               CGST 6.0% :
               <span className="ml-5">
-                {dataSet.totalCgstAmount_6.toFixed(2)}
+                {dataSet?.totalCgstAmount_6.toFixed(2)}
               </span>
             </div>
           )}
-          {dataSet.totalSgstAmount_6 > 0 && (
+          {dataSet?.totalSgstAmount_6 > 0 && (
             <div>
               SGST 6.0% :
               <span className="ml-5">
-                {dataSet.totalSgstAmount_6.toFixed(2)}
+                {dataSet?.totalSgstAmount_6.toFixed(2)}
               </span>
             </div>
           )}
-          {dataSet.totalCgstAmount_2_5 > 0 && (
+          {dataSet?.totalCgstAmount_2_5 > 0 && (
             <div>
               CGST 2.5% :
               <span className="ml-5">
-                {dataSet.totalCgstAmount_2_5.toFixed(2)}
+                {dataSet?.totalCgstAmount_2_5.toFixed(2)}
               </span>
             </div>
           )}
-          {dataSet.totalSgstAmount_2_5 > 0 && (
+          {dataSet?.totalSgstAmount_2_5 > 0 && (
             <div>
               SGST 2.5% :
               <span className="ml-5">
-                {dataSet.totalSgstAmount_2_5.toFixed(2)}
+                {dataSet?.totalSgstAmount_2_5.toFixed(2)}
               </span>
             </div>
           )}
         </div>
         <hr />
         <div className="text-end font-bold">
-          <h3>Total : ₹ {+dataSet.total?.toFixed(2)}</h3>
+          <h3>Total : ₹ {+dataSet?.total?.toFixed(2)}</h3>
         </div>
 
         <div className=" flex justify-between">
@@ -197,18 +198,18 @@ const Template1 = forwardRef((props, ref) => {
               <strong>Bank Details</strong>
             </div>
             <div>
-              Bank : <span className="font-bold">{bankDetails.bankName}</span>{" "}
+              Bank : <span className="font-bold">{bankDetails?.bankName}</span>{" "}
             </div>
             <div>
               Account # :{" "}
-              <span className="font-bold">{bankDetails.accountNo}</span>
+              <span className="font-bold">{bankDetails?.accountNo}</span>
             </div>
             <div>
               IFSC Code :{" "}
-              <span className="font-bold">{bankDetails.ifscCode}</span>
+              <span className="font-bold">{bankDetails?.ifscCode}</span>
             </div>
             <div>
-              Branch : <span className="font-bold">{bankDetails.branch}</span>
+              Branch : <span className="font-bold">{bankDetails?.branch}</span>
             </div>
           </div>
           <div className="mt-24">

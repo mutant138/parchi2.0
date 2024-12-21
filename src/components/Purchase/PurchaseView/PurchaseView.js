@@ -8,8 +8,19 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
-import Template from "../Template/Template";
-function PurchaseView({ purchase }) {
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
+import Template9 from "../../Templates/Template9";
+import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
+function PurchaseView({ purchase, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -17,9 +28,93 @@ function PurchaseView({ purchase }) {
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   const purchaseRef = useRef();
+  const templatesComponents = {
+    template1: (
+      <Template1
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
 
+    template2: (
+      <Template2
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template3: (
+      <Template3
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template4: (
+      <Template4
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+    template5: (
+      <Template5
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template6: (
+      <Template6
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+    template7: (
+      <Template7
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+    template8: (
+      <Template8
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+    template9: (
+      <Template9
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+    template10: (
+      <Template10
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+    template11: (
+      <Template11
+        ref={purchaseRef}
+        dataSet={purchase}
+        bankDetails={bankDetails}
+      />
+    ),
+  };
   useEffect(() => {
     if (purchase.products) {
       const tax = purchase?.products.reduce((acc, cur) => {
@@ -142,16 +237,26 @@ function PurchaseView({ purchase }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {purchase.paymentStatus !== "Paid" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
             >
-              <RiDeleteBin6Line />
+              Change Template
             </button>
           </div>
-        )}
+          {purchase.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
@@ -426,16 +531,21 @@ function PurchaseView({ purchase }) {
                     </div>
                   </div>
                 </div>
-                <Template
-                  ref={purchaseRef}
-                  purchaseData={purchase}
-                  //   bankDetails={bankDetails}
-                />
+                {templatesComponents[selectTemplate]}
               </div>
             </div>
           </div>
         </div>
       )}
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 }

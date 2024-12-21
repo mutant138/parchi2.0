@@ -29,42 +29,42 @@ const Template3 = forwardRef((props, ref) => {
             </h1>
           </div>
           <div className="text-right">
-            <h2 className="text-xl font-bold">{dataSet.type}</h2>
+            <h2 className="text-xl font-bold">{dataSet?.type}</h2>
           </div>
         </header>
         <div className="flex justify-between items-center  border-b pb-4 mb-3">
           <div>
             <span className="font-bold"> Date:</span>{" "}
-            {DateFormate(dataSet.dueDate)}
+            {DateFormate(dataSet?.dueDate)}
           </div>
           <div>
-            <span className="font-bold">{dataSet.type} No:</span> {dataSet.no}
+            <span className="font-bold">{dataSet?.type} No:</span> {dataSet?.no}
           </div>
         </div>
 
-        {/* {dataSet.type} Details */}
+        {/* {dataSet?.type} Details */}
         <section className="flex justify-between  mb-3">
           <div>
-            <h3 className="font-bold">{dataSet.type}d To:</h3>
+            <h3 className="font-bold">{dataSet?.type}d To:</h3>
             <p>{dataSet?.userTo?.name}</p>
             <p>
-              {dataSet.userTo.address}
-              {dataSet.userTo.city}
-              {dataSet.userTo.zipCode}
+              {dataSet?.userTo.address}
+              {dataSet?.userTo.city}
+              {dataSet?.userTo.zipCode}
             </p>
-            <p>{dataSet.userTo.phone}</p>
-            <p>{dataSet.userTo.email}</p>
+            <p>{dataSet?.userTo.phone}</p>
+            <p>{dataSet?.userTo.email}</p>
           </div>
           <div className="text-right">
             <h3 className="font-bold">Pay To:</h3>
             <p> {dataSet?.createdBy?.name}</p>
             <p>
-              {dataSet.createdBy.address}
-              {dataSet.createdBy.city}
-              {dataSet.createdBy.zipCode}
+              {dataSet?.createdBy.address}
+              {dataSet?.createdBy.city}
+              {dataSet?.createdBy.zipCode}
             </p>
-            <p>{dataSet.createdBy.email}</p>
-            <p>{dataSet.createdBy.phoneNo}</p>
+            <p>{dataSet?.createdBy.email}</p>
+            <p>{dataSet?.createdBy.phoneNo}</p>
           </div>
         </section>
 
@@ -81,7 +81,7 @@ const Template3 = forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {dataSet.products.map((item, index) => (
+            {dataSet?.products.map((item, index) => (
               <tr key={index} className="border-t-2">
                 <td className="py-2 pl-1">{index + 1}</td>
                 <td className="py-2 pl-1">{item.name}</td>
@@ -93,39 +93,39 @@ const Template3 = forwardRef((props, ref) => {
             ))}
           </tbody>
         </table>
-        {dataSet.tcs.isTcsApplicable && (
+        {dataSet?.tcs.isTcsApplicable && (
           <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
             <span className="font-bold">TCS :</span>
-            <span className="ml-5">{dataSet.tcs.tcs_amount.toFixed(2)}</span>
+            <span className="ml-5">{dataSet?.tcs.tcs_amount.toFixed(2)}</span>
           </div>
         )}
-        {dataSet.tds.isTdsApplicable && (
+        {dataSet?.tds.isTdsApplicable && (
           <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
             <span className="font-bold">TDS :</span>
-            <span className="ml-5">{dataSet.tds.tds_amount.toFixed(2)}</span>
+            <span className="ml-5">{dataSet?.tds.tds_amount.toFixed(2)}</span>
           </div>
         )}
 
         <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
           <span className="font-bold">Tax :</span>
-          <span className="ml-5">{dataSet.tax}</span>
+          <span className="ml-5">{dataSet?.tax}</span>
         </div>
 
         <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
           <span className="font-bold">Total :</span>₹
-          {+dataSet.total?.toFixed(2)}
+          {+dataSet?.total?.toFixed(2)}
         </div>
 
         {/* Note */}
         <footer className="mt-6  text-gray-500 text-xs">
           <div>
             <span className="font-bold">NOTE:</span>{" "}
-            {dataSet.notes || "No notes"}
+            {dataSet?.notes || "No notes"}
           </div>
           <div className=" text-gray-600">
             <p>
               <span className="font-bold">Terms & Conditions: </span>
-              {dataSet.terms || "No Terms & Conditions"}
+              {dataSet?.terms || "No Terms & Conditions"}
             </p>
           </div>
         </footer>

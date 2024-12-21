@@ -6,11 +6,22 @@ import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
-import Template from "../Template/Template";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
-import {Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Template9 from "../../Templates/Template9";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
+import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
 
-function ProForma({ proForma }) {
+function ProForma({ proForma, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -19,9 +30,93 @@ function ProForma({ proForma }) {
   const [isProFormaOpen, setIsProFormaOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   const proFormaRef = useRef();
+  const templatesComponents = {
+    template1: (
+      <Template1
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
 
+    template2: (
+      <Template2
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template3: (
+      <Template3
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template4: (
+      <Template4
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+    template5: (
+      <Template5
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template6: (
+      <Template6
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+    template7: (
+      <Template7
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+    template8: (
+      <Template8
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+    template9: (
+      <Template9
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+    template10: (
+      <Template10
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+    template11: (
+      <Template11
+        ref={proFormaRef}
+        dataSet={proForma}
+        bankDetails={bankDetails}
+      />
+    ),
+  };
   useEffect(() => {
     if (proForma.products) {
       const tax = proForma?.products.reduce((acc, cur) => {
@@ -168,16 +263,26 @@ function ProForma({ proForma }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {proForma.paymentStatus !== "Paid" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
             >
-              <RiDeleteBin6Line />
+              Change Template
             </button>
           </div>
-        )}
+          {proForma.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
@@ -252,7 +357,7 @@ function ProForma({ proForma }) {
           </div>
         </div>
       </div> */}
-<div
+      <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
         style={{ height: "64vh" }}
       >
@@ -296,7 +401,7 @@ function ProForma({ proForma }) {
                   <div className="mt-8">
                     <div className="mb-2.5">
                       <span className="mr-12  font-semibold text-gray-900">
-                      ProForma Date:
+                        ProForma Date:
                       </span>
                       <span className="  text-gray-600">
                         {DateFormate(proForma?.date)}
@@ -452,16 +557,21 @@ function ProForma({ proForma }) {
                     </div>
                   </div>
                 </div>
-                <Template
-                  ref={proFormaRef}
-                  proFormaData={proForma}
-                  //   bankDetails={bankDetails}
-                />
+                {templatesComponents[selectTemplate]}
               </div>
             </div>
           </div>
         </div>
       )}
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 }
