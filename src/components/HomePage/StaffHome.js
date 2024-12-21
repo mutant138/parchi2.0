@@ -77,18 +77,12 @@ const StaffHome = () => {
       console.log("staffSnap", staffSnapshot);
 
       if (!staffSnapshot.empty) {
-        const staffDoc = staffSnapshot.docs[0].data();
+        const staffDoc = staffSnapshot.docs.map((doc) => doc.data());
         console.log("Staff document:", staffDoc);
 
-        const companyRefs = Array.isArray(staffDoc.companyRef)
-          ? staffDoc.companyRef
-          : [staffDoc.companyRef];
-
-        console.log("companyRefs", companyRefs);
-
-        const companyPromises = companyRefs.map(async (companyRef) => {
-          if (companyRef) {
-            const companyDoc = await getDoc(companyRef);
+        const companyPromises = staffDoc.map(async (companyRef) => {
+          if (companyRef.companyRef) {
+            const companyDoc = await getDoc(companyRef.companyRef);
             return companyDoc.exists() ? companyDoc.data() : null;
           }
           return null;
