@@ -8,7 +8,7 @@ import { FaRegEye } from "react-icons/fa";
 import { IoMdClose, IoMdDownload } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 
-const InvoiceList = () => {
+const InvoiceList = ({ companyDetails, isStaff }) => {
   const [invoices, setInvoices] = useState([]);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const invoiceRef = useRef();
@@ -16,11 +16,16 @@ const InvoiceList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedInvoiceData, setSelectedInvoiceData] = useState(null);
   const [filterStatus, setFilterStatus] = useState("All");
-
+  console.log("staffcompanydetails", companyDetails);
   const userDetails = useSelector((state) => state.users);
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
 
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -257,7 +262,7 @@ const InvoiceList = () => {
                         <td className="py-3">
                           {(() => {
                             if (
-                              invoice.date.seconds &&
+                              invoice?.date?.seconds &&
                               typeof invoice.date.seconds === "number"
                             ) {
                               const date = new Date(

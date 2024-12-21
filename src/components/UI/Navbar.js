@@ -11,7 +11,7 @@ import {
 import SunyaLogo from "../../assets/SunyaLogo.jpg";
 import { IoMdSettings } from "react-icons/io";
 
-const Navbar = ({ selectedCompany }) => {
+const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCompanyOpen, setIsCompanyOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -21,6 +21,7 @@ const Navbar = ({ selectedCompany }) => {
   const companyName =
     userDetails.companies[userDetails.selectedCompanyIndex].name;
   console.log("selectedCompany", selectedCompany);
+  console.log("companyDetails", companyDetails, isStaff);
   function onSwitchCompany(index) {
     const payload = { ...userDetails, selectedCompanyIndex: index };
     dispatch(setUserLogin(payload));
@@ -72,15 +73,20 @@ const Navbar = ({ selectedCompany }) => {
               onClick={() => setIsCompanyOpen(!isCompanyOpen)}
             >
               <div className="bg-orange-400 text-white font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
-                {userDetails?.companies?.[
-                  userDetails.selectedCompanyIndex
-                ]?.name
-                  ?.slice(0, 2)
-                  .toUpperCase() || "YB"}
+                {isStaff && selectedCompany
+                  ? selectedCompany?.slice(0, 2).toUpperCase() || "YB"
+                  : userDetails?.companies?.[
+                      userDetails.selectedCompanyIndex
+                    ]?.name
+                      ?.slice(0, 2)
+                      .toUpperCase() || "YB"}
               </div>
               <div>
                 <span className="font-bold text-gray-800">
-                  {userDetails.companies[userDetails.selectedCompanyIndex].name}
+                  {isStaff && selectedCompany
+                    ? selectedCompany
+                    : userDetails.companies[userDetails.selectedCompanyIndex]
+                        .name}
                 </span>
               </div>
               <div className="absolute z-10 left-0 top-10 w-max px-2 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
@@ -148,17 +154,19 @@ const Navbar = ({ selectedCompany }) => {
               </div>
             </button>
 
-            <button
-              type="button"
-              className="relative group px-2 py-1 rounded-full text-gray-600 hover:text-black ml-[3px]"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              // onBlur={() => setIsProfileOpen(!isProfileOpen)}
-            >
-              <FaUserCircle className="text-gray-600" size={16} />
-              <div className="absolute z-10 left-1/2 transform -translate-x-1/2 top-8 px-2 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
-                Profile
-              </div>
-            </button>
+            {!userDetails.selectedDashboard === "staff" && (
+              <button
+                type="button"
+                className="relative group px-2 py-1 rounded-full text-gray-600 hover:text-black ml-[3px]"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                // onBlur={() => setIsProfileOpen(!isProfileOpen)}
+              >
+                <FaUserCircle className="text-gray-600" size={16} />
+                <div className="absolute z-10 left-1/2 transform -translate-x-1/2 top-8 px-2 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
+                  Profile
+                </div>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -282,21 +290,43 @@ const Navbar = ({ selectedCompany }) => {
             style={{ marginTop: "8vh" }}
           >
             <div className="" onClick={(e) => e.stopPropagation()}>
-              {userDetails.companies.map((company, index) => (
-                <div
-                  className="hover:bg-blue-100 w-full border-b-2 p-2 flex items-center cursor-pointer"
-                  key={company.companyId}
-                  onClick={() => {
-                    navigate("/");
-                    onSwitchCompany(index);
-                  }}
-                >
-                  <div className="bg-orange-400 text-white mr-3 font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
-                    {company.name?.slice(0, 2).toUpperCase() || "YB"}
-                  </div>
-                  {company.name}
-                </div>
-              ))}
+              {companyDetails.length > 0 ? (
+                <>
+                  {companyDetails.map((company, index) => (
+                    <div
+                      className="hover:bg-blue-100 w-full border-b-2 p-2 flex items-center cursor-pointer"
+                      key={company.id}
+                      //  onClick={() => {
+                      //    navigate("/");
+                      //    onSwitchCompany(index);
+                      //  }}
+                    >
+                      <div className="bg-orange-400 text-white mr-3 font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
+                        {company.name?.slice(0, 2).toUpperCase() || "YB"}
+                      </div>
+                      {company.name}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {userDetails.companies.map((company, index) => (
+                    <div
+                      className="hover:bg-blue-100 w-full border-b-2 p-2 flex items-center cursor-pointer"
+                      key={company.companyId}
+                      onClick={() => {
+                        navigate("/");
+                        onSwitchCompany(index);
+                      }}
+                    >
+                      <div className="bg-orange-400 text-white mr-3 font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
+                        {company.name?.slice(0, 2).toUpperCase() || "YB"}
+                      </div>
+                      {company.name}
+                    </div>
+                  ))}
+                </>
+              )}
               <div className="hover:bg-blue-100 w-full  p-2 flex items-center">
                 <span className="text-sm text-gray-600 font-medium tracking-tight">
                   + Add Another Company

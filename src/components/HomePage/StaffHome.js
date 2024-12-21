@@ -136,13 +136,16 @@ const StaffHome = () => {
         const companyPromises = staffDoc.map(async (staff) => {
           if (staff.companyRef) {
             const companyDoc = await getDoc(staff.companyRef);
-            return companyDoc.exists() ? companyDoc.data() : null;
+            console.log("companyDoc", companyDoc);
+            return companyDoc.exists()
+              ? { id: companyDoc.id, ...companyDoc.data() }
+              : null;
           }
           return null;
         });
 
         const companies = await Promise.all(companyPromises);
-
+        console.log("companies", companies);
         if (companies.length > 0) {
           console.log("All associated companies:", companies);
           setCompanyDetails(companies);
@@ -168,7 +171,11 @@ const StaffHome = () => {
   return (
     <div>
       <div style={{ height: "8vh" }}>
-        <Navbar selectedCompany={selectedCompanyName} />
+        <Navbar
+          selectedCompany={selectedCompanyName}
+          companyDetails={companyDetails}
+          isStaff={true}
+        />
       </div>
       <div className="flex" style={{ height: "92vh" }}>
         <div>{!showModal && <SideBar staff={roles} />}</div>
