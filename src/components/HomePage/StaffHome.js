@@ -42,7 +42,7 @@ import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 
-const Modal = ({ companyDetails, onClose }) => {
+const Modal = ({ companyDetails, onClose, setSelectedCompany }) => {
   console.log("Company details:", companyDetails);
   const navigate = useNavigate();
   return (
@@ -59,6 +59,7 @@ const Modal = ({ companyDetails, onClose }) => {
                 className="p-2 border-b last:border-none cursor-pointer hover:bg-gray-100"
                 onClick={() => {
                   navigate("invoice");
+                  setSelectedCompany(company.name);
                 }}
               >
                 <p>
@@ -94,6 +95,7 @@ const StaffHome = () => {
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [roles, setRoles] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState("");
   useEffect(() => {
     if (location.pathname === "/staff") {
       setShowModal(true);
@@ -155,11 +157,11 @@ const StaffHome = () => {
   const closeModal = () => {
     setShowModal(false);
   };
-
+  console.log("selected company", selectedCompany);
   return (
     <div>
       <div style={{ height: "8vh" }}>
-        <Navbar />
+        <Navbar selectedCompany={selectedCompany} />
       </div>
       <div className="flex" style={{ height: "92vh" }}>
         <div>{!showModal && <SideBar staff={roles} />}</div>
@@ -265,7 +267,11 @@ const StaffHome = () => {
         </div>
       </div>
       {showModal && (
-        <Modal companyDetails={companyDetails} onClose={closeModal} />
+        <Modal
+          companyDetails={companyDetails}
+          onClose={closeModal}
+          setSelectedCompany={setSelectedCompany}
+        />
       )}
     </div>
   );

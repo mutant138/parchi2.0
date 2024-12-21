@@ -11,7 +11,7 @@ import {
 import SunyaLogo from "../../assets/SunyaLogo.jpg";
 import { IoMdSettings } from "react-icons/io";
 
-const Navbar = () => {
+const Navbar = ({ selectedCompany }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCompanyOpen, setIsCompanyOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -20,7 +20,7 @@ const Navbar = () => {
   const userDetails = useSelector((state) => state.users);
   const companyName =
     userDetails.companies[userDetails.selectedCompanyIndex].name;
-
+  console.log("selectedCompany", selectedCompany);
   function onSwitchCompany(index) {
     const payload = { ...userDetails, selectedCompanyIndex: index };
     dispatch(setUserLogin(payload));
@@ -115,7 +115,7 @@ const Navbar = () => {
           </div> */}
 
           {userDetails.selectedDashboard === "staff" && (
-            <div> You Logged as a Staff in {companyName}'s Company</div>
+            <div> You Logged as a Staff in {selectedCompany}'s Company</div>
           )}
           <div className="flex items-center">
             <button
