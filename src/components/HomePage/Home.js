@@ -162,7 +162,8 @@ const Home = () => {
             <Route path="/products" element={<ProductHome />}></Route>
             <Route path="/services-list" element={<ServicesList />}></Route>
             <Route path="/projects" element={<Projects />}></Route>
-            <Route path="/products/:productId" element={<ProductView />} />
+            <Route path="/products/:id" element={<ProductView />}></Route>
+            
 
           
            
