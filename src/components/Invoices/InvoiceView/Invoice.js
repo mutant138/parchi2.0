@@ -19,6 +19,7 @@ import Template7 from "../../Templates/Template7";
 import Template8 from "../../Templates/Template8";
 import Template9 from "../../Templates/Template9";
 import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
+import Template10 from "../../Templates/Template10";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Invoice({ invoice, bankDetails }) {
   const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const invoiceRef = useRef();
-  const [selectTemplate, setSelectTemplate] = useState("template9");
+  const [selectTemplate, setSelectTemplate] = useState("template10");
 
   const templatesComponents = {
     template1: (
@@ -94,6 +95,13 @@ function Invoice({ invoice, bankDetails }) {
     ),
     template9: (
       <Template9
+        ref={invoiceRef}
+        invoiceData={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+    template10: (
+      <Template10
         ref={invoiceRef}
         invoiceData={invoice}
         bankDetails={bankDetails}

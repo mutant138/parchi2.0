@@ -151,7 +151,7 @@ const Settings = () => {
                 name="userName"
                 value={formData.userName}
                 onChange={handleChange}
-                className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+                className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
                 placeholder="User Name"
               />
             </div>
@@ -168,7 +168,7 @@ const Settings = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="YOUR BUSINESS NAME"
             />
           </div>
@@ -182,7 +182,7 @@ const Settings = () => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="phone number..."
             />
           </div>
@@ -198,7 +198,7 @@ const Settings = () => {
               name="tagline"
               value={formData.tagline}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Enter your tagline..."
             />
           </div>
@@ -213,7 +213,7 @@ const Settings = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Company Email Address"
             />
           </div>
@@ -226,7 +226,7 @@ const Settings = () => {
               name="altContact"
               value={formData.altContact}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Alternate contact number"
             />
           </div>
@@ -241,7 +241,7 @@ const Settings = () => {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Address"
             />
           </div>
@@ -255,7 +255,7 @@ const Settings = () => {
               name="zipCode"
               value={formData.zipCode}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="PIN Code"
             />
           </div>
@@ -271,7 +271,7 @@ const Settings = () => {
               name="city"
               value={formData.city}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="City"
             />
           </div>
@@ -284,7 +284,7 @@ const Settings = () => {
               name="website"
               value={formData.website}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500  dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="Website"
             />
           </div>
@@ -299,7 +299,7 @@ const Settings = () => {
               name="gst"
               value={formData.gst}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="GST"
             />
           </div>
@@ -312,7 +312,7 @@ const Settings = () => {
               name="panNumber"
               value={formData.panNumber}
               onChange={handleChange}
-              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg  focus:outline-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
+              className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg  focus:outline-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
               placeholder="PAN Number"
             />
           </div>
