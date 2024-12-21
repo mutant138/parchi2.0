@@ -49,8 +49,10 @@ const Modal = ({ companyDetails, onClose }) => {
 
 const StaffHome = () => {
   const location = useLocation();
-  const phone = useSelector((state) => state.users.phone); // User's phone number from Redux
+  const phone = useSelector((state) => +state.users.phone);
+  // User's phone number from Redux
   console.log("Phone:", phone);
+  console.log("type phone", typeof phone, phone);
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
 
@@ -64,7 +66,6 @@ const StaffHome = () => {
       setShowModal(false);
     }
   }, [location, phone]);
-
   const fetchCompanyDetails = async (phone) => {
     try {
       const staffQuery = query(
@@ -73,18 +74,33 @@ const StaffHome = () => {
       );
       const staffSnapshot = await getDocs(staffQuery);
       console.log("Staff snapshot:", staffSnapshot.docs);
+      console.log("staffSnap", staffSnapshot);
 
       if (!staffSnapshot.empty) {
         const staffDoc = staffSnapshot.docs[0].data();
         console.log("Staff document:", staffDoc);
-        const companyRef = staffDoc.companyRef;
-        const companyDoc = await getDoc(companyRef);
-        console.log("Company document:", companyDoc.data());
 
-        if (companyDoc.exists()) {
-          setCompanyDetails(companyDoc.data());
+        const companyRefs = Array.isArray(staffDoc.companyRef)
+          ? staffDoc.companyRef
+          : [staffDoc.companyRef];
+
+        console.log("companyRefs", companyRefs);
+
+        const companyPromises = companyRefs.map(async (companyRef) => {
+          if (companyRef) {
+            const companyDoc = await getDoc(companyRef);
+            return companyDoc.exists() ? companyDoc.data() : null;
+          }
+          return null;
+        });
+
+        const companies = await Promise.all(companyPromises);
+
+        if (companies.length > 0) {
+          console.log("All associated companies:", companies);
+          setCompanyDetails(companies);
         } else {
-          console.error("Company not found");
+          console.error("No valid companies found for this staff member.");
           setCompanyDetails(null);
         }
       } else {

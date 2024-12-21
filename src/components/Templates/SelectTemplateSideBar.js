@@ -26,6 +26,7 @@ function SelectTemplateSideBar({
     { id: "template7", img: template7 },
     { id: "template8", img: template8 },
     { id: "template9", img: template9 },
+    { id: "template10", img: template9 },
   ];
 
   return (
