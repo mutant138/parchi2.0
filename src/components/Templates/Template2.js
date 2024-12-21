@@ -28,9 +28,9 @@ const Template2 = forwardRef((props, ref) => {
             </span>
           </div>
           <div className="text-right">
-            <h1 className="text-xl font-bold"># Invoice</h1>
+            <h1 className="text-xl font-bold uppercase"># {dataSet.type}</h1>
             <p>
-              Invoice: <span className="font-medium">{dataSet.no}</span>
+              {dataSet.type}: <span className="font-medium">{dataSet.no}</span>
             </p>
             <p>
               Date:{" "}

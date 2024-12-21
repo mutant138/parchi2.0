@@ -26,13 +26,13 @@ const Template9 = forwardRef((props, ref) => {
           <h1 className="text-3xl font-bold text-green-500">
             {dataSet?.createdBy?.name}
           </h1>
-          <h1 className="text-xl">Invoice</h1>
+          <h1 className="text-xl">{dataSet.type}</h1>
         </div>
         <div className="flex justify-end bg-blue-50 p-2 rounded-lg">
           <div className="text-end grid grid-cols-2 w-1/3">
             <span className="font-bold"> Date:</span>
             <span>{DateFormate(dataSet.dueDate)}</span>
-            <span className="font-bold">Invoice No:</span>
+            <span className="font-bold">{dataSet.type} No:</span>
             <span> #{dataSet.no}</span>
           </div>
         </div>

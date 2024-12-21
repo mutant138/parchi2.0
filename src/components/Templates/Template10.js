@@ -22,7 +22,9 @@ const Template10 = forwardRef((props, ref) => {
     >
       <div ref={ref} style={{ width: "595px", padding: "20px" }}>
         {/* Header */}
-        <div className="text-center text-lg pb-3">Tax Invoice</div>
+        <div className="text-center text-lg pb-3 uppercase">
+          Tax {dataSet.type}
+        </div>
         <div className="flex justify-between items-center pb-4">
           <h1 className="text-3xl font-bold text-blue-500">
             {dataSet?.createdBy?.name}
@@ -38,7 +40,7 @@ const Template10 = forwardRef((props, ref) => {
             <p>{dataSet.userTo.email}</p>
           </div>
           <div>
-            <h1 className="font-bold">Invoice No:</h1>
+            <h1 className="font-bold">{dataSet.type} No:</h1>
             <div> #{dataSet.no}</div>
           </div>
         </div>
@@ -56,7 +58,7 @@ const Template10 = forwardRef((props, ref) => {
               {DateFormate(dataSet.dueDate)}
             </p>
             <p>
-              <span className="font-bold">Invoice Date: </span>{" "}
+              <span className="font-bold">{dataSet.type} Date: </span>{" "}
               {DateFormate(dataSet.date)}
             </p>
           </div>

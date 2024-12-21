@@ -25,7 +25,7 @@ const Template6 = forwardRef((props, ref) => {
           <h1 className="text-3xl font-bold ">{dataSet?.createdBy?.name}</h1>
           <div className="text-end">
             <div className=" font-bold text-gray-800">
-              Tax Invoice/Bill of Supply/Cash Memo
+              Tax {dataSet.type}/Bill of Supply/Cash Memo
             </div>
             <div>(Original for Recipient) </div>
           </div>
@@ -71,11 +71,11 @@ const Template6 = forwardRef((props, ref) => {
               {dataSet.userTo.city}
             </p>
             <p>
-              <span className="font-bold">InvoiceNumber : </span>
+              <span className="font-bold">{dataSet.type} Number : </span>
               {dataSet.no}
             </p>
             <p>
-              <span className="font-bold">Invoice Date : </span>
+              <span className="font-bold">{dataSet.type} Date : </span>
               {DateFormate(dataSet.date)}
             </p>
           </div>
