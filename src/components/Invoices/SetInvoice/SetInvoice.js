@@ -28,9 +28,7 @@ const SetInvoice = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [invoiceDate, setInvoiceDate] = useState(
-    Timestamp.fromDate(new Date())
-  );
+  const [date, setdate] = useState(Timestamp.fromDate(new Date()));
   const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -158,7 +156,7 @@ const SetInvoice = () => {
         );
         const getData = (await getDoc(docRef)).data();
 
-        setInvoiceDate(getData.invoiceDate);
+        setdate(getData.date);
         setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
@@ -556,7 +554,7 @@ const SetInvoice = () => {
         ...formData,
         tds,
         tcs,
-        invoiceDate,
+        date,
         dueDate,
         createdBy: {
           companyRef: companyRef,
@@ -733,12 +731,10 @@ const SetInvoice = () => {
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(invoiceDate)}
+                  value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setInvoiceDate(
-                      Timestamp.fromDate(new Date(e.target.value))
-                    );
+                    setdate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />

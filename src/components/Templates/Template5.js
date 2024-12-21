@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template5 = forwardRef((props, ref) => {
-  const { invoiceData, bankDetails } = props;
-  if (!invoiceData) {
+  const { dataSet, bankDetails } = props;
+  if (!dataSet) {
     return;
   }
   function DateFormate(timestamp) {
@@ -25,11 +25,11 @@ const Template5 = forwardRef((props, ref) => {
         <div className="flex justify-between items-center ">
           <div className="flex items-center space-x-2">
             <h1 className="text-3xl font-bold text-green-500">
-              {invoiceData?.createdBy?.name}
+              {dataSet?.createdBy?.name}
             </h1>
             <div>
               <div className=" font-bold ">
-                {invoiceData?.createdBy?.name} Invoice
+                {dataSet?.createdBy?.name} Invoice
               </div>
               {/* <p><span></span>GSTIN: 4828E9B55BD92X6</p>
             <p>State: Ontario, Toronto</p>
@@ -39,14 +39,14 @@ const Template5 = forwardRef((props, ref) => {
           <div className="text-right">
             <p>
               <span className="font-bold">Total:</span> ₹
-              {+invoiceData.total?.toFixed(2)}
+              {+dataSet.total?.toFixed(2)}
             </p>
             <p>
               <span className="font-bold">Invoice Date:</span>
-              {DateFormate(invoiceData.dueDate)}
+              {DateFormate(dataSet.dueDate)}
             </p>
             <p>
-              <span className="font-bold">Invoice No:</span> {invoiceData.no}
+              <span className="font-bold">Invoice No:</span> {dataSet.no}
             </p>
           </div>
         </div>
@@ -59,25 +59,25 @@ const Template5 = forwardRef((props, ref) => {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div>
             <p className="font-bold">User Name:</p>
-            <p>{invoiceData?.userTo?.name}</p>
+            <p>{dataSet?.userTo?.name}</p>
             {/* <p>Customer GSTIN: 4828E9B55BD92X6</p> */}
           </div>
           <div>
             <p className="font-bold">Billing Address:</p>
             <p>
               {" "}
-              {invoiceData.createdBy.address}
-              {invoiceData.createdBy.city}
-              {invoiceData.createdBy.zipCode}
+              {dataSet.createdBy.address}
+              {dataSet.createdBy.city}
+              {dataSet.createdBy.zipCode}
             </p>
           </div>
           <div>
             <p className="font-bold">Shipping Address:</p>
             <p>
               {" "}
-              {invoiceData.userTo.address}
-              {invoiceData.userTo.city}
-              {invoiceData.userTo.zipCode}
+              {dataSet.userTo.address}
+              {dataSet.userTo.city}
+              {dataSet.userTo.zipCode}
             </p>
           </div>
         </div>
@@ -91,13 +91,13 @@ const Template5 = forwardRef((props, ref) => {
           <div>
             <p>
               <span className="font-bold">Place of Supply: </span>
-              {invoiceData.userTo.city}
+              {dataSet.userTo.city}
             </p>
           </div>
           <div>
             <p>
               <span className="font-bold">Due Date:</span>{" "}
-              {DateFormate(invoiceData.dueDate)}
+              {DateFormate(dataSet.dueDate)}
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ const Template5 = forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {invoiceData.products.map((item, index) => (
+            {dataSet.products.map((item, index) => (
               <tr key={index} className="border-t-2">
                 <td className=" pt-2 pb-2 pl-1">{item.name}</td>
                 <td className=" pt-2 pb-2 pl-1">{item.tax}%</td>
@@ -141,34 +141,34 @@ const Template5 = forwardRef((props, ref) => {
           <div className="w-full">
             <div>
               <span className="font-bold">NOTE:</span>{" "}
-              {invoiceData.notes || "No notes"}
+              {dataSet.notes || "No notes"}
             </div>
             <div className=" text-gray-600">
               <p>
                 <span className="font-bold">Terms & Conditions: </span>
-                {invoiceData.terms || "No Terms & Conditions"}
+                {dataSet.terms || "No Terms & Conditions"}
               </p>
             </div>
           </div>
           <div className="w-1/2">
             <div className="grid grid-cols-2 text-end">
               <div>Sub Total:</div>
-              <div>₹{+invoiceData.subTotal?.toFixed(2)}</div>
+              <div>₹{+dataSet.subTotal?.toFixed(2)}</div>
               <div>Discount:</div>{" "}
               <div>
-                {!invoiceData.extraDiscountType && "₹"}
-                {invoiceData.extraDiscount}
-                {invoiceData.extraDiscountType && "%"}
+                {!dataSet.extraDiscountType && "₹"}
+                {dataSet.extraDiscount}
+                {dataSet.extraDiscountType && "%"}
               </div>
               <div>Tax:</div>
               <div className=" border-b-2  border-black border-dotted">
                 {" "}
-                {invoiceData.tax}%
+                {dataSet.tax}%
               </div>
             </div>
             <div className="font-bold grid grid-cols-2 text-end pt-3">
               <div>Total:</div>
-              <div>₹{+invoiceData.total?.toFixed(2)}</div>
+              <div>₹{+dataSet.total?.toFixed(2)}</div>
             </div>
           </div>
         </div>

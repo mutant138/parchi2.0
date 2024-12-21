@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template3 = forwardRef((props, ref) => {
-  const { invoiceData, bankDetails } = props;
-  if (!invoiceData) {
+  const { dataSet, bankDetails } = props;
+  if (!dataSet) {
     return;
   }
   function DateFormate(timestamp) {
@@ -25,7 +25,7 @@ const Template3 = forwardRef((props, ref) => {
         <header className="flex justify-between items-center border-b pb-4 mb-3">
           <div>
             <h1 className="text-3xl font-bold text-blue-500">
-              {invoiceData?.createdBy?.name}
+              {dataSet?.createdBy?.name}
             </h1>
           </div>
           <div className="text-right">
@@ -35,10 +35,10 @@ const Template3 = forwardRef((props, ref) => {
         <div className="flex justify-between items-center  border-b pb-4 mb-3">
           <div>
             <span className="font-bold"> Date:</span>{" "}
-            {DateFormate(invoiceData.dueDate)}
+            {DateFormate(dataSet.dueDate)}
           </div>
           <div>
-            <span className="font-bold">Invoice No:</span> {invoiceData.no}
+            <span className="font-bold">Invoice No:</span> {dataSet.no}
           </div>
         </div>
 
@@ -46,25 +46,25 @@ const Template3 = forwardRef((props, ref) => {
         <section className="flex justify-between  mb-3">
           <div>
             <h3 className="font-bold">Invoiced To:</h3>
-            <p>{invoiceData?.userTo?.name}</p>
+            <p>{dataSet?.userTo?.name}</p>
             <p>
-              {invoiceData.userTo.address}
-              {invoiceData.userTo.city}
-              {invoiceData.userTo.zipCode}
+              {dataSet.userTo.address}
+              {dataSet.userTo.city}
+              {dataSet.userTo.zipCode}
             </p>
-            <p>{invoiceData.userTo.phone}</p>
-            <p>{invoiceData.userTo.email}</p>
+            <p>{dataSet.userTo.phone}</p>
+            <p>{dataSet.userTo.email}</p>
           </div>
           <div className="text-right">
             <h3 className="font-bold">Pay To:</h3>
-            <p> {invoiceData?.createdBy?.name}</p>
+            <p> {dataSet?.createdBy?.name}</p>
             <p>
-              {invoiceData.createdBy.address}
-              {invoiceData.createdBy.city}
-              {invoiceData.createdBy.zipCode}
+              {dataSet.createdBy.address}
+              {dataSet.createdBy.city}
+              {dataSet.createdBy.zipCode}
             </p>
-            <p>{invoiceData.createdBy.email}</p>
-            <p>{invoiceData.createdBy.phoneNo}</p>
+            <p>{dataSet.createdBy.email}</p>
+            <p>{dataSet.createdBy.phoneNo}</p>
           </div>
         </section>
 
@@ -81,7 +81,7 @@ const Template3 = forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {invoiceData.products.map((item, index) => (
+            {dataSet.products.map((item, index) => (
               <tr key={index} className="border-t-2">
                 <td className="py-2 pl-1">{index + 1}</td>
                 <td className="py-2 pl-1">{item.name}</td>
@@ -93,43 +93,39 @@ const Template3 = forwardRef((props, ref) => {
             ))}
           </tbody>
         </table>
-        {invoiceData.tcs.isTcsApplicable && (
+        {dataSet.tcs.isTcsApplicable && (
           <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
             <span className="font-bold">TCS :</span>
-            <span className="ml-5">
-              {invoiceData.tcs.tcs_amount.toFixed(2)}
-            </span>
+            <span className="ml-5">{dataSet.tcs.tcs_amount.toFixed(2)}</span>
           </div>
         )}
-        {invoiceData.tds.isTdsApplicable && (
+        {dataSet.tds.isTdsApplicable && (
           <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
             <span className="font-bold">TDS :</span>
-            <span className="ml-5">
-              {invoiceData.tds.tds_amount.toFixed(2)}
-            </span>
+            <span className="ml-5">{dataSet.tds.tds_amount.toFixed(2)}</span>
           </div>
         )}
 
         <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
           <span className="font-bold">Tax :</span>
-          <span className="ml-5">{invoiceData.tax}</span>
+          <span className="ml-5">{dataSet.tax}</span>
         </div>
 
         <div className="py-2 pe-3 text-end border-x-2 border-b-2 bg-gray-100">
           <span className="font-bold">Total :</span>₹
-          {+invoiceData.total?.toFixed(2)}
+          {+dataSet.total?.toFixed(2)}
         </div>
 
         {/* Note */}
         <footer className="mt-6  text-gray-500 text-xs">
           <div>
             <span className="font-bold">NOTE:</span>{" "}
-            {invoiceData.notes || "No notes"}
+            {dataSet.notes || "No notes"}
           </div>
           <div className=" text-gray-600">
             <p>
               <span className="font-bold">Terms & Conditions: </span>
-              {invoiceData.terms || "No Terms & Conditions"}
+              {dataSet.terms || "No Terms & Conditions"}
             </p>
           </div>
         </footer>

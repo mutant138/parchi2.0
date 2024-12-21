@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template7 = forwardRef((props, ref) => {
-  const { invoiceData, bankDetails } = props;
-  if (!invoiceData) {
+  const { dataSet, bankDetails } = props;
+  if (!dataSet) {
     return;
   }
   function DateFormate(timestamp) {
@@ -25,15 +25,15 @@ const Template7 = forwardRef((props, ref) => {
         <div className="flex justify-between items-center border-b pb-4">
           <div>
             <h1 className=" text-gray-800">
-              <span className="font-bold">Invoice No:</span> #{invoiceData.no}
+              <span className="font-bold">Invoice No:</span> #{dataSet.no}
             </h1>
             <p className="text-gray-600">
               <span className="font-bold"> Date:</span>{" "}
-              {DateFormate(invoiceData.dueDate)}
+              {DateFormate(dataSet.dueDate)}
             </p>
           </div>
           <h1 className="text-3xl font-bold text-green-500">
-            {invoiceData?.createdBy?.name}
+            {dataSet?.createdBy?.name}
           </h1>
           {/* <img src="/ivonne-logo.png" alt="Ivonne Logo" className="h-12" /> */}
         </div>
@@ -42,25 +42,25 @@ const Template7 = forwardRef((props, ref) => {
         <div className="grid grid-cols-2 gap-6 mt-6 text-sm text-gray-800">
           <div>
             <h3 className="font-bold">Invoice To:</h3>
-            <p>{invoiceData?.userTo?.name}</p>
+            <p>{dataSet?.userTo?.name}</p>
             <p>
-              {invoiceData.userTo.address}
-              {invoiceData.userTo.city}
-              {invoiceData.userTo.zipCode}
+              {dataSet.userTo.address}
+              {dataSet.userTo.city}
+              {dataSet.userTo.zipCode}
             </p>
-            <p>{invoiceData.userTo.phone}</p>
-            <p>{invoiceData.userTo.email}</p>
+            <p>{dataSet.userTo.phone}</p>
+            <p>{dataSet.userTo.email}</p>
           </div>
           <div className="text-right">
             <h3 className="font-bold">Pay To:</h3>
-            <p> {invoiceData?.createdBy?.name}</p>
+            <p> {dataSet?.createdBy?.name}</p>
             <p>
-              {invoiceData.createdBy.address}
-              {invoiceData.createdBy.city}
-              {invoiceData.createdBy.zipCode}
+              {dataSet.createdBy.address}
+              {dataSet.createdBy.city}
+              {dataSet.createdBy.zipCode}
             </p>
-            <p>{invoiceData.createdBy.email}</p>
-            <p>{invoiceData.createdBy.phoneNo}</p>
+            <p>{dataSet.createdBy.email}</p>
+            <p>{dataSet.createdBy.phoneNo}</p>
           </div>
         </div>
 
@@ -80,7 +80,7 @@ const Template7 = forwardRef((props, ref) => {
               </tr>
             </thead>
             <tbody>
-              {invoiceData.products.map((item, index) => (
+              {dataSet.products.map((item, index) => (
                 <tr key={index} className="border-t-2">
                   <td className=" pt-2 pb-2 pl-1">{item.name}</td>
                   <td className=" pt-2 pb-2 pl-1">{item.tax}%</td>
@@ -106,18 +106,18 @@ const Template7 = forwardRef((props, ref) => {
             <div className="w-1/2 bg-gray-100">
               <div className="flex justify-between border py-2">
                 <span className="font-semibold">Subtotal:</span>
-                <span> ₹{+invoiceData.subTotal?.toFixed(2)}</span>
+                <span> ₹{+dataSet.subTotal?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between border py-2">
                 <span className="font-semibold">Tax:</span>
-                <span>{invoiceData.tax}%</span>
+                <span>{dataSet.tax}%</span>
               </div>
             </div>
           </div>
           <div className="flex justify-end font-bold text-gray-800 pt-2">
             <div className="w-1/2 flex justify-between ">
               <span>Total Amount:</span>
-              <span> ₹{+invoiceData.total?.toFixed(2)}</span>
+              <span> ₹{+dataSet.total?.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -126,12 +126,12 @@ const Template7 = forwardRef((props, ref) => {
         <div className="mt-6 text-sm text-gray-600 py-2">
           <div>
             <span className="font-bold">NOTE:</span>{" "}
-            {invoiceData.notes || "No notes"}
+            {dataSet.notes || "No notes"}
           </div>
           <div className=" text-gray-600">
             <p>
               <span className="font-bold">Terms & Conditions: </span>
-              {invoiceData.terms || "No Terms & Conditions"}
+              {dataSet.terms || "No Terms & Conditions"}
             </p>
           </div>
         </div>

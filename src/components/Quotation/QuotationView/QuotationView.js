@@ -7,29 +7,120 @@ import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
-import { Link,useNavigate } from "react-router-dom";
-import Template from "../Template/Template";
-function QuotationView({ quotation }) {
+import { Link, useNavigate } from "react-router-dom";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
+import Template9 from "../../Templates/Template9";
+import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
+
+function QuotationView({ quotation, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const [isQuotationOpen, setIsQuotationOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
-  const [totalDiscount, setTotalDiscount] = useState(0);
-
+  const [selectTemplate, setSelectTemplate] = useState("template1");
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
   const quotationRef = useRef();
 
+  const templatesComponents = {
+    template1: (
+      <Template1
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template2: (
+      <Template2
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template3: (
+      <Template3
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template4: (
+      <Template4
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+    template5: (
+      <Template5
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template6: (
+      <Template6
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+    template7: (
+      <Template7
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+    template8: (
+      <Template8
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+    template9: (
+      <Template9
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+    template10: (
+      <Template10
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+    template11: (
+      <Template11
+        ref={quotationRef}
+        dataSet={quotation}
+        bankDetails={bankDetails}
+      />
+    ),
+  };
   useEffect(() => {
     if (quotation.products) {
       const tax = quotation?.products.reduce((acc, cur) => {
         return acc + cur?.tax;
       }, 0);
-      const discount = quotation?.products.reduce((acc, cur) => {
-        return acc + cur?.discount;
-      }, 0);
       setTotalTax(tax);
-      setTotalDiscount(discount);
     }
   }, [quotation]);
 
@@ -142,91 +233,28 @@ function QuotationView({ quotation }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {quotation.paymentStatus !== "Paid" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
             >
-              <RiDeleteBin6Line />
+              Change Template
             </button>
           </div>
-        )}
+          {quotation.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      {/* <div className="space-y-2 ">
-        <div className="bg-white rounded-t-lg p-3 py-2">
-          <div>
-            <div>
-              <div></div>
-              <div>
-                <div>Bill To</div>
-                <div></div>
-                <div></div>
-              </div>
-            </div>
-            <div>Date: {DateFormate(quotation?.date)}</div>
-          </div>
-        </div>
-        <div className="bg-white rounded-b-lg px-3 pb-3">
-          {quotation?.products?.length > 0 &&
-            quotation?.products.map((ele, index) => (
-              <div key={index} className="flex justify-between border-b-2 py-3">
-                <div>
-                  <div className="text-lg font-bold">{ele.name}</div>
-                  <div>-</div>
-                  <div>Qty: {ele.quantity}</div>
-                </div>
-                <div className="text-end">
-                  <div>Price: ₹{ele?.sellingPrice}</div>
-                  <div>Tax :{ele?.tax}%</div>
-                  <div>Discount :₹{ele?.discount}</div>
-                </div>
-              </div>
-            ))}
-          <div className="text-end border-b-2 border-dashed py-3">
-            <div>subTotal: ₹{quotation.subTotal}</div>
-            <div>Tax: {totalTax}%</div>
-            <div>
-              {quotation.extraDiscount?.amount > 0 && (
-                <>
-                  Extra Discount:{" "}
-                  {quotation?.extraDiscount?.type === "percentage"
-                    ? `${quotation.extraDiscount.amount}%`
-                    : `₹${quotation.extraDiscount.amount}`}{" "}
-                </>
-              )}
-            </div>
-            <div>
-              {" "}
-              {quotation.packagingCharges > 0 && (
-                <>Packaging Charges: ₹{quotation.packagingCharges}</>
-              )}
-            </div>
-            <div>
-              {" "}
-              {quotation.shippingCharges > 0 && (
-                <>Shipping Charges: ₹{quotation.shippingCharges} </>
-              )}{" "}
-            </div>
-          </div>
-          <div className="flex space-x-3 justify-end font-bold text-lg">
-            <div>Total:</div>
-            <div>₹ {quotation.total}</div>
-          </div>
-          <div className="bg-gray-100  rounded-lg">
-            <div className="p-2">
-              <div>Notes</div>
-              <div className="font-bold">{quotation.notes || "No Data"}</div>
-            </div>
-            <hr />
-            <div className="p-2">
-              <div>Terms And Conditions</div>
-              <div className="font-bold">{quotation.terms || "No Data"}</div>
-            </div>
-          </div>
-        </div>
-      </div> */}
-<div
+      <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
         style={{ height: "64vh" }}
       >
@@ -426,16 +454,21 @@ function QuotationView({ quotation }) {
                     </div>
                   </div>
                 </div>
-                <Template
-                  ref={quotationRef}
-                  quotationData={quotation}
-                  //   bankDetails={bankDetails}
-                />
+                {templatesComponents[selectTemplate]}
               </div>
             </div>
           </div>
         </div>
       )}
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 }

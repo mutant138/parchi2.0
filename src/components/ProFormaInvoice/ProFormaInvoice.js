@@ -233,9 +233,7 @@ const ProFormaInvoice = () => {
                             <option value="UnPaid">UnPaid</option>
                           </select>
                         </td>
-                        <td className="py-3">
-                          {invoice.mode || "Online"}
-                        </td>
+                        <td className="py-3">{invoice.mode || "Online"}</td>
                         <td className="py-3">{invoice.proFormaNo}</td>
 
                         <td className="py-3">
@@ -244,13 +242,13 @@ const ProFormaInvoice = () => {
                               invoice.date &&
                               typeof invoice.date.seconds === "number"
                             ) {
-                              const invoiceDate = new Date(
+                              const date = new Date(
                                 invoice.date.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
-                                invoiceDate.setHours(0, 0, 0, 0);
+                                date.setHours(0, 0, 0, 0);
                               const daysDiff = Math.floor(
                                 timeDiff / (1000 * 60 * 60 * 24)
                               );
