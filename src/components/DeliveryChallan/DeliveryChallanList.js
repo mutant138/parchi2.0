@@ -228,21 +228,21 @@ const DeliveryChallanList = () => {
                 </thead>
                 <tbody>
                   {filteredDeliveryChallan.length > 0 ? (
-                    filteredDeliveryChallan.map((deliveryChallan) => (
+                    filteredDeliveryChallan.map((dcItem) => (
                       <tr
-                        key={deliveryChallan.id}
+                        key={dcItem.id}
                         className="border-b text-center cursor-pointer"
                         onClick={(e) => {
-                          navigate(deliveryChallan.id);
+                          navigate(dcItem.id);
                         }}
                       >
                         <td className="py-3">
-                          {deliveryChallan.customerDetails?.name} <br />
+                          {dcItem.customerDetails?.name} <br />
                           <span className="text-gray-500">
-                            {deliveryChallan.customerDetails.phone}
+                            {dcItem.customerDetails?.phone}
                           </span>
                         </td>
-                        <td className="py-3">{`₹ ${deliveryChallan.total.toFixed(
+                        <td className="py-3">{`₹ ${dcItem?.total?.toFixed(
                           2
                         )}`}</td>
                         <td
@@ -250,17 +250,14 @@ const DeliveryChallanList = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <select
-                            value={deliveryChallan.paymentStatus}
+                            value={dcItem?.paymentStatus}
                             onChange={(e) => {
-                              handleStatusChange(
-                                deliveryChallan.id,
-                                e.target.value
-                              );
+                              handleStatusChange(dcItem.id, e.target.value);
                             }}
                             className={`border p-1 rounded ${
-                              deliveryChallan.paymentStatus === "Paid"
+                              dcItem?.paymentStatus === "Paid"
                                 ? "bg-green-100 text-green-700"
-                                : deliveryChallan.paymentStatus === "Pending"
+                                : dcItem.paymentStatus === "Pending"
                                 ? "bg-yellow-100 text-yellow-700"
                                 : "bg-red-100 text-red-700"
                             }`}
@@ -270,22 +267,16 @@ const DeliveryChallanList = () => {
                             <option value="UnPaid">UnPaid</option>
                           </select>
                         </td>
-                        <td className="py-3">
-                          {deliveryChallan.mode || "Online"}
-                        </td>
-                        <td className="py-3">
-                          {deliveryChallan.deliveryChallanNo}
-                        </td>
+                        <td className="py-3">{dcItem.mode || "Online"}</td>
+                        <td className="py-3">{dcItem.deliveryChallanNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
-                              deliveryChallan.date.seconds &&
-                              typeof deliveryChallan.date.seconds === "number"
+                              dcItem?.date?.seconds &&
+                              typeof dcItem?.date?.seconds === "number"
                             ) {
-                              const date = new Date(
-                                deliveryChallan.date.seconds * 1000
-                              );
+                              const date = new Date(dcItem.date.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -

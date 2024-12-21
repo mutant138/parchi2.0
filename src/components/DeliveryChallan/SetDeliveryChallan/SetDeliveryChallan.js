@@ -28,7 +28,7 @@ const SetDeliveryChallan = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [date, setdate] = useState(Timestamp.fromDate(new Date()));
+  const [date, setDate] = useState(Timestamp.fromDate(new Date()));
   const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -158,7 +158,7 @@ const SetDeliveryChallan = () => {
         );
         const getData = (await getDoc(docRef)).data();
 
-        setdate(getData.date);
+        setDate(getData.date);
         setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
@@ -730,7 +730,7 @@ const SetDeliveryChallan = () => {
                   value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setdate(Timestamp.fromDate(new Date(e.target.value)));
+                    setDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />

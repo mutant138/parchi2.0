@@ -28,7 +28,7 @@ const SetPos = () => {
 
   const phoneNo = userDetails.phone;
 
-  const [posDate, setPosDate] = useState(Timestamp.fromDate(new Date()));
+  const [date, setDate] = useState(Timestamp.fromDate(new Date()));
   const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -150,7 +150,7 @@ const SetPos = () => {
         );
         const getData = (await getDoc(docRef)).data();
 
-        setPosDate(getData.posDate);
+        setDate(getData.date);
         setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
@@ -526,7 +526,7 @@ const SetPos = () => {
         ...formData,
         tds,
         tcs,
-        posDate,
+        date,
         dueDate,
         createdBy: {
           companyRef: companyRef,
@@ -684,10 +684,10 @@ const SetPos = () => {
                 </label>
                 <input
                   type="date"
-                  value={DateFormate(posDate)}
+                  value={DateFormate(date)}
                   className="border p-1 rounded w-full mt-1"
                   onChange={(e) => {
-                    setPosDate(Timestamp.fromDate(new Date(e.target.value)));
+                    setDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                   required
                 />
