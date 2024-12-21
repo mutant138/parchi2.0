@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template1 = forwardRef((props, ref) => {
-  const { invoiceData, bankDetails } = props;
-  if (!invoiceData) {
+  const { dataSet, bankDetails } = props;
+  if (!dataSet) {
     return;
   }
 
@@ -26,9 +26,9 @@ const Template1 = forwardRef((props, ref) => {
         <div className="flex justify-between">
           <div>
             <div className="text-lg font-bold text-start">
-              {invoiceData?.createdBy?.name}
+              {dataSet?.createdBy?.name}
             </div>
-            <div>Mobile : {invoiceData?.createdBy?.phoneNo}</div>
+            <div>Mobile : {dataSet?.createdBy?.phoneNo}</div>
           </div>
           <div>
             <h3 className="font-bold">TAX INVOICE</h3>
@@ -37,19 +37,18 @@ const Template1 = forwardRef((props, ref) => {
         <div className="flex justify-between text-start">
           <div className="mt-2 text-start">
             <strong>Bill To :</strong>
-            <div>{invoiceData.userTo.name}</div>
-            <div>Ph : {invoiceData.userTo.phone}</div>
+            <div>{dataSet.userTo.name}</div>
+            <div>Ph : {dataSet.userTo.phone}</div>
           </div>
           <div>
             <div>
-              <strong>Invoice # :</strong> {invoiceData.no}
+              <strong>Invoice # :</strong> {dataSet.no}
             </div>
             <div>
-              <strong>Invoice Date :</strong>{" "}
-              {DateFormate(invoiceData.invoiceDate)}
+              <strong>Invoice Date :</strong> {DateFormate(dataSet.date)}
             </div>
             <div>
-              <strong>Due Date :</strong> {DateFormate(invoiceData.dueDate)}
+              <strong>Due Date :</strong> {DateFormate(dataSet.dueDate)}
             </div>
             <div>
               <strong>Place of Supply :</strong> -
@@ -73,7 +72,7 @@ const Template1 = forwardRef((props, ref) => {
               </tr>
             </thead>
             <tbody>
-              {invoiceData.products.map((item, index) => (
+              {dataSet.products.map((item, index) => (
                 <tr key={index}>
                   <td className="border border-black pt-2 pb-2 pl-1">
                     {index + 1}
@@ -111,89 +110,85 @@ const Template1 = forwardRef((props, ref) => {
           </table>
         </div>
         <div className="mt-4 text-end">
-          {invoiceData.shippingCharges > 0 && (
+          {dataSet.shippingCharges > 0 && (
             <div>
               Delivery/Shipping Charges :
-              <span className="ml-5"> {invoiceData.shippingCharges}</span>
+              <span className="ml-5"> {dataSet.shippingCharges}</span>
             </div>
           )}
-          {invoiceData.packagingCharges > 0 && (
+          {dataSet.packagingCharges > 0 && (
             <div>
               Packaging Charges :
-              <span className="ml-5"> {invoiceData.packagingCharges}</span>
+              <span className="ml-5"> {dataSet.packagingCharges}</span>
             </div>
           )}
         </div>
 
         <div className="mt-4 mb-3 text-end">
-          {invoiceData.tcs.isTcsApplicable && (
+          {dataSet.tcs.isTcsApplicable && (
             <div>
               TCS :
-              <span className="ml-5">
-                {invoiceData.tcs.tcs_amount.toFixed(2)}
-              </span>
+              <span className="ml-5">{dataSet.tcs.tcs_amount.toFixed(2)}</span>
             </div>
           )}
-          {invoiceData.tds.isTdsApplicable && (
+          {dataSet.tds.isTdsApplicable && (
             <div>
               TDS :
-              <span className="ml-5">
-                {invoiceData.tds.tds_amount.toFixed(2)}
-              </span>
+              <span className="ml-5">{dataSet.tds.tds_amount.toFixed(2)}</span>
             </div>
           )}
-          {invoiceData.totalCgstAmount_9 > 0 && (
+          {dataSet.totalCgstAmount_9 > 0 && (
             <div>
               CGST 9.0% :
               <span className="ml-5">
-                {invoiceData.totalCgstAmount_9.toFixed(2)}
+                {dataSet.totalCgstAmount_9.toFixed(2)}
               </span>
             </div>
           )}
-          {invoiceData.totalSgstAmount_9 > 0 && (
+          {dataSet.totalSgstAmount_9 > 0 && (
             <div>
               SGST 9.0% :
               <span className="ml-5">
-                {invoiceData.totalSgstAmount_9.toFixed(2)}
+                {dataSet.totalSgstAmount_9.toFixed(2)}
               </span>
             </div>
           )}
-          {invoiceData.totalCgstAmount_6 > 0 && (
+          {dataSet.totalCgstAmount_6 > 0 && (
             <div>
               CGST 6.0% :
               <span className="ml-5">
-                {invoiceData.totalCgstAmount_6.toFixed(2)}
+                {dataSet.totalCgstAmount_6.toFixed(2)}
               </span>
             </div>
           )}
-          {invoiceData.totalSgstAmount_6 > 0 && (
+          {dataSet.totalSgstAmount_6 > 0 && (
             <div>
               SGST 6.0% :
               <span className="ml-5">
-                {invoiceData.totalSgstAmount_6.toFixed(2)}
+                {dataSet.totalSgstAmount_6.toFixed(2)}
               </span>
             </div>
           )}
-          {invoiceData.totalCgstAmount_2_5 > 0 && (
+          {dataSet.totalCgstAmount_2_5 > 0 && (
             <div>
               CGST 2.5% :
               <span className="ml-5">
-                {invoiceData.totalCgstAmount_2_5.toFixed(2)}
+                {dataSet.totalCgstAmount_2_5.toFixed(2)}
               </span>
             </div>
           )}
-          {invoiceData.totalSgstAmount_2_5 > 0 && (
+          {dataSet.totalSgstAmount_2_5 > 0 && (
             <div>
               SGST 2.5% :
               <span className="ml-5">
-                {invoiceData.totalSgstAmount_2_5.toFixed(2)}
+                {dataSet.totalSgstAmount_2_5.toFixed(2)}
               </span>
             </div>
           )}
         </div>
         <hr />
         <div className="text-end font-bold">
-          <h3>Total : ₹ {+invoiceData.total?.toFixed(2)}</h3>
+          <h3>Total : ₹ {+dataSet.total?.toFixed(2)}</h3>
         </div>
 
         <div className=" flex justify-between">

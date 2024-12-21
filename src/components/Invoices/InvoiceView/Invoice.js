@@ -20,6 +20,7 @@ import Template8 from "../../Templates/Template8";
 import Template9 from "../../Templates/Template9";
 import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
 import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
 
 function Invoice({ invoice, bankDetails }) {
   const navigate = useNavigate();
@@ -30,80 +31,51 @@ function Invoice({ invoice, bankDetails }) {
   const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const invoiceRef = useRef();
-  const [selectTemplate, setSelectTemplate] = useState("template10");
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   const templatesComponents = {
     template1: (
-      <Template1
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template1 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
 
     template2: (
-      <Template2
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template2 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
 
     template3: (
-      <Template3
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template3 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
 
     template4: (
-      <Template4
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template4 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
     template5: (
-      <Template5
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template5 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
 
     template6: (
-      <Template6
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template6 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
     template7: (
-      <Template7
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template7 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
     template8: (
-      <Template8
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template8 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
     template9: (
-      <Template9
-        ref={invoiceRef}
-        invoiceData={invoice}
-        bankDetails={bankDetails}
-      />
+      <Template9 ref={invoiceRef} dataSet={invoice} bankDetails={bankDetails} />
     ),
     template10: (
       <Template10
         ref={invoiceRef}
-        invoiceData={invoice}
+        dataSet={invoice}
+        bankDetails={bankDetails}
+      />
+    ),
+    template11: (
+      <Template11
+        ref={invoiceRef}
+        dataSet={invoice}
         bankDetails={bankDetails}
       />
     ),
@@ -344,7 +316,7 @@ function Invoice({ invoice, bankDetails }) {
             Share via Email
           </button>
         </div>
-        {invoice.paymentStatus !== "Paid" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
               className={"px-4 py-1 text-blue-700"}
@@ -352,14 +324,18 @@ function Invoice({ invoice, bankDetails }) {
             >
               Change Template
             </button>
-            <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
-            >
-              <RiDeleteBin6Line />
-            </button>
           </div>
-        )}
+          {invoice.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
@@ -408,7 +384,7 @@ function Invoice({ invoice, bankDetails }) {
                         Invoice Date:
                       </span>
                       <span className="  text-gray-600">
-                        {DateFormate(invoice?.invoiceDate)}
+                        {DateFormate(invoice?.date)}
                       </span>
                     </div>
                     <div>

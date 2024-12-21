@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 
 const Template9 = forwardRef((props, ref) => {
-  const { invoiceData, bankDetails } = props;
-  if (!invoiceData) {
+  const { dataSet, bankDetails } = props;
+  if (!dataSet) {
     return;
   }
   function DateFormate(timestamp) {
@@ -24,16 +24,16 @@ const Template9 = forwardRef((props, ref) => {
         {/* Header */}
         <div className="flex justify-between items-center pb-4">
           <h1 className="text-3xl font-bold text-green-500">
-            {invoiceData?.createdBy?.name}
+            {dataSet?.createdBy?.name}
           </h1>
           <h1 className="text-xl">Invoice</h1>
         </div>
         <div className="flex justify-end bg-blue-50 p-2 rounded-lg">
           <div className="text-end grid grid-cols-2 w-1/3">
             <span className="font-bold"> Date:</span>
-            <span>{DateFormate(invoiceData.dueDate)}</span>
+            <span>{DateFormate(dataSet.dueDate)}</span>
             <span className="font-bold">Invoice No:</span>
-            <span> #{invoiceData.no}</span>
+            <span> #{dataSet.no}</span>
           </div>
         </div>
 
@@ -41,25 +41,25 @@ const Template9 = forwardRef((props, ref) => {
         <div className="grid grid-cols-2 gap-6 mt-6 text-sm text-gray-800">
           <div>
             <h3 className="font-bold">To:</h3>
-            <p>{invoiceData?.userTo?.name}</p>
+            <p>{dataSet?.userTo?.name}</p>
             <p>
-              {invoiceData.userTo.address}
-              {invoiceData.userTo.city}
-              {invoiceData.userTo.zipCode}
+              {dataSet.userTo.address}
+              {dataSet.userTo.city}
+              {dataSet.userTo.zipCode}
             </p>
-            <p>{invoiceData.userTo.phone}</p>
-            <p>{invoiceData.userTo.email}</p>
+            <p>{dataSet.userTo.phone}</p>
+            <p>{dataSet.userTo.email}</p>
           </div>
           <div className="">
             <h3 className="font-bold">Author:</h3>
-            <p> {invoiceData?.createdBy?.name}</p>
+            <p> {dataSet?.createdBy?.name}</p>
             <p>
-              {invoiceData.createdBy.address}
-              {invoiceData.createdBy.city}
-              {invoiceData.createdBy.zipCode}
+              {dataSet.createdBy.address}
+              {dataSet.createdBy.city}
+              {dataSet.createdBy.zipCode}
             </p>
-            <p>{invoiceData.createdBy.email}</p>
-            <p>{invoiceData.createdBy.phoneNo}</p>
+            <p>{dataSet.createdBy.email}</p>
+            <p>{dataSet.createdBy.phoneNo}</p>
           </div>
         </div>
 
@@ -75,7 +75,7 @@ const Template9 = forwardRef((props, ref) => {
               </tr>
             </thead>
             <tbody>
-              {invoiceData.products.map((item, index) => (
+              {dataSet.products.map((item, index) => (
                 <tr key={index} className="border-t-2">
                   <td className=" pt-2 pb-2 pl-1">{item.name}</td>
                   <td className=" pt-2 pb-2 pl-1">{item.description}</td>
@@ -91,7 +91,7 @@ const Template9 = forwardRef((props, ref) => {
           <div className="flex justify-end bg-blue-50 border font-bold text-gray-800">
             <div className="w-1/3 flex justify-between px-1 py-1">
               <span>Total :</span>
-              <span> ₹{+invoiceData.total?.toFixed(2)}</span>
+              <span> ₹{+dataSet.total?.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -100,12 +100,12 @@ const Template9 = forwardRef((props, ref) => {
         <div className="mt-6 text-sm text-gray-600 py-2">
           <div>
             <span className="font-bold">NOTE:</span>{" "}
-            {invoiceData.notes || "No notes"}
+            {dataSet.notes || "No notes"}
           </div>
           <div className=" text-gray-600">
             <p>
               <span className="font-bold">Terms & Conditions: </span>
-              {invoiceData.terms || "No Terms & Conditions"}
+              {dataSet.terms || "No Terms & Conditions"}
             </p>
           </div>
         </div>

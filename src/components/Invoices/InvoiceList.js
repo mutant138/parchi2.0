@@ -8,7 +8,7 @@ import { FaRegEye } from "react-icons/fa";
 import { IoMdClose, IoMdDownload } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 
-const InvoiceList = ({ isStaff, companyDetails, permission }) => {
+const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const invoiceRef = useRef();
@@ -257,11 +257,11 @@ const InvoiceList = ({ isStaff, companyDetails, permission }) => {
                         <td className="py-3">
                           {(() => {
                             if (
-                              invoice.invoiceDate.seconds &&
-                              typeof invoice.invoiceDate.seconds === "number"
+                              invoice.date.seconds &&
+                              typeof invoice.date.seconds === "number"
                             ) {
                               const date = new Date(
-                                invoice.invoiceDate.seconds * 1000
+                                invoice.date.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =
