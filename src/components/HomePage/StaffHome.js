@@ -86,9 +86,9 @@ const StaffHome = () => {
         const staffDoc = staffSnapshot.docs.map((doc) => doc.data());
         console.log("Staff document:", staffDoc);
 
-        const companyPromises = staffDoc.map(async (companyRef) => {
-          if (companyRef.companyRef) {
-            const companyDoc = await getDoc(companyRef.companyRef);
+        const companyPromises = staffDoc.map(async (staff) => {
+          if (staff.companyRef) {
+            const companyDoc = await getDoc(staff.companyRef);
             return companyDoc.exists() ? companyDoc.data() : null;
           }
           return null;
