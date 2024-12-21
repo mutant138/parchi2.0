@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { GrMenu } from "react-icons/gr";
-import { LiaMoneyBillWaveSolid } from "react-icons/lia";
-import { GrUserManager } from "react-icons/gr";
-import { CgMoreVerticalO } from "react-icons/cg";
 import { FaAngleUp } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
@@ -43,7 +40,7 @@ function SideBar() {
         },
         {
           name: "Purchase",
-          path:"/purchase"
+          path: "/purchase",
         },
         {
           name: "Pro Forma Invoice",

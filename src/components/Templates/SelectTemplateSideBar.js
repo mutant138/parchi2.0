@@ -9,6 +9,7 @@ import template6 from "../../assets/templates/template6.png";
 import template7 from "../../assets/templates/template7.png";
 import template8 from "../../assets/templates/template8.png";
 import template9 from "../../assets/templates/template9.png";
+import template10 from "../../assets/templates/template10.png";
 function SelectTemplateSideBar({
   isOpen,
   onClose,
@@ -26,7 +27,8 @@ function SelectTemplateSideBar({
     { id: "template7", img: template7 },
     { id: "template8", img: template8 },
     { id: "template9", img: template9 },
-    { id: "template10", img: template9 },
+    { id: "template10", img: template10 },
+    { id: "template11", img: template10 },
   ];
 
   return (
