@@ -84,7 +84,7 @@ function SelectTemplateSideBar({
         </div>
         <div>
           <button
-            className="w-full bg-blue-500 p-2 rounded-lg mt-10"
+            className="w-full bg-blue-500 p-2 rounded-lg mt-10 text-white"
             onClick={() => onSelectedTemplate(selectTemplate)}
           >
             Done
