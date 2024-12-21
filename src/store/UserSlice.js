@@ -39,6 +39,7 @@ if (localStorage.getItem("user")) {
     selectedCompanyIndex,
     companies,
     selectedDashboard: selectedDashboard,
+
     userAsOtherCompanies: {
       customer: [],
       vendor: [],

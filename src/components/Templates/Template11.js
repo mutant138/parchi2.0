@@ -17,137 +17,147 @@ const Template11 = forwardRef((props, ref) => {
   }
   return (
     <div
-      className=" bg-white border border-gray-300 rounded-md shadow-md overflow-y-auto"
+      className=" border border-gray-300 rounded-md shadow-md overflow-y-auto"
       style={{ height: "80vh" }}
     >
-      <div ref={ref} style={{ width: "595px", padding: "20px" }}>
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-700">Invoice</h1>
-          <div className="">
-            <span className="text-3xl font-bold text-primary-600">
-              {invoiceData?.createdBy?.name}
-            </span>
-          </div>
-        </header>
+      <div ref={ref} style={{ width: "595px" }}>
+        <div className="bg-white" style={{ padding: "20px" }}>
+          <header className="flex justify-between items-center mb-3">
+            <h1 className="text-3xl font-bold text-gray-700">Invoice</h1>
+            <div className="">
+              <span className="text-3xl font-bold text-primary-600">
+                {invoiceData?.createdBy?.name}
+              </span>
+            </div>
+          </header>
 
-        <section className="grid grid-cols-2 gap-8 mb-8">
-          <div>
-            <h2 className="text-sm font-bold text-gray-600">INVOICE NUMBER</h2>
-            <p className="text-sm text-gray-700">{invoiceData.no}</p>
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-gray-600">DATE OF ISSUE</h2>
-            <p className="text-sm text-gray-700">
-              {" "}
-              {DateFormate(invoiceData.dueDate)}
-            </p>
-          </div>
-        </section>
+          <section className="grid grid-cols-2 gap-8 mb-3">
+            <div>
+              <h2 className="text-sm font-bold text-gray-600">
+                INVOICE NUMBER
+              </h2>
+              <p className="text-sm text-gray-700 bg-blue-100 w-fit pe-3">
+                {invoiceData.no}
+              </p>
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-gray-600">DATE OF ISSUE</h2>
+              <p className="text-sm text-gray-700 bg-blue-100 w-fit pe-3">
+                {" "}
+                {DateFormate(invoiceData.dueDate)}
+              </p>
+            </div>
+          </section>
 
-        <section className="grid grid-cols-2 gap-8 mb-8">
-          <div>
-            <h2 className="text-sm font-bold text-gray-600">BILLED TO</h2>
-            <p className="text-sm text-gray-700">
-              Client name
-              <br />
-              123 Your Street
-              <br />
-              City, State, Country
-              <br />
-              Zip Code
-              <br />
-              Phone
-            </p>
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-gray-600">
-              YOUR COMPANY NAME
-            </h2>
-            <p className="text-sm text-gray-700">
-              Building name 123 Your Street
-              <br />
-              City/State, Country
-              <br />
-              Zip Code
-              <br />
-              GSTIN
-              <br />
-              +1-541-754-3010
-              <br />
-              you@email.co.uk
-              <br />
-              yourwebsite.co.uk
-            </p>
-          </div>
-        </section>
-
-        <table className="w-full mb-8 border-collapse border border-gray-300">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-600">
-                Description
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-600">
-                Unit cost
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-600">
-                QTY/HR Rate
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-600">
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array(8)
-              .fill()
-              .map((_, index) => (
+          <section className="grid grid-cols-2 gap-8 ">
+            <div>
+              <h2 className="text-sm font-bold text-gray-600">BILLED TO</h2>
+              <div className="text-sm text-gray-700 bg-blue-100 w-fit pe-3">
+                <p>{invoiceData?.userTo?.name}</p>
+                <p>{invoiceData.userTo.address}</p>
+                <p> {invoiceData.userTo.city}</p>
+                <p> {invoiceData.userTo.zipCode}</p>
+                <p>{invoiceData.userTo.phone}</p>
+                <p>{invoiceData.userTo.email}</p>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-gray-600">
+                {invoiceData?.createdBy?.name}
+              </h2>
+              <div className="text-sm text-gray-700 bg-blue-100 w-fit pe-3">
+                <p>{invoiceData.createdBy.address}</p>
+                <p> {invoiceData.createdBy.city}</p>
+                <p> {invoiceData.createdBy.zipCode}</p>
+                <p>{invoiceData.createdBy.phone}</p>
+                <p>{invoiceData.createdBy.email}</p>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div className="bg-gray-100" style={{ padding: "20px" }}>
+          <table className="w-full mb-8 border-separate ">
+            <thead>
+              <tr>
+                <th className="bg-blue-100 me-2 p-2 text-left text-sm font-bold text-gray-600">
+                  Description
+                </th>
+                <th className="bg-blue-100  me-2 p-2 text-left text-sm font-bold text-gray-600">
+                  Unit cost
+                </th>
+                <th className="bg-blue-100  me-2 p-2 text-left text-sm font-bold text-gray-600">
+                  QTY/HR Rate
+                </th>
+                <th className="bg-blue-100  me-2 p-2 text-left text-sm font-bold text-gray-600">
+                  Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoiceData.products.map((item, index) => (
                 <tr key={index}>
-                  <td className="border border-gray-300 p-2 text-sm text-gray-700">
-                    Your item name
+                  <td className="bg-blue-100 p-2 text-sm text-gray-700">
+                    {item.name}
                   </td>
-                  <td className="border border-gray-300 p-2 text-sm text-gray-700">
-                    $0.00
+                  <td className="bg-blue-100 p-2 text-sm text-gray-700">
+                    {item.sellingPrice.toFixed(1)}
                   </td>
-                  <td className="border border-gray-300 p-2 text-sm text-gray-700">
-                    1
+                  <td className="bg-blue-100 p-2 text-sm text-gray-700">
+                    {item.quantity}
                   </td>
-                  <td className="border border-gray-300 p-2 text-sm text-gray-700">
-                    $0.00
+                  <td className="bg-blue-100 p-2 text-sm text-gray-700">
+                    {item.totalAmount.toFixed(2)}
                   </td>
                 </tr>
               ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
 
-        <section className="flex justify-end mb-8">
-          <div className="w-full sm:w-1/2">
-            <div className="flex justify-between text-sm text-gray-700 mb-2">
-              <span>Subtotal</span>
-              <span>$0.00</span>
+          <section className="flex justify-end mb-3">
+            <div className="w-full sm:w-1/2">
+              <div className="flex justify-between text-sm text-gray-700 mb-2">
+                <span className="w-full">Subtotal</span>
+                <span className="bg-blue-100 w-full text-end">
+                  ₹{+invoiceData.subTotal?.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-700 mb-2">
+                <span className="w-full">Discount</span>
+                <span className="bg-blue-100 w-full text-end">
+                  {invoiceData.extraDiscount}
+                  {invoiceData.discountType ? "%" : ""}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-700 mb-2">
+                <span className="w-full">Tax rate</span>
+                <span className="bg-blue-100 w-full text-end">
+                  {invoiceData.tax}%
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between text-sm text-gray-700 mb-2">
-              <span>Discount</span>
-              <span>$0.00</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-700 mb-2">
-              <span>Tax rate</span>
-              <span>%</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-700 mb-2">
-              <span>Tax</span>
-              <span>$0.00</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-gray-900">
-              <span>INVOICE TOTAL</span>
-              <span>$0.00</span>
+          </section>
+          <div className="flex justify-end text-gray-900">
+            <div className="  text-gray-900">
+              <div className="w-full">INVOICE TOTAL</div>
+              <div className="bg-blue-100 text-end">
+                ₹{+invoiceData.total?.toFixed(2)}
+              </div>
             </div>
           </div>
-        </section>
 
-        <footer>
-          <p className="text-sm text-gray-500">TERMS</p>
-        </footer>
+          <footer>
+            <div>
+              <span className="font-bold">NOTE:</span>{" "}
+              {invoiceData.notes || "No notes"}
+            </div>
+            <div className=" text-gray-600">
+              <p>
+                <span className="font-bold">Terms & Conditions: </span>
+                {invoiceData.terms || "No Terms & Conditions"}
+              </p>
+            </div>
+          </footer>
+        </div>
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import { FaRegEye } from "react-icons/fa";
 import { IoMdClose, IoMdDownload } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 
-const InvoiceList = ({ isStaff, companyDetails, permission }) => {
+const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const invoiceRef = useRef();
