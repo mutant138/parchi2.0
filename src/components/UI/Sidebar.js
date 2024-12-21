@@ -17,7 +17,7 @@ function SideBar() {
   const viewDashBoardList = {
     customer: ["Invoice", "Projects", "Quotation"],
     vendor: ["PO", "Projects", "Quotation"],
-    staff: ["Projects", "Invoice", "PO", "Quotation"],
+    staff: ["Projects", "Invoice", "PO", "Quotation", "Customers", "Vendors"],
   };
 
   const constSideBarDetails = {
@@ -43,7 +43,7 @@ function SideBar() {
         },
         {
           name: "Purchase",
-          path:"/purchase"
+          path: "/purchase",
         },
         {
           name: "Pro Forma Invoice",

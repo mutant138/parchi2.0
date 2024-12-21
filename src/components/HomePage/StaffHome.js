@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../UI/Navbar";
 import SideBar from "../UI/Sidebar";
-import { Outlet, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   collection,
@@ -12,10 +18,13 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import InvoiceList from "../Invoices/InvoiceList";
+import InvoiceView from "../Invoices/InvoiceView/InvoiceView";
+import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 
 const Modal = ({ companyDetails, onClose }) => {
   console.log("Company details:", companyDetails);
-
+  const navigate = useNavigate();
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -28,7 +37,9 @@ const Modal = ({ companyDetails, onClose }) => {
               <div
                 key={company.id}
                 className="p-2 border-b last:border-none cursor-pointer hover:bg-gray-100"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate("invoice");
+                }}
               >
                 <p>
                   <strong>{index + 1}. Name:</strong> {company.name}
@@ -126,6 +137,25 @@ const StaffHome = () => {
       <div className="flex" style={{ height: "92vh" }}>
         <div>{!showModal && <SideBar />}</div>
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
+          <Routes>
+            <Route>
+              <Route
+                path="/invoice"
+                element={
+                  <InvoiceList companyDetails={companyDetails} isStaff={true} />
+                }
+              ></Route>
+              <Route path="/invoice/:id" element={<InvoiceView />}></Route>
+              <Route
+                path="/invoice/create-invoice"
+                element={<SetInvoice />}
+              ></Route>
+              <Route
+                path="/invoice/:invoiceId/edit-invoice"
+                element={<SetInvoice />}
+              ></Route>
+            </Route>
+          </Routes>
           <Outlet />
         </div>
       </div>
