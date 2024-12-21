@@ -118,10 +118,10 @@ const VendorPO = () => {
                         <td className="py-3">
                           {(() => {
                             if (
-                              p.poDate.seconds &&
-                              typeof p.poDate.seconds === "number"
+                              p.date.seconds &&
+                              typeof p.date.seconds === "number"
                             ) {
-                              const date = new Date(p.poDate.seconds * 1000);
+                              const date = new Date(p.date.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -

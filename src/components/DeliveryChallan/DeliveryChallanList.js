@@ -280,13 +280,11 @@ const DeliveryChallanList = () => {
                         <td className="py-3">
                           {(() => {
                             if (
-                              deliveryChallan.deliveryChallanDate.seconds &&
-                              typeof deliveryChallan.deliveryChallanDate
-                                .seconds === "number"
+                              deliveryChallan.date.seconds &&
+                              typeof deliveryChallan.date.seconds === "number"
                             ) {
                               const date = new Date(
-                                deliveryChallan.deliveryChallanDate.seconds *
-                                  1000
+                                deliveryChallan.date.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =

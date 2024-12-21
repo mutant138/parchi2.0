@@ -8,7 +8,7 @@ import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
 import Template from "../Template/Template";
 import { doc, deleteDoc } from "firebase/firestore";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const DeliveryChallan = ({ deliveryChallan }) => {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
@@ -168,7 +168,7 @@ const DeliveryChallan = ({ deliveryChallan }) => {
                 <div></div>
               </div>
             </div>
-            <div>Date: {DateFormate(deliveryChallan?.deliveryChallanDate)}</div>
+            <div>Date: {DateFormate(deliveryChallan?.date)}</div>
           </div>
         </div>
         <div className="bg-white rounded-b-lg px-3 pb-3">
@@ -234,7 +234,7 @@ const DeliveryChallan = ({ deliveryChallan }) => {
           </div>
         </div>
       </div> */}
-<div
+      <div
         className="grid grid-cols-12 gap-6 mt-6 overflow-y-auto"
         style={{ height: "64vh" }}
       >
@@ -281,7 +281,7 @@ const DeliveryChallan = ({ deliveryChallan }) => {
                         DeliveryChallan Date:
                       </span>
                       <span className="  text-gray-600">
-                        {DateFormate(deliveryChallan?.deliveryChallanDate)}
+                        {DateFormate(deliveryChallan?.date)}
                       </span>
                     </div>
                     {/* <div>
@@ -396,8 +396,8 @@ const DeliveryChallan = ({ deliveryChallan }) => {
                 Thank You!
               </div>
               <div className="mt-1  text-gray-800">
-                If you have any questions concerning this deliveryChallan, use the
-                following contact information:
+                If you have any questions concerning this deliveryChallan, use
+                the following contact information:
               </div>
               <div className="text-xs text-gray-800 mt-2">
                 {userDetails.email}

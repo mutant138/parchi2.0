@@ -29,7 +29,7 @@ const SetPos = () => {
   const phoneNo = userDetails.phone;
 
   const [posDate, setPosDate] = useState(Timestamp.fromDate(new Date()));
-  // const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
+  const [dueDate, setDueDate] = useState(Timestamp.fromDate(new Date()));
   const [taxSelect, setTaxSelect] = useState("");
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [total_Tax_Amount, setTotal_Tax_Amount] = useState(0);
@@ -151,7 +151,7 @@ const SetPos = () => {
         const getData = (await getDoc(docRef)).data();
 
         setPosDate(getData.posDate);
-        // setDueDate(getData.dueDate);
+        setDueDate(getData.dueDate);
         const customerData = (
           await getDoc(getData.customerDetails.customerRef)
         ).data();
@@ -527,7 +527,7 @@ const SetPos = () => {
         tds,
         tcs,
         posDate,
-        // dueDate,
+        dueDate,
         createdBy: {
           companyRef: companyRef,
           name: companyDetails.name,
@@ -677,7 +677,7 @@ const SetPos = () => {
 
           <div className="flex-1">
             <h2 className="font-semibold mb-2">Other Details</h2>
-            <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
                   Pos Date <span className="text-red-500">*</span>
@@ -692,7 +692,7 @@ const SetPos = () => {
                   required
                 />
               </div>
-              {/* <div>
+              <div>
                 <label className="text-sm text-gray-600">
                   Due Date <span className="text-red-500">*</span>
                 </label>
@@ -704,7 +704,7 @@ const SetPos = () => {
                     setDueDate(Timestamp.fromDate(new Date(e.target.value)));
                   }}
                 />
-              </div> */}
+              </div>
               <div>
                 <label className="text-sm text-gray-600">
                   Pos No. <span className="text-red-500">*</span>

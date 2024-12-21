@@ -118,14 +118,12 @@ const Template = forwardRef((props, ref) => {
         </div>
         <div>
           <div>
-            <strong>PO # :</strong>{" "}
-            {ModifiedPoData.poNo}
+            <strong>PO # :</strong> {ModifiedPoData.poNo}
           </div>
           <div>
-            <strong>PO Date :</strong>{" "}
-            {DateFormate(ModifiedPoData.poDate)}
+            <strong>PO Date :</strong> {DateFormate(ModifiedPoData.date)}
           </div>
-         
+
           <div>
             <strong>Place of Supply :</strong> -
           </div>
@@ -189,19 +187,13 @@ const Template = forwardRef((props, ref) => {
         {ModifiedPoData.shippingCharges > 0 && (
           <div>
             Delivery/Shipping Charges :
-            <span className="ml-5">
-              {" "}
-              {ModifiedPoData.shippingCharges}
-            </span>
+            <span className="ml-5"> {ModifiedPoData.shippingCharges}</span>
           </div>
         )}
         {ModifiedPoData.packagingCharges > 0 && (
           <div>
             Packaging Charges :
-            <span className="ml-5">
-              {" "}
-              {ModifiedPoData.packagingCharges}
-            </span>
+            <span className="ml-5"> {ModifiedPoData.packagingCharges}</span>
           </div>
         )}
       </div>

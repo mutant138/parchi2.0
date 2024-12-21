@@ -16,7 +16,6 @@ function PO() {
 
   const selectedDashboardUser = userDetails.selectedDashboard;
   const navigate = useNavigate();
-  console.log("selectedDashboardUser", selectedDashboardUser);
   const [POList, setPOList] = useState([]);
 
   const [POCount, setPOCount] = useState({
@@ -76,13 +75,7 @@ function PO() {
 
   async function onStatusUpdate(value, poId) {
     try {
-      const docRef = doc(
-        db,
-        "companies",
-        companyDetails.companyId,
-        "po",
-        poId
-      );
+      const docRef = doc(db, "companies", companyDetails.companyId, "po", poId);
       await updateDoc(docRef, { orderStatus: value });
       const UpdatedData = POList.map((ele) => {
         if (ele.id === poId) {
@@ -187,10 +180,13 @@ function PO() {
                 <tbody>
                   {filteredPO.length > 0 ? (
                     filteredPO.map((po) => (
-                      <tr key={po.id} className="border-b cursor-pointer "   
-                      onClick={(e) => {
-                        navigate(po.id);
-                      }}>
+                      <tr
+                        key={po.id}
+                        className="border-b cursor-pointer "
+                        onClick={(e) => {
+                          navigate(po.id);
+                        }}
+                      >
                         <td className="py-3 ">
                           {po.vendorDetails?.name} <br />
                           <span className="text-gray-500">
@@ -198,9 +194,10 @@ function PO() {
                           </span>
                         </td>
                         <td className="py-3 ">{`₹ ${po.total.toFixed(2)}`}</td>
-                        <td className="py-3 "
-                            onClick={(e) => e.stopPropagation()}
-                            >
+                        <td
+                          className="py-3 "
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <select
                             value={po.orderStatus}
                             className={`border p-1 rounded ${
@@ -222,10 +219,10 @@ function PO() {
                         <td className="py-3 ">
                           {(() => {
                             if (
-                              po.poDate.seconds &&
-                              typeof po.poDate.seconds === "number"
+                              po.date.seconds &&
+                              typeof po.date.seconds === "number"
                             ) {
-                              const date = new Date(po.poDate.seconds * 1000);
+                              const date = new Date(po.date.seconds * 1000);
                               const today = new Date();
                               const timeDiff =
                                 today.setHours(0, 0, 0, 0) -
