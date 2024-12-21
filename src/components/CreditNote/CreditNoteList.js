@@ -91,11 +91,11 @@ const CreditNoteList = () => {
   };
 
   const filteredCreditNote = creditNote.filter((creditnote) => {
-    const { customerDetails, creditnoteNo, paymentStatus } = creditnote;
+    const { customerDetails, creditNoteNo, paymentStatus } = creditnote;
     const customerName = customerDetails?.name || "";
     const matchesSearch =
       customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      creditnoteNo
+      creditNoteNo
         ?.toString()
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
@@ -265,14 +265,13 @@ const CreditNoteList = () => {
                           </select>
                         </td>
                         <td className="py-3">{creditnote.mode || "Online"}</td>
-                        <td className="py-3">{creditnote.creditnoteNo}</td>
+                        <td className="py-3">{creditnote.creditNoteNo}</td>
 
                         <td className="py-3">
                           {(() => {
                             if (
                               creditnote.date.seconds &&
-                              typeof creditnote.date.seconds ===
-                                "number"
+                              typeof creditnote.date.seconds === "number"
                             ) {
                               const date = new Date(
                                 creditnote.date.seconds * 1000

@@ -39,6 +39,7 @@ function SelectTemplateSideBar({
       }`}
       onClick={() => {
         onClose();
+        setSelectTemplate(preSelectedTemplate);
       }}
     >
       <div
@@ -52,6 +53,7 @@ function SelectTemplateSideBar({
         <button
           onClick={() => {
             onClose();
+            setSelectTemplate(preSelectedTemplate);
           }}
           className="absolute text-3xl top-4 right-4 text-gray-600 hover:text-gray-900 cursor-pointer"
         >

@@ -180,10 +180,10 @@ const Template8 = forwardRef((props, ref) => {
           <div className="flex justify-between">
             <div className="w-full border-r-2 border-black px-2">
               <h3 className="font-bold text-gray-800">Bank Details:</h3>
-              <p>Bank: {bankDetails.bankName}</p>
-              <p>Account #: {bankDetails.accountNo}</p>
-              <p>IFSC: {bankDetails.ifscCode}</p>
-              <p>Branch: {bankDetails.branch}</p>
+              <p>Bank: {bankDetails?.bankName}</p>
+              <p>Account #: {bankDetails?.accountNo}</p>
+              <p>IFSC: {bankDetails?.ifscCode}</p>
+              <p>Branch: {bankDetails?.branch}</p>
             </div>
             <div className="text-sm text-gray-600 w-3/4 px-2">
               <div className="font-bold text-gray-800">Note:</div>

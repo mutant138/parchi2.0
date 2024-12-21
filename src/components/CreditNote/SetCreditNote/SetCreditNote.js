@@ -51,7 +51,7 @@ const SetCreditNote = () => {
     discount: 0,
     paymentStatus: "UnPaid",
     notes: "",
-    creditnoteNo: "",
+    creditNoteNo: "",
     packagingCharges: 0,
     subTotal: 0,
     tds: {},
@@ -118,16 +118,16 @@ const SetCreditNote = () => {
       const querySnapshot = await getDocs(
         collection(db, "companies", companyDetails.companyId, "creditnote")
       );
-      const noList = querySnapshot.docs.map((doc) => doc.data().creditnoteNo);
+      const noList = querySnapshot.docs.map((doc) => doc.data().creditNoteNo);
       if (creditnoteId) {
         setPreCreditNoteList(
-          noList.filter((ele) => ele !== formData.creditnoteNo)
+          noList.filter((ele) => ele !== formData.creditNoteNo)
         );
       } else {
         setPreCreditNoteList(noList);
         setFormData((val) => ({
           ...val,
-          creditnoteNo: String(noList.length + 1).padStart(4, 0),
+          creditNoteNo: String(noList.length + 1).padStart(4, 0),
         }));
       }
     } catch (error) {
@@ -744,12 +744,12 @@ const SetCreditNote = () => {
               <div>
                 <label className="text-sm text-gray-600">
                   CreditNote No. <span className="text-red-500">*</span>
-                  {preCreditNoteList.includes(formData.creditnoteNo) && (
+                  {preCreditNoteList.includes(formData.creditNoteNo) && (
                     <span className="text-red-800 text-xs">
                       "Already CreditNote No. exist"{" "}
                     </span>
                   )}
-                  {Number(formData.creditnoteNo) == 0 && (
+                  {Number(formData.creditNoteNo) == 0 && (
                     <span className="text-red-800 text-xs">
                       "Kindly Enter valid CreditNote No."{" "}
                     </span>
@@ -759,12 +759,12 @@ const SetCreditNote = () => {
                   type="text"
                   placeholder="Enter creditnote No. "
                   className="border p-1 rounded w-full mt-1"
-                  value={formData.creditnoteNo}
+                  value={formData.creditNoteNo}
                   onChange={(e) => {
                     const { value } = e.target;
                     setFormData((val) => ({
                       ...val,
-                      creditnoteNo: value,
+                      creditNoteNo: value,
                     }));
                   }}
                   required

@@ -7,10 +7,21 @@ import { FaRegEye } from "react-icons/fa";
 import { db, storage } from "../../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from "react-redux";
-import Template from "../Template/Template";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import SunyaLogo from "../../../assets/SunyaLogo.jpg";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
+import Template9 from "../../Templates/Template9";
+import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
 
 function Po({ Po, bankDetails }) {
   const navigate = useNavigate();
@@ -20,8 +31,9 @@ function Po({ Po, bankDetails }) {
   const [isPoOpen, setIsPoOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
-  console.log("Po", Po);
   const poRef = useRef();
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   useEffect(() => {
     if (Po.products) {
@@ -87,7 +99,27 @@ function Po({ Po, bankDetails }) {
       console.error("Error uploading or sharing the PDF:", error);
     }
   };
+  const templatesComponents = {
+    template1: <Template1 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
 
+    template2: <Template2 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+
+    template3: <Template3 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+
+    template4: <Template4 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+    template5: <Template5 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+
+    template6: <Template6 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+    template7: <Template7 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+    template8: <Template8 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+    template9: <Template9 ref={poRef} dataSet={Po} bankDetails={bankDetails} />,
+    template10: (
+      <Template10 ref={poRef} dataSet={Po} bankDetails={bankDetails} />
+    ),
+    template11: (
+      <Template11 ref={poRef} dataSet={Po} bankDetails={bankDetails} />
+    ),
+  };
   const handleEmailShare = async () => {
     if (!Po.id) {
       console.error("Po ID is missing!");
@@ -113,7 +145,7 @@ function Po({ Po, bankDetails }) {
 
           // Construct the email subject and body
           const subject = `Po for ${Po.vendorDetailsname}`;
-          const body = `Hi ${Po.vendorDetailsname},%0D%0A%0D%0AHere is your Po for the recent purchase.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
+          const body = `Hi ${Po.vendorDetailsname},%0D%0A%0D%0AHere is your Po for the recent Po.%0D%0A%0D%0AYou can download it here: ${downloadURL}`;
 
           // Open the default email client with pre-filled subject and body
           window.location.href = `mailto:?subject=${subject}&body=${body}`;
@@ -242,16 +274,26 @@ function Po({ Po, bankDetails }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {Po.orderStatus !== "Received" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
             >
-              <RiDeleteBin6Line />
+              Change Template
             </button>
           </div>
-        )}
+          {Po.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
@@ -522,12 +564,21 @@ function Po({ Po, bankDetails }) {
                     </div>
                   </div>
                 </div>
-                <Template ref={poRef} poData={Po} bankDetails={bankDetails} />
+                {templatesComponents[selectTemplate]}
               </div>
             </div>
           </div>
         </div>
       )}
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 }

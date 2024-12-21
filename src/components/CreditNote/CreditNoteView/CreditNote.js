@@ -6,10 +6,22 @@ import jsPDF from "jspdf";
 import { FaRegEye } from "react-icons/fa";
 import { db } from "../../../firebase";
 import { useSelector } from "react-redux";
-import Template from "../Templates/Template";
 import { doc, deleteDoc } from "firebase/firestore";
-import {Link, useNavigate } from "react-router-dom";
-const CreditNote = ({ creditNote }) => {
+import { Link, useNavigate } from "react-router-dom";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
+import Template9 from "../../Templates/Template9";
+import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
+
+const CreditNote = ({ creditNote, bankDetails }) => {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -17,9 +29,93 @@ const CreditNote = ({ creditNote }) => {
   const [isCreditNoteOpen, setIsCreditNoteOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   const creditNoteRef = useRef();
+  const templatesComponents = {
+    template1: (
+      <Template1
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
 
+    template2: (
+      <Template2
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template3: (
+      <Template3
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template4: (
+      <Template4
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+    template5: (
+      <Template5
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+
+    template6: (
+      <Template6
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+    template7: (
+      <Template7
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+    template8: (
+      <Template8
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+    template9: (
+      <Template9
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+    template10: (
+      <Template10
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+    template11: (
+      <Template11
+        ref={creditNoteRef}
+        dataSet={creditNote}
+        bankDetails={bankDetails}
+      />
+    ),
+  };
   useEffect(() => {
     if (creditNote.products) {
       const tax = creditNote?.products.reduce((acc, cur) => {
@@ -142,16 +238,26 @@ const CreditNote = ({ creditNote }) => {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {creditNote.paymentStatus !== "Paid" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
             >
-              <RiDeleteBin6Line />
+              Change Template
             </button>
           </div>
-        )}
+          {creditNote.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
@@ -426,16 +532,21 @@ const CreditNote = ({ creditNote }) => {
                     </div>
                   </div>
                 </div>
-                <Template
-                  ref={creditNoteRef}
-                  creditNoteData={creditNote}
-                  //   bankDetails={bankDetails}
-                />
+                {templatesComponents[selectTemplate]}
               </div>
             </div>
           </div>
         </div>
       )}
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 };

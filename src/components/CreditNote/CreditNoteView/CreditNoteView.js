@@ -3,11 +3,7 @@ import CreditNote from "./CreditNote";
 import { Link, useParams } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useSelector } from "react-redux";
-import {
-  collection,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 const CreditNoteView = () => {
@@ -23,12 +19,72 @@ const CreditNoteView = () => {
 
   const fetchCreditNote = async () => {
     try {
+      let totalTaxableAmount = 0;
+      let totalSgstAmount_2_5 = 0;
+      let totalCgstAmount_2_5 = 0;
+      let totalSgstAmount_6 = 0;
+      let totalCgstAmount_6 = 0;
+      let totalSgstAmount_9 = 0;
+      let totalCgstAmount_9 = 0;
+      let tax = 0;
       const creditNoteRef = doc(db, "companies", companyId, "creditnote", id);
-      const resData = (await getDoc(creditNoteRef)).data();
+      const { customerDetails, creditNoteNo, ...resData } = (
+        await getDoc(creditNoteRef)
+      ).data();
       const creditNoteData = {
         id,
         ...resData,
+        type: "Credit Note",
+        no: creditNoteNo,
+        userTo: customerDetails,
+        products: resData.products.map((item) => {
+          let discount = +item.discount || 0;
+
+          if (item.discountType) {
+            discount = (+item.sellingPrice / 100) * item.discount;
+          }
+          const netAmount = item.sellingPrice - (discount || 0);
+          const taxRate = item.tax || 0;
+          const sgst = taxRate / 2;
+          const cgst = taxRate / 2;
+          const taxAmount = netAmount * (taxRate / 100);
+          const sgstAmount = netAmount * (sgst / 100);
+          const cgstAmount = netAmount * (cgst / 100);
+          tax += item.tax || 0;
+          item.returnQty = 0;
+
+          totalTaxableAmount += netAmount * item.quantity;
+          totalSgstAmount_2_5 += sgst === 2.5 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_2_5 += cgst === 2.5 ? cgstAmount * item.quantity : 0;
+          totalSgstAmount_6 += sgst === 6 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_6 += cgst === 6 ? cgstAmount * item.quantity : 0;
+          totalSgstAmount_9 += sgst === 9 ? sgstAmount * item.quantity : 0;
+          totalCgstAmount_9 += cgst === 9 ? cgstAmount * item.quantity : 0;
+          return {
+            ...item,
+            sgst,
+            cgst,
+            taxAmount,
+            sgstAmount,
+            cgstAmount,
+            totalAmount: netAmount * item.quantity,
+            netAmount,
+          };
+        }),
+        tax,
+        totalTaxableAmount,
+        totalSgstAmount_2_5,
+        totalCgstAmount_2_5,
+        totalSgstAmount_6,
+        totalCgstAmount_6,
+        totalSgstAmount_9,
+        totalCgstAmount_9,
       };
+
+      if (creditNoteData?.book?.bookRef) {
+        const bankData = (await getDoc(creditNoteData?.book.bookRef)).data();
+        setBankDetails(bankData);
+      }
       setCreditNote(creditNoteData);
     } catch (error) {
       console.error("Error fetching creditnote:", error);
@@ -90,7 +146,7 @@ const CreditNoteView = () => {
         >
           <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
         </Link>
-        <h1 className="text-2xl font-bold">{creditNote.creditnoteNo}</h1>
+        <h1 className="text-2xl font-bold">{creditNote.creditNoteNo}</h1>
       </header>
 
       <div>
@@ -134,7 +190,7 @@ const CreditNoteView = () => {
       <div className="w-full">
         {activeTab === "CreditNote" && (
           <div>
-            <CreditNote creditNote={creditNote} />
+            <CreditNote creditNote={creditNote} bankDetails={bankDetails} />
           </div>
         )}
         {/* {activeTab === "Returns" && (

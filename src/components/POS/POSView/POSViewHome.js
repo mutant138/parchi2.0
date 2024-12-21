@@ -9,8 +9,20 @@ import { useSelector } from "react-redux";
 import { doc, deleteDoc, increment, updateDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import Template from "../Template/Template";
+import Template1 from "../../Templates/Template1";
+import Template2 from "../../Templates/Template2";
+import Template3 from "../../Templates/Template3";
+import Template4 from "../../Templates/Template4";
+import Template5 from "../../Templates/Template5";
+import Template6 from "../../Templates/Template6";
+import Template7 from "../../Templates/Template7";
+import Template8 from "../../Templates/Template8";
+import Template9 from "../../Templates/Template9";
+import Template10 from "../../Templates/Template10";
+import Template11 from "../../Templates/Template11";
+import SelectTemplateSideBar from "../../Templates/SelectTemplateSideBar";
 
-function POSViewHome({ POS }) {
+function POSViewHome({ POS, bankDetails }) {
   const navigate = useNavigate();
   const userDetails = useSelector((state) => state.users);
   const companyId =
@@ -18,8 +30,49 @@ function POSViewHome({ POS }) {
   const [isPOSOpen, setIsPOSOpen] = useState(false);
   const [totalTax, setTotalTax] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
+  const [isSelectTemplateOpen, setIsSelectTemplateOpen] = useState(false);
+  const [selectTemplate, setSelectTemplate] = useState("template1");
 
   const POSRef = useRef();
+  const templatesComponents = {
+    template1: (
+      <Template1 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+
+    template2: (
+      <Template2 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+
+    template3: (
+      <Template3 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+
+    template4: (
+      <Template4 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+    template5: (
+      <Template5 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+
+    template6: (
+      <Template6 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+    template7: (
+      <Template7 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+    template8: (
+      <Template8 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+    template9: (
+      <Template9 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+    template10: (
+      <Template10 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+    template11: (
+      <Template11 ref={POSRef} dataSet={POS} bankDetails={bankDetails} />
+    ),
+  };
 
   useEffect(() => {
     if (POS.products) {
@@ -33,6 +86,7 @@ function POSViewHome({ POS }) {
       setTotalDiscount(discount);
     }
   }, [POS]);
+
   const handleDownloadPdf = () => {
     if (!POS.id) {
       return;
@@ -161,16 +215,26 @@ function POSViewHome({ POS }) {
             <IoMdDownload /> &nbsp; download
           </button>
         </div>
-        {POS?.paymentStatus !== "Paid" && (
+        <div className="flex items-center">
           <div className="text-end">
             <button
-              className={"px-4 py-1 text-red-700 text-2xl"}
-              onClick={handleDelete}
+              className={"px-4 py-1 text-blue-700"}
+              onClick={() => setIsSelectTemplateOpen(true)}
             >
-              <RiDeleteBin6Line />
+              Change Template
             </button>
           </div>
-        )}
+          {POS.paymentStatus !== "Paid" && (
+            <div className="text-end">
+              <button
+                className={"px-4 py-1 text-red-700 text-2xl"}
+                onClick={handleDelete}
+              >
+                <RiDeleteBin6Line />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {/* <div className="space-y-2 ">
         <div className="bg-white rounded-t-lg p-3 py-2">
@@ -421,12 +485,21 @@ function POSViewHome({ POS }) {
                     </div>
                   </div>
                 </div>
-                <Template ref={POSRef} posData={POS} />
+                {templatesComponents[selectTemplate]}
               </div>
             </div>
           </div>
         </div>
       )}
+      <SelectTemplateSideBar
+        isOpen={isSelectTemplateOpen}
+        onClose={() => setIsSelectTemplateOpen(false)}
+        preSelectedTemplate={selectTemplate}
+        onSelectedTemplate={(template) => {
+          setSelectTemplate(template);
+          setIsSelectTemplateOpen(false);
+        }}
+      />
     </div>
   );
 }
