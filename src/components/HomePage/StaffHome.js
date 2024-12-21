@@ -13,32 +13,25 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 
-// Modal Component to Show Company Details
 const Modal = ({ companyDetails, onClose }) => {
-  console.log("companydetails", companyDetails);
+  console.log("Company details:", companyDetails);
+
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-2xl font-semibold mb-4 text-center">
           Company Details
         </h2>
-        {companyDetails && companyDetails.length > 0 ? (
-          <div>
-            {companyDetails.map((company, index) => (
-              <div
-                key={company.id}
-                className="p-2 border-b last:border-none cursor-pointer hover:bg-gray-100"
-                onClick={() => {}}
-              >
-                <p>
-                  <strong>{index + 1}. Name:</strong> {company.name}
-                </p>
-              </div>
-            ))}
+        {companyDetails ? (
+          <div className="cursor-pointer">
+            <p>
+              <strong>Name:</strong> {companyDetails.name}
+            </p>
+            
           </div>
         ) : (
           <p className="text-center text-gray-500">
-            No companyDetails found for this staff member.
+            No company details found for this staff member.
           </p>
         )}
         <div className="mt-6 flex justify-center">
@@ -58,11 +51,11 @@ const StaffHome = () => {
   const location = useLocation();
   const phone = useSelector((state) => +state.users.phone);
   // User's phone number from Redux
+  console.log("Phone:", phone);
   console.log("type phone", typeof phone, phone);
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
 
-  // Trigger to show modal and fetch company details based on phone number
   useEffect(() => {
     if (location.pathname === "/staff") {
       setShowModal(true);
@@ -77,24 +70,19 @@ const StaffHome = () => {
     try {
       const staffQuery = query(
         collection(db, "staff"),
-        where("phone", "==", phone)
+        where("phone", "==", Number(phone))
       );
       const staffSnapshot = await getDocs(staffQuery);
+      console.log("Staff snapshot:", staffSnapshot.docs);
       console.log("staffSnap", staffSnapshot);
 
       if (!staffSnapshot.empty) {
-        const staffDoc = staffSnapshot.docs[0].data();
+        const staffDoc = staffSnapshot.docs.map((doc) => doc.data());
         console.log("Staff document:", staffDoc);
 
-        const companyRefs = Array.isArray(staffDoc.companyRef)
-          ? staffDoc.companyRef
-          : [staffDoc.companyRef];
-
-        console.log("companyRefs", companyRefs);
-
-        const companyPromises = companyRefs.map(async (companyRef) => {
-          if (companyRef) {
-            const companyDoc = await getDoc(companyRef);
+        const companyPromises = staffDoc.map(async (companyRef) => {
+          if (companyRef.companyRef) {
+            const companyDoc = await getDoc(companyRef.companyRef);
             return companyDoc.exists() ? companyDoc.data() : null;
           }
           return null;
