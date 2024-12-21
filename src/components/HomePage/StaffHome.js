@@ -13,14 +13,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 
-// Modal Component to Show Company Details
 const Modal = ({ companyDetails, onClose }) => {
-  console.log("companydetails", companyDetails);
+  console.log("Company details:", companyDetails);
+
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-2xl font-semibold mb-4 text-center">
-          Company Details
+          Company Details{" "}
         </h2>
         {companyDetails && companyDetails.length > 0 ? (
           <div>
@@ -38,7 +38,7 @@ const Modal = ({ companyDetails, onClose }) => {
           </div>
         ) : (
           <p className="text-center text-gray-500">
-            No companyDetails found for this staff member.
+            No company details found for this staff member.
           </p>
         )}
         <div className="mt-6 flex justify-center">
@@ -58,11 +58,11 @@ const StaffHome = () => {
   const location = useLocation();
   const phone = useSelector((state) => +state.users.phone);
   // User's phone number from Redux
+  console.log("Phone:", phone);
   console.log("type phone", typeof phone, phone);
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
 
-  // Trigger to show modal and fetch company details based on phone number
   useEffect(() => {
     if (location.pathname === "/staff") {
       setShowModal(true);
@@ -80,6 +80,7 @@ const StaffHome = () => {
         where("phone", "==", phone)
       );
       const staffSnapshot = await getDocs(staffQuery);
+      console.log("Staff snapshot:", staffSnapshot.docs);
       console.log("staffSnap", staffSnapshot);
 
       if (!staffSnapshot.empty) {
