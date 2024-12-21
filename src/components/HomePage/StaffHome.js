@@ -24,9 +24,6 @@ import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
 import Quotation from "../Quotation/Quotation";
 import QuotationViewHome from "../Quotation/QuotationView/QuotationViewHome";
 import SetQuotation from "../Quotation/SetQuotation/SetQuotation";
-import PO from "../PO/PO";
-import PoView from "../PO/PoView/PoView";
-import SetPO from "../PO/SetPO/SetPO";
 import CreateProject from "../Projects/CreateProject/CreateProject";
 import ProjectView from "../Projects/ProjectView/ProjectView";
 import Users from "../Projects/ProjectView/Users/Users";
@@ -41,6 +38,9 @@ import CustomerList from "../Customers/CustomerList";
 import CustomerView from "../Customers/CustomerView/CustomerView";
 import VendorList from "../Vendors/VendorList";
 import VendorView from "../Vendors/VendorView/VendorView";
+import Purchase from "../Purchase/Purchase";
+import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
+import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 
 const Modal = ({ companyDetails, onClose }) => {
   console.log("Company details:", companyDetails);
@@ -93,7 +93,7 @@ const StaffHome = () => {
   console.log("type phone", typeof phone, phone);
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
-
+  const [roles, setRoles] = useState([]);
   useEffect(() => {
     if (location.pathname === "/staff") {
       setShowModal(true);
@@ -117,7 +117,13 @@ const StaffHome = () => {
       if (!staffSnapshot.empty) {
         const staffDoc = staffSnapshot.docs.map((doc) => doc.data());
         console.log("Staff document:", staffDoc);
-
+        const staffSidebar = staffDoc.map((staff) => {
+          if (staff.roles) {
+            console.log("role", staff.roles);
+            return Object.keys(staff.roles).filter((role) => staff.roles[role]);
+          }
+          return [];
+        });
         const companyPromises = staffDoc.map(async (staff) => {
           if (staff.companyRef) {
             const companyDoc = await getDoc(staff.companyRef);
@@ -135,6 +141,7 @@ const StaffHome = () => {
           console.error("No valid companies found for this staff member.");
           setCompanyDetails(null);
         }
+        setRoles(staffSidebar);
       } else {
         console.error("Staff not found");
         setCompanyDetails(null);
@@ -144,7 +151,7 @@ const StaffHome = () => {
       setCompanyDetails(null);
     }
   };
-
+  console.log("roles", roles);
   const closeModal = () => {
     setShowModal(false);
   };
@@ -155,66 +162,103 @@ const StaffHome = () => {
         <Navbar />
       </div>
       <div className="flex" style={{ height: "92vh" }}>
-        <div>{!showModal && <SideBar />}</div>
+        <div>{!showModal && <SideBar staff={roles} />}</div>
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
           <Routes>
-            <Route
-              path="/invoice"
-              element={
-                <InvoiceList companyDetails={companyDetails} isStaff={true} />
-              }
-            ></Route>
-            <Route path="/invoice/:id" element={<InvoiceView />}></Route>
-            <Route
-              path="/invoice/create-invoice"
-              element={<SetInvoice />}
-            ></Route>
-            <Route
-              path="/invoice/:invoiceId/edit-invoice"
-              element={<SetInvoice />}
-            ></Route>
-            <Route path="/quotation" element={<Quotation />}></Route>
-            <Route
-              path="/quotation/:id"
-              element={<QuotationViewHome />}
-            ></Route>
-            <Route
-              path="/quotation/create-quotation"
-              element={<SetQuotation />}
-            ></Route>
-            <Route
-              path="/quotation/:quotationId/edit-quotation"
-              element={<SetQuotation />}
-            ></Route>
-            <Route path="/po" element={<PO />}></Route>
-
-            <Route path="/po/:id" element={<PoView />}></Route>
-            <Route path="/po/create-po" element={<SetPO />}></Route>
-            <Route path="/po/:poId/edit-po" element={<SetPO />}></Route>
-
-            <Route
-              path="/projects/create-project"
-              element={<CreateProject />}
-            ></Route>
-            <Route path="/projects/:id" element={<ProjectView />} />
-            <Route path="/projects/:id/user" element={<Users />} />
-            <Route path="/projects/:id/tasks" element={<Tasks />}></Route>
-            <Route
-              path="/projects/:id/milestones"
-              element={<Milestone />}
-            ></Route>
-            <Route path="/projects/:id/files" element={<Files />}></Route>
-            <Route
-              path="/projects/:id/approvals"
-              element={<Approval />}
-            ></Route>
-            <Route path="/projects/:id/payments" element={<Payment />}></Route>
-            <Route path="/projects/:id/items" element={<Items />}></Route>
-            <Route path="/projects/:id/chats" element={<Chats />}></Route>
-            <Route path="/customers" element={<CustomerList />}></Route>
-            <Route path="/customers/:id" element={<CustomerView />}></Route>
-            <Route path="/vendors" element={<VendorList />}></Route>
-            <Route path="/vendors/:id" element={<VendorView />}></Route>
+            {roles.length > 0 && roles[0].includes("CreateInvoice") && (
+              <>
+                <Route
+                  path="/invoice"
+                  element={
+                    <InvoiceList
+                      companyDetails={companyDetails}
+                      isStaff={true}
+                    />
+                  }
+                ></Route>
+                <Route path="/invoice/:id" element={<InvoiceView />}></Route>
+                <Route
+                  path="/invoice/create-invoice"
+                  element={<SetInvoice />}
+                ></Route>
+                <Route
+                  path="/invoice/:invoiceId/edit-invoice"
+                  element={<SetInvoice />}
+                ></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateQuotation") && (
+              <>
+                <Route path="/quotation" element={<Quotation />}></Route>
+                <Route
+                  path="/quotation/:id"
+                  element={<QuotationViewHome />}
+                ></Route>
+                <Route
+                  path="/quotation/create-quotation"
+                  element={<SetQuotation />}
+                ></Route>
+                <Route
+                  path="/quotation/:quotationId/edit-quotation"
+                  element={<SetQuotation />}
+                ></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreatePurchase") && (
+              <>
+                <Route path="/purchase" element={<Purchase />}></Route>
+                <Route
+                  path="/purchase/:id"
+                  element={<PurchaseViewHome />}
+                ></Route>
+                <Route
+                  path="/purchase/create-purchase"
+                  element={<SetPurchase />}
+                ></Route>
+                <Route
+                  path="/purchase/:purchaseId/edit-purchase"
+                  element={<SetPurchase />}
+                ></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateProject") && (
+              <>
+                <Route
+                  path="/projects/create-project"
+                  element={<CreateProject />}
+                ></Route>
+                <Route path="/projects/:id" element={<ProjectView />} />
+                <Route path="/projects/:id/user" element={<Users />} />
+                <Route path="/projects/:id/tasks" element={<Tasks />}></Route>
+                <Route
+                  path="/projects/:id/milestones"
+                  element={<Milestone />}
+                ></Route>
+                <Route path="/projects/:id/files" element={<Files />}></Route>
+                <Route
+                  path="/projects/:id/approvals"
+                  element={<Approval />}
+                ></Route>
+                <Route
+                  path="/projects/:id/payments"
+                  element={<Payment />}
+                ></Route>
+                <Route path="/projects/:id/items" element={<Items />}></Route>
+                <Route path="/projects/:id/chats" element={<Chats />}></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateCustomers") && (
+              <>
+                <Route path="/customers" element={<CustomerList />}></Route>
+                <Route path="/customers/:id" element={<CustomerView />}></Route>
+              </>
+            )}
+            {roles.length > 0 && roles[0].includes("CreateVendors") && (
+              <>
+                <Route path="/vendors" element={<VendorList />}></Route>
+                <Route path="/vendors/:id" element={<VendorView />}></Route>
+              </>
+            )}
           </Routes>
 
           <Outlet />

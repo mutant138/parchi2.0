@@ -6,7 +6,7 @@ import { FaAngleDown } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 import { useSelector } from "react-redux";
 
-function SideBar() {
+function SideBar({ staff }) {
   const location = useLocation();
   const [isSideBarExpend, setIsSideBarExpend] = useState(true);
   const userDetails = useSelector((state) => state.users);
@@ -14,9 +14,13 @@ function SideBar() {
   const viewDashBoardList = {
     customer: ["Invoice", "Projects", "Quotation"],
     vendor: ["PO", "Projects", "Quotation"],
-    staff: ["Projects", "Invoice", "PO", "Quotation", "Customers", "Vendors"],
+    staff: staff
+      ? staff[0]?.map((s) => s.toString().replace(/^Create/, ""))
+      : [],
   };
+  console.log("staff", staff);
 
+  console.log("viewdashboard", viewDashBoardList);
   const constSideBarDetails = {
     sales: {
       // image: <LiaMoneyBillWaveSolid size={30} />,
