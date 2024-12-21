@@ -698,7 +698,7 @@ const SetQuotation = () => {
             <div className="grid grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg">
               <div>
                 <label className="text-sm text-gray-600">
-                  quotation Date <span className="text-red-500">*</span>
+                  Quotation Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -713,7 +713,7 @@ const SetQuotation = () => {
 
               <div>
                 <label className="text-sm text-gray-600">
-                  quotation No. <span className="text-red-500">*</span>
+                  Quotation No. <span className="text-red-500">*</span>
                   {preQuotationList.includes(formData.quotationNo) && (
                     <span className="text-red-800 text-xs">
                       "Already quotation No. exist"{" "}
