@@ -42,7 +42,12 @@ import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 
-const Modal = ({ companyDetails, onClose, setSelectedCompany }) => {
+const Modal = ({
+  companyDetails,
+  onClose,
+  setSelectedCompanyName,
+  setSelectedCompany,
+}) => {
   console.log("Company details:", companyDetails);
   const navigate = useNavigate();
   return (
@@ -59,7 +64,8 @@ const Modal = ({ companyDetails, onClose, setSelectedCompany }) => {
                 className="p-2 border-b last:border-none cursor-pointer hover:bg-gray-100"
                 onClick={() => {
                   navigate("invoice");
-                  setSelectedCompany(company.name);
+                  setSelectedCompanyName(company.name);
+                  setSelectedCompany(company);
                 }}
               >
                 <p>
@@ -95,7 +101,8 @@ const StaffHome = () => {
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [roles, setRoles] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState("");
+  const [selectedCompanyName, setSelectedCompanyName] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState(null);
   useEffect(() => {
     if (location.pathname === "/staff") {
       setShowModal(true);
@@ -161,7 +168,7 @@ const StaffHome = () => {
   return (
     <div>
       <div style={{ height: "8vh" }}>
-        <Navbar selectedCompany={selectedCompany} />
+        <Navbar selectedCompany={selectedCompanyName} />
       </div>
       <div className="flex" style={{ height: "92vh" }}>
         <div>{!showModal && <SideBar staff={roles} />}</div>
@@ -173,7 +180,7 @@ const StaffHome = () => {
                   path="/invoice"
                   element={
                     <InvoiceList
-                      companyDetails={companyDetails}
+                      companyDetails={selectedCompany}
                       isStaff={true}
                     />
                   }
@@ -270,6 +277,7 @@ const StaffHome = () => {
         <Modal
           companyDetails={companyDetails}
           onClose={closeModal}
+          setSelectedCompanyName={setSelectedCompanyName}
           setSelectedCompany={setSelectedCompany}
         />
       )}
