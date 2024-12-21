@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../UI/Navbar";
 import SideBar from "../UI/Sidebar";
-import { Outlet, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   collection,
@@ -12,10 +18,33 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import InvoiceList from "../Invoices/InvoiceList";
+import InvoiceView from "../Invoices/InvoiceView/InvoiceView";
+import SetInvoice from "../Invoices/SetInvoice/SetInvoice";
+import Quotation from "../Quotation/Quotation";
+import QuotationViewHome from "../Quotation/QuotationView/QuotationViewHome";
+import SetQuotation from "../Quotation/SetQuotation/SetQuotation";
+import PO from "../PO/PO";
+import PoView from "../PO/PoView/PoView";
+import SetPO from "../PO/SetPO/SetPO";
+import CreateProject from "../Projects/CreateProject/CreateProject";
+import ProjectView from "../Projects/ProjectView/ProjectView";
+import Users from "../Projects/ProjectView/Users/Users";
+import Tasks from "../Projects/ProjectView/Tasks/Tasks";
+import Milestone from "../Projects/ProjectView/Milestone/Milestone";
+import Files from "../Projects/ProjectView/Files/Files";
+import Approval from "../Projects/ProjectView/Approvals/Approval";
+import Payment from "../Projects/ProjectView/Payment/Payment";
+import Items from "../Projects/ProjectView/Items/Items";
+import Chats from "../Projects/ProjectView/Chats/Chats";
+import CustomerList from "../Customers/CustomerList";
+import CustomerView from "../Customers/CustomerView/CustomerView";
+import VendorList from "../Vendors/VendorList";
+import VendorView from "../Vendors/VendorView/VendorView";
 
 const Modal = ({ companyDetails, onClose }) => {
   console.log("Company details:", companyDetails);
-
+  const navigate = useNavigate();
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -28,7 +57,9 @@ const Modal = ({ companyDetails, onClose }) => {
               <div
                 key={company.id}
                 className="p-2 border-b last:border-none cursor-pointer hover:bg-gray-100"
-                onClick={() => {}}
+                onClick={() => {
+                  navigate("invoice");
+                }}
               >
                 <p>
                   <strong>{index + 1}. Name:</strong> {company.name}
@@ -126,6 +157,66 @@ const StaffHome = () => {
       <div className="flex" style={{ height: "92vh" }}>
         <div>{!showModal && <SideBar />}</div>
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
+          <Routes>
+            <Route
+              path="/invoice"
+              element={
+                <InvoiceList companyDetails={companyDetails} isStaff={true} />
+              }
+            ></Route>
+            <Route path="/invoice/:id" element={<InvoiceView />}></Route>
+            <Route
+              path="/invoice/create-invoice"
+              element={<SetInvoice />}
+            ></Route>
+            <Route
+              path="/invoice/:invoiceId/edit-invoice"
+              element={<SetInvoice />}
+            ></Route>
+            <Route path="/quotation" element={<Quotation />}></Route>
+            <Route
+              path="/quotation/:id"
+              element={<QuotationViewHome />}
+            ></Route>
+            <Route
+              path="/quotation/create-quotation"
+              element={<SetQuotation />}
+            ></Route>
+            <Route
+              path="/quotation/:quotationId/edit-quotation"
+              element={<SetQuotation />}
+            ></Route>
+            <Route path="/po" element={<PO />}></Route>
+
+            <Route path="/po/:id" element={<PoView />}></Route>
+            <Route path="/po/create-po" element={<SetPO />}></Route>
+            <Route path="/po/:poId/edit-po" element={<SetPO />}></Route>
+
+            <Route
+              path="/projects/create-project"
+              element={<CreateProject />}
+            ></Route>
+            <Route path="/projects/:id" element={<ProjectView />} />
+            <Route path="/projects/:id/user" element={<Users />} />
+            <Route path="/projects/:id/tasks" element={<Tasks />}></Route>
+            <Route
+              path="/projects/:id/milestones"
+              element={<Milestone />}
+            ></Route>
+            <Route path="/projects/:id/files" element={<Files />}></Route>
+            <Route
+              path="/projects/:id/approvals"
+              element={<Approval />}
+            ></Route>
+            <Route path="/projects/:id/payments" element={<Payment />}></Route>
+            <Route path="/projects/:id/items" element={<Items />}></Route>
+            <Route path="/projects/:id/chats" element={<Chats />}></Route>
+            <Route path="/customers" element={<CustomerList />}></Route>
+            <Route path="/customers/:id" element={<CustomerView />}></Route>
+            <Route path="/vendors" element={<VendorList />}></Route>
+            <Route path="/vendors/:id" element={<VendorView />}></Route>
+          </Routes>
+
           <Outlet />
         </div>
       </div>

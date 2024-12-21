@@ -129,7 +129,7 @@ const ProductList = () => {
                 products.map((product) => (
                   <tr
                     key={product.id}
-                    className="hover:bg-gray-100 text-gray-600"
+                    className="hover:bg-gray-100 cursor-pointer text-gray-600"
                     onClick={() => handleProductClick(product.id)}
                   >
                     <td className="px-4 py-3">

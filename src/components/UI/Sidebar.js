@@ -14,7 +14,7 @@ function SideBar() {
   const viewDashBoardList = {
     customer: ["Invoice", "Projects", "Quotation"],
     vendor: ["PO", "Projects", "Quotation"],
-    staff: ["Projects", "Invoice", "PO", "Quotation"],
+    staff: ["Projects", "Invoice", "PO", "Quotation", "Customers", "Vendors"],
   };
 
   const constSideBarDetails = {

@@ -71,7 +71,6 @@ import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 import Settings from "../Settings/Settings";
 import ProductView from "../Products/ProductView";
 
-
 const Home = () => {
   const location = useLocation();
 
@@ -163,10 +162,7 @@ const Home = () => {
             <Route path="/services-list" element={<ServicesList />}></Route>
             <Route path="/projects" element={<Projects />}></Route>
             <Route path="/products/:id" element={<ProductView />}></Route>
-            
 
-          
-           
             <Route
               path="/projects/create-project"
               element={<CreateProject />}
@@ -254,10 +250,7 @@ const Home = () => {
               element={<SetCreditNote />}
             ></Route>
             <Route path="/vendor/po" element={<VendorPO />}></Route>
-            <Route
-              path="/user"
-              element={<Settings/>}
-            ></Route>
+            <Route path="/user" element={<Settings />}></Route>
           </Routes>
           <Outlet />
         </div>

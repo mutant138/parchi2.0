@@ -41,7 +41,7 @@ function Services({ servicesList }) {
           ))}
         </div>
       ) : (
-        <div className="flex justify-center">No Bills Found</div>
+        <div className="flex justify-center">No Services Found</div>
       )}
     </div>
   );

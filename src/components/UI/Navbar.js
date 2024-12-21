@@ -18,6 +18,8 @@ const Navbar = () => {
   const [editForm, setEditForm] = useState({ name: "", email: "", phone: "" });
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.users);
+  const companyName =
+    userDetails.companies[userDetails.selectedCompanyIndex].name;
 
   function onSwitchCompany(index) {
     const payload = { ...userDetails, selectedCompanyIndex: index };
@@ -94,7 +96,7 @@ const Navbar = () => {
                 <option value="">default</option>
                 <option value="customer">customer</option>
                 <option value="vendor">vendor</option>
-                <option value="staff">staff</option> 
+                <option value="staff">staff</option>
               </select>
             </div>
           </div>
@@ -109,8 +111,12 @@ const Navbar = () => {
                 className="absolute z-10 left-2 top-1/2 transform -translate-y-1/2 text-gray-600"
                 size={16}
               />
-            </div>
+            </div> 
           </div> */}
+
+          {userDetails.selectedDashboard === "staff" && (
+            <div> You Logged as a Staff in {companyName}'s Company</div>
+          )}
           <div className="flex items-center">
             <button
               type="button"
