@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { IoSearch } from "react-icons/io5";
-function Projects() {
+function Projects({ companyDetails, isStaff }) {
   const userDetails = useSelector((state) => state.users);
   const [filterStatus, setFilterStatus] = useState("All");
   const [loading, setLoading] = useState(!true);
@@ -17,16 +17,18 @@ function Projects() {
     total: 0,
   });
   // const [filterDate, setFilterDate] = useState({ from: "", to: "" });
-
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
   const navigate = useNavigate();
   useEffect(() => {
     async function fetchProjectsList() {
       try {
-        const companyRef = doc(
-          db,
-          "companies",
-          userDetails?.companies[userDetails.selectedCompanyIndex]?.companyId
-        );
+        const companyRef = doc(db, "companies", companyId);
 
         const projectRef = collection(db, "projects");
 

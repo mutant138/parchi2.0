@@ -5,27 +5,26 @@ import { db } from "../../firebase";
 import { useSelector } from "react-redux";
 import { IoSearch } from "react-icons/io5";
 
-const Purchase = () => {
+const Purchase = ({ companyDetails, isStaff }) => {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
 
   const userDetails = useSelector((state) => state.users);
-
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
   const navigate = useNavigate();
   useEffect(() => {
     const fetchPurchases = async () => {
       setLoading(true);
       try {
-        const purchaseRef = collection(
-          db,
-          "companies",
-          companyId,
-          "purchases"
-        );
+        const purchaseRef = collection(db, "companies", companyId, "purchases");
         const querySnapshot = await getDocs(purchaseRef);
         const purchasesData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -219,9 +218,7 @@ const Purchase = () => {
                             <option value="UnPaid">UnPaid</option>
                           </select>
                         </td>
-                        <td className="py-3">
-                          {purchase.mode || "Online"}
-                        </td>
+                        <td className="py-3">{purchase.mode || "Online"}</td>
                         <td className="py-3">{purchase.purchaseNo}</td>
 
                         <td className="py-3">
@@ -272,6 +269,6 @@ const Purchase = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Purchase;

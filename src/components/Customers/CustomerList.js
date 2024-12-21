@@ -19,15 +19,22 @@ import {
 } from "../../store/CustomerSlice";
 import CreateCustomer from "./CreateCustomer";
 
-const CustomerList = () => {
+const CustomerList = ({ companyDetails, isStaff }) => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-
+  console.log("customercompanyDetails", companyDetails);
   const userDetails = useSelector((state) => state.users);
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+    console.log("!companyId", companyId);
+  } else {
+    companyId = companyDetails.id;
+    console.log("companyId", companyId);
+  }
   const customersDetails = useSelector((state) => state.customers).data;
   const dispatch = useDispatch();
 

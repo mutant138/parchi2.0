@@ -41,6 +41,7 @@ import VendorView from "../Vendors/VendorView/VendorView";
 import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
+import Projects from "../Projects/Projects";
 
 const Modal = ({
   companyDetails,
@@ -205,7 +206,15 @@ const StaffHome = () => {
             )}
             {roles.length > 0 && roles[0].includes("CreateQuotation") && (
               <>
-                <Route path="/quotation" element={<Quotation />}></Route>
+                <Route
+                  path="/quotation"
+                  element={
+                    <Quotation
+                      companyDetails={selectedCompany}
+                      isStaff={true}
+                    />
+                  }
+                ></Route>
                 <Route
                   path="/quotation/:id"
                   element={<QuotationViewHome />}
@@ -222,7 +231,12 @@ const StaffHome = () => {
             )}
             {roles.length > 0 && roles[0].includes("CreatePurchase") && (
               <>
-                <Route path="/purchase" element={<Purchase />}></Route>
+                <Route
+                  path="/purchase"
+                  element={
+                    <Purchase companyDetails={selectedCompany} isStaff={true} />
+                  }
+                ></Route>
                 <Route
                   path="/purchase/:id"
                   element={<PurchaseViewHome />}
@@ -239,6 +253,12 @@ const StaffHome = () => {
             )}
             {roles.length > 0 && roles[0].includes("CreateProject") && (
               <>
+                <Route
+                  path="/projects"
+                  element={
+                    <Projects companyDetails={selectedCompany} isStaff={true} />
+                  }
+                ></Route>
                 <Route
                   path="/projects/create-project"
                   element={<CreateProject />}
@@ -265,13 +285,29 @@ const StaffHome = () => {
             )}
             {roles.length > 0 && roles[0].includes("CreateCustomers") && (
               <>
-                <Route path="/customers" element={<CustomerList />}></Route>
+                <Route
+                  path="/customers"
+                  element={
+                    <CustomerList
+                      companyDetails={selectedCompany}
+                      isStaff={true}
+                    />
+                  }
+                ></Route>
                 <Route path="/customers/:id" element={<CustomerView />}></Route>
               </>
             )}
             {roles.length > 0 && roles[0].includes("CreateVendors") && (
               <>
-                <Route path="/vendors" element={<VendorList />}></Route>
+                <Route
+                  path="/vendors"
+                  element={
+                    <VendorList
+                      companyDetails={selectedCompany}
+                      isStaff={true}
+                    />
+                  }
+                ></Route>
                 <Route path="/vendors/:id" element={<VendorView />}></Route>
               </>
             )}

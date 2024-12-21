@@ -5,7 +5,7 @@ import { db } from "../../firebase";
 import { useSelector } from "react-redux";
 import { IoSearch } from "react-icons/io5";
 
-function Quotation() {
+function Quotation({ companyDetails, isStaff }) {
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,8 +13,13 @@ function Quotation() {
 
   const userDetails = useSelector((state) => state.users);
 
-  const companyId =
-    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  let companyId;
+  if (!companyDetails) {
+    companyId =
+      userDetails.companies[userDetails.selectedCompanyIndex].companyId;
+  } else {
+    companyId = companyDetails.id;
+  }
   const navigate = useNavigate();
   useEffect(() => {
     const fetchQuotations = async () => {
@@ -219,9 +224,7 @@ function Quotation() {
                             <option value="UnPaid">UnPaid</option>
                           </select>
                         </td>
-                        <td className="py-3">
-                          {quotation.mode || "Online"}
-                        </td>
+                        <td className="py-3">{quotation.mode || "Online"}</td>
                         <td className="py-3">{quotation.quotationNo}</td>
 
                         <td className="py-3">
