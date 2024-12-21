@@ -51,8 +51,11 @@ const Template1 = forwardRef((props, ref) => {
             <div>
               <strong>Due Date :</strong> {DateFormate(dataSet?.dueDate)}
             </div>
-            <div>
-              <strong>Place of Supply :</strong> -
+            <div className="text-end">
+              <strong>Place of Supply :</strong>
+              <p>{dataSet?.userTo.address}</p>
+              <p> {dataSet?.userTo.city}</p>
+              <p> {dataSet?.userTo.zipCode}</p>
             </div>
           </div>
         </div>
