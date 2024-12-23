@@ -69,7 +69,7 @@ import Purchase from "../Purchase/Purchase";
 import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 import Settings from "../Settings/Settings";
-import ProductView from "../Products/ProductView";
+import ProductViewHome from "../Products/ProductView/ProductViewHome";
 
 const Home = () => {
   const location = useLocation();
@@ -161,7 +161,7 @@ const Home = () => {
             <Route path="/products" element={<ProductHome />}></Route>
             <Route path="/services-list" element={<ServicesList />}></Route>
             <Route path="/projects" element={<Projects />}></Route>
-            <Route path="/products/:id" element={<ProductView />}></Route>
+            <Route path="/products/:id" element={<ProductViewHome />}></Route>
 
             <Route
               path="/projects/create-project"

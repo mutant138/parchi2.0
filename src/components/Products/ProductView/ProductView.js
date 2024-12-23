@@ -1,48 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Link, useParams } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db, storage } from "../../firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import { db, storage } from "../../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useSelector } from "react-redux";
 import { FaUserEdit } from "react-icons/fa";
 
-const ProductView = () => {
+const ProductView = ({ productData }) => {
   const { id: productId } = useParams();
   const userDetails = useSelector((state) => state.users);
-  const companyDetails = userDetails.companies[userDetails.selectedCompanyIndex];
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const companyDetails =
+    userDetails.companies[userDetails.selectedCompanyIndex];
   const [isEdit, setIsEdit] = useState(false);
-  const [updatedData, setUpdatedData] = useState({});
+  const [product, setProduct] = useState(productData);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const productRef = doc(
-          db,
-          "companies",
-          companyDetails.companyId,
-          "products",
-          productId
-        );
-        const productDoc = await getDoc(productRef);
-        if (productDoc.exists()) {
-          setProduct({ id: productDoc.id, ...productDoc.data() });
-          setUpdatedData({ id: productDoc.id, ...productDoc.data() });
-        } else {
-          console.error("No such document!");
-        }
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [productId, companyDetails.companyId]);
+    setLoading(true);
+    setProduct(productData);
+    setLoading(false);
+  }, [productData]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -62,9 +41,15 @@ const ProductView = () => {
           },
           async () => {
             const downloadURL = await getDownloadURL(storageRef);
-            const productRef = doc(db, "companies", companyDetails.companyId, "products", productId);
+            const productRef = doc(
+              db,
+              "companies",
+              companyDetails.companyId,
+              "products",
+              productId
+            );
             await updateDoc(productRef, { imageUrl: downloadURL });
-            setUpdatedData((prev) => ({ ...prev, imageUrl: downloadURL }));
+            setProduct((prev) => ({ ...prev, imageUrl: downloadURL }));
             alert("Product image updated successfully");
             setProgress(0);
           }
@@ -77,8 +62,14 @@ const ProductView = () => {
 
   const onUpdateProduct = async () => {
     try {
-      const productRef = doc(db, "companies", companyDetails.companyId, "products", productId);
-      const { id, ...rest } = updatedData;
+      const productRef = doc(
+        db,
+        "companies",
+        companyDetails.companyId,
+        "products",
+        productId
+      );
+      const { id, ...rest } = product;
       await updateDoc(productRef, rest);
       alert("Product updated successfully");
       setIsEdit(false);
@@ -88,36 +79,25 @@ const ProductView = () => {
   };
 
   const onCancelEdit = () => {
-    setUpdatedData(product);
+    setProduct(productData);
     setIsEdit(false);
   };
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-full">Loading product...</div>;
-  }
-
-  if (!product) {
-    return <div className="flex items-center justify-center h-full">Product not found.</div>;
-  }
-
-  const subTotal = product.sellingPrice * product.stock;
-  const taxAmount = (subTotal * product.tax) / 100;
+  const subTotal = product?.sellingPrice * product?.stock;
+  const taxAmount = (subTotal * product?.tax) / 100;
   const total = subTotal + taxAmount;
 
-  return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md">
-        <div className="p-5 border-b flex items-center">
-          <Link
-            className="text-gray-700 py-1 px-2 rounded-full hover:bg-gray-200 transition duration-200"
-            to={"/products"}
-          >
-            <AiOutlineArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-2xl font-semibold text-gray-900 ml-4">Product Details</h1>
-          <p className="text-sm text-gray-600 mt-1 ml-auto">Date: {new Date().toLocaleDateString()}</p>
-        </div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        Loading product...
+      </div>
+    );
+  }
 
+  return (
+    <div className="p-6 bg-gray-50 overflow-y-auto" style={{ height: "76vh" }}>
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md">
         <div className="p-6">
           {progress > 0 && (
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -128,15 +108,15 @@ const ProductView = () => {
             </div>
           )}
           <div className="flex items-center space-x-6 mb-6">
-            {updatedData.imageUrl ? (
+            {product?.imageUrl ? (
               <img
-                src={updatedData.imageUrl}
+                src={product?.imageUrl}
                 alt="Product"
                 className="w-20 h-20 rounded-full object-cover shadow-md"
               />
             ) : (
               <span className="bg-purple-500 text-white w-20 h-20 flex items-center justify-center rounded-full text-2xl shadow-md">
-                {updatedData.name.charAt(0).toUpperCase()}
+                {product?.name?.charAt(0).toUpperCase()}
               </span>
             )}
             <div className="flex-1">
@@ -144,17 +124,17 @@ const ProductView = () => {
                 {isEdit ? (
                   <input
                     type="text"
-                    value={updatedData.name}
+                    value={product?.name}
                     className="border border-gray-300 p-2 rounded-md w-full focus:outline-none focus:ring focus:ring-purple-200"
                     onChange={(e) =>
-                      setUpdatedData((val) => ({
+                      setProduct((val) => ({
                         ...val,
                         name: e.target.value,
                       }))
                     }
                   />
                 ) : (
-                  updatedData.name || "N/A"
+                  product?.name || "N/A"
                 )}
               </div>
               {!isEdit && (
@@ -184,12 +164,12 @@ const ProductView = () => {
                   <label className="text-sm text-gray-500">Quantity</label>
                   <input
                     type="text"
-                    value={updatedData.stock || (isEdit ? "" : "N/A")}
+                    value={product?.stock || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
-                      setUpdatedData((val) => ({
+                      setProduct((val) => ({
                         ...val,
                         stock: e.target.value,
                       }))
@@ -201,12 +181,12 @@ const ProductView = () => {
                   <label className="text-sm text-gray-500">Discount</label>
                   <input
                     type="text"
-                    value={updatedData.discount || (isEdit ? "" : "N/A")}
+                    value={product?.discount || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
-                      setUpdatedData((val) => ({
+                      setProduct((val) => ({
                         ...val,
                         discount: e.target.value,
                       }))
@@ -218,12 +198,12 @@ const ProductView = () => {
                   <label className="text-sm text-gray-500">GST Tax</label>
                   <input
                     type="text"
-                    value={updatedData.tax || (isEdit ? "" : "N/A")}
+                    value={product?.tax || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
-                      setUpdatedData((val) => ({
+                      setProduct((val) => ({
                         ...val,
                         tax: e.target.value,
                       }))
@@ -241,12 +221,12 @@ const ProductView = () => {
                   <label className="text-sm text-gray-500">Unit Price</label>
                   <input
                     type="text"
-                    value={updatedData.sellingPrice || (isEdit ? "" : "N/A")}
+                    value={product?.sellingPrice || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
-                      setUpdatedData((val) => ({
+                      setProduct((val) => ({
                         ...val,
                         sellingPrice: e.target.value,
                       }))
@@ -255,15 +235,17 @@ const ProductView = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Purchase Price</label>
+                  <label className="text-sm text-gray-500">
+                    Purchase Price
+                  </label>
                   <input
                     type="text"
-                    value={updatedData.purchasePrice || (isEdit ? "" : "N/A")}
+                    value={product?.purchasePrice || (isEdit ? "" : "N/A")}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
                     onChange={(e) =>
-                      setUpdatedData((val) => ({
+                      setProduct((val) => ({
                         ...val,
                         purchasePrice: e.target.value,
                       }))
@@ -275,7 +257,7 @@ const ProductView = () => {
                   <label className="text-sm text-gray-500">Includes Tax</label>
                   <input
                     type="text"
-                    value={updatedData.sellingPriceTaxType ? "Yes" : "No"}
+                    value={product?.sellingPriceTaxType ? "Yes" : "No"}
                     className={`block w-full border-gray-300 p-2 rounded-md focus:ring focus:ring-purple-200 ${
                       isEdit ? "border" : "bg-gray-100"
                     }`}
@@ -314,7 +296,7 @@ const ProductView = () => {
               <div className="text-right">
                 <p>₹{subTotal.toFixed(2)}</p>
                 <p>₹{taxAmount.toFixed(2)}</p>
-                <p>₹{(product.purchasePrice * product.stock).toFixed(2)}</p>
+                <p>₹{(product?.purchasePrice * product?.stock).toFixed(2)}</p>
                 <p className="font-semibold">₹{total.toFixed(2)}</p>
               </div>
             </div>
