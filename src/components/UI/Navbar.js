@@ -154,7 +154,7 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
               </div>
             </button>
 
-            {!userDetails.selectedDashboard === "staff" && (
+            {userDetails.selectedDashboard !== "staff" && (
               <button
                 type="button"
                 className="relative group px-2 py-1 rounded-full text-gray-600 hover:text-black ml-[3px]"

@@ -24,6 +24,7 @@ const Roles = () => {
 
   const companyDetails =
     userDetails.companies[userDetails.selectedCompanyIndex];
+
   async function fetchStaffData() {
     try {
       setLoading(true);
@@ -51,24 +52,24 @@ const Roles = () => {
     setLoading(false);
   }
 
-  async function handleRoleToggle(staff, roleName, isChecked, id) {
+  async function handleRoleToggle(staff, roleName, action, isChecked) {
     try {
       const staffRef = doc(db, "staff", staff.id);
-      const payload = {
+      const updatedRoles = {
         ...staff.roles,
-        [roleName]: isChecked,
+        [roleName]: {
+          ...staff.roles[roleName],
+          [action]: isChecked,
+        },
       };
-      await updateDoc(staffRef, { roles: payload });
+      await updateDoc(staffRef, { roles: updatedRoles });
 
       setStaffData((prevData) =>
         prevData.map((item) => {
           if (item.id === staff.id) {
             return {
               ...item,
-              roles: {
-                ...item.roles,
-                [roleName]: isChecked,
-              },
+              roles: updatedRoles,
             };
           }
           return item;
@@ -82,6 +83,23 @@ const Roles = () => {
   useEffect(() => {
     fetchStaffData();
   }, [companyDetails.companyId]);
+
+  const rolesList = [
+    "CreateInvoice",
+    "CreateServices",
+    "CreateQuotation",
+    "CreatePurchase",
+    "CreateCustomers",
+    "CreateVendors",
+    "CreateProject",
+    "CreatePo",
+    "CreatePOS",
+    "CreateProFormaInvoice",
+    "CreateCreditNote",
+    "CreateDeliveryChallan",
+  ];
+
+  const actions = ["create", "edit", "view", "delete"];
 
   return (
     <div className="w-full" style={{ width: "100%", height: "92vh" }}>
@@ -101,40 +119,23 @@ const Roles = () => {
             <h1 className="text-2xl font-bold">Roles</h1>
           </div>
         </header>
-        {/* <div className="flex items-center bg-white space-x-4 mb-4 border p-2 rounded">
-          <input
-            type="text"
-            placeholder="Search by Designation Name..."
-            className=" w-full focus:outline-none"
-            onChange={(e) => setSearchInput(e.target.value)}
-            value={searchInput}
-          />
-          <IoSearch />
-        </div> */}
-        {/* <div>
-          <div className="text-4xl text-blue-700 font-bold">
-            {rolesCount.total}
-          </div>
-          <div>Total Roles</div>
-        </div> */}
         <div>
           {loading ? (
             <div className="text-center py-6">Loading Roles...</div>
           ) : staffData.length > 0 ? (
             staffData.map((ele) => (
               <div
-                className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3 "
+                className="border-2 shadow bg-white cursor-pointer rounded-lg p-3 mt-3"
                 key={ele.id}
               >
                 <div className="px-5 space-y-3">
                   <div
                     className="font-bold"
-                    key={ele.id}
                     onClick={() =>
-                      setStaffData(
-                        staffData.map((staff) => {
-                          if (staff.id == ele.id) {
-                            staff.isExpand = !staff.isExpand;
+                      setStaffData((prevData) =>
+                        prevData.map((staff) => {
+                          if (staff.id === ele.id) {
+                            return { ...staff, isExpand: !staff.isExpand };
                           }
                           return staff;
                         })
@@ -145,41 +146,38 @@ const Roles = () => {
                   </div>
 
                   {ele.isExpand &&
-                    [
-                      "CreateInvoice",
-                      "CreateServices",
-                      "CreateQuotation",
-                      "CreatePurchase",
-                      "CreateCustomers",
-                      "CreateVendors",
-                      "CreateProject",
-                      "CreatePo",
-                      "CreatePOS",
-                      "CreateProFormaInvoice",
-                      "CreateCreditNote",
-                      "CreateDeliveryChallan",
-                    ].map((roleName, index) => (
-                      <div key={roleName} className="flex justify-between">
-                        <div>{roleName}</div>
-                        <div>
-                          <label className="relative inline-block w-14 h-8">
-                            <input
-                              type="checkbox"
-                              name={roleName}
-                              className="sr-only peer"
-                              checked={ele.roles?.[roleName] || false}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleRoleToggle(
-                                  ele,
-                                  roleName,
-                                  e.target.checked
-                                );
-                              }}
-                            />
-                            <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
-                            <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
-                          </label>
+                    rolesList.map((roleName) => (
+                      <div key={roleName} className="mt-3">
+                        <h2 className="font-semibold">{roleName}</h2>
+                        <div className="grid grid-cols-4 gap-4 mt-2">
+                          {actions.map((action) => (
+                            <div
+                              key={action}
+                              className="flex justify-between items-center"
+                            >
+                              <span className="capitalize">{action}</span>
+                              <label className="relative inline-block w-14 h-8">
+                                <input
+                                  type="checkbox"
+                                  className="sr-only peer"
+                                  checked={
+                                    ele.roles?.[roleName]?.[action] || false
+                                  }
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    handleRoleToggle(
+                                      ele,
+                                      roleName,
+                                      action,
+                                      e.target.checked
+                                    );
+                                  }}
+                                />
+                                <span className="absolute cursor-pointer inset-0 bg-[#9fccfa] rounded-full transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-focus:ring-2 peer-focus:ring-[#0974f1] peer-checked:bg-[#0974f1]"></span>
+                                <span className="absolute top-0 left-0 h-8 w-8 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.4)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center peer-checked:translate-x-[1.6em]"></span>
+                              </label>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}
@@ -198,3 +196,4 @@ const Roles = () => {
 };
 
 export default Roles;
+
