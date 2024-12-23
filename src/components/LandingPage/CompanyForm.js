@@ -6,9 +6,15 @@ const CompanyForm = (userRef) => {
   const [formData, setFormData] = useState({ name: "" });
 
   async function onSubmit(e) {
+    if (!formData.name) {
+      formData.name = "Your Company";
+    }
     e.preventDefault();
     try {
-      await addDoc(collection(db, "companies"), { ...formData, userRef });
+      await addDoc(collection(db, "companies"), {
+        ...formData,
+        ...userRef,
+      });
       alert("!Successfully Created!");
     } catch (error) {
       console.log("🚀 ~ Submit ~ error:", error);
@@ -127,11 +133,19 @@ const CompanyForm = (userRef) => {
               className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
               name="phone"
               onChange={handleChangeInput}
+              required
             />
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-between">
+          <button
+            type="button"
+            className="text-blue-600  px-4 py-2 rounded-md "
+            onClick={onSubmit}
+          >
+            Skip for Now
+          </button>
           <button
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
