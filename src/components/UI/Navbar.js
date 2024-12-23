@@ -290,7 +290,7 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
             style={{ marginTop: "8vh" }}
           >
             <div className="" onClick={(e) => e.stopPropagation()}>
-              {companyDetails.length > 0 ? (
+              {companyDetails?.length > 0 ? (
                 <>
                   {companyDetails.map((company, index) => (
                     <div

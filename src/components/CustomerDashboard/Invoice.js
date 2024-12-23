@@ -127,11 +127,11 @@ function Invoice() {
                         <td className="py-3">
                           {(() => {
                             if (
-                              invoice.date.seconds &&
-                              typeof invoice.date.seconds === "number"
+                              invoice?.date.seconds &&
+                              typeof invoice?.date?.seconds === "number"
                             ) {
                               const date = new Date(
-                                invoice.date.seconds * 1000
+                                invoice?.date?.seconds * 1000
                               );
                               const today = new Date();
                               const timeDiff =

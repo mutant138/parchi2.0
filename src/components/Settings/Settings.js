@@ -35,7 +35,6 @@ const Settings = () => {
             id: companySnapshot.id,
             ...companySnapshot.data(),
           };
-          console.log("companyData", companyData);
           setFormData(companyData);
         } else {
           console.error("No such document!");

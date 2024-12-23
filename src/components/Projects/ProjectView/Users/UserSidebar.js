@@ -81,7 +81,7 @@ function UserSidebar({ isOpen, onClose, projectId, projectDetails, Refresh }) {
 
   useEffect(() => {
     const filterData = dataSet[activeNav].filter((val) =>
-      val.name.toLowerCase().includes(searchTerm)
+      val.name?.toLowerCase().includes(searchTerm)
     );
     setModifiedData(filterData);
     setSelectedDataSet(previousSelectedDataSet[activeNav]);
