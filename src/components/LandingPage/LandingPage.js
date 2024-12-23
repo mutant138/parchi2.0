@@ -213,7 +213,7 @@ const LandingPage = () => {
           </div> */}
 
           {isCompanyFound ? (
-            <CompanyForm />
+            <CompanyForm userRef={""} />
           ) : (
             <div className=" ">
               <div className="flex space-x-3 mb-10 border-2 rounded-lg">
