@@ -8,7 +8,7 @@ const CompanyForm = (userRef) => {
   async function onSubmit(e) {
     e.preventDefault();
     try {
-      await addDoc(collection(db, "companies"), formData);
+      await addDoc(collection(db, "companies"), { ...formData, userRef });
       alert("!Successfully Created!");
     } catch (error) {
       console.log("🚀 ~ Submit ~ error:", error);
