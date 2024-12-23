@@ -115,8 +115,6 @@ const StaffHome = () => {
   const location = useLocation();
   const phone = useSelector((state) => +state.users.phone);
   // User's phone number from Redux
-  console.log("Phone:", phone);
-  console.log("type phone", typeof phone, phone);
   const [showModal, setShowModal] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [roles, setRoles] = useState([]);
@@ -132,6 +130,7 @@ const StaffHome = () => {
       setShowModal(false);
     }
   }, [location, phone]);
+
   const fetchCompanyDetails = async (phone) => {
     try {
       const staffQuery = query(
@@ -139,12 +138,9 @@ const StaffHome = () => {
         where("phone", "==", phone)
       );
       const staffSnapshot = await getDocs(staffQuery);
-      console.log("Staff snapshot:", staffSnapshot.docs);
-      console.log("staffSnap", staffSnapshot);
 
       if (!staffSnapshot.empty) {
         const staffDoc = staffSnapshot.docs.map((doc) => doc.data());
-        console.log("Staff document:", staffDoc);
         const staffSidebar = staffDoc.map((staff) => {
           if (staff.roles) {
             console.log("role", staff.roles);
@@ -164,28 +160,23 @@ const StaffHome = () => {
         });
 
         const companies = await Promise.all(companyPromises);
-        console.log("companies", companies);
         if (companies.length > 0) {
-          console.log("All associated companies:", companies);
           setCompanyDetails(companies);
         } else {
-          console.error("No valid companies found for this staff member.");
           setCompanyDetails(null);
         }
         setRoles(staffSidebar);
-      } else {
-        console.error("Staff not found");
-        setCompanyDetails(null);
       }
     } catch (error) {
       console.error("Error fetching company details:", error);
       setCompanyDetails(null);
     }
   };
-  console.log("roles", roles);
+
   const closeModal = () => {
     setShowModal(false);
   };
+
   console.log("selected company", selectedCompany);
   return (
     <div>
