@@ -126,8 +126,10 @@ function ProjectView() {
   async function fetchIncomeAndExpense() {
     try {
       const expensesRef = collection(db, "companies", companyId, "expenses");
-      const projectRef = doc(db, "projects", id);
-      const q = query(expensesRef, where("projectRef", "==", projectRef));
+      const q = query(
+        expensesRef,
+        where("projectRef", "==", doc(db, "projects", id))
+      );
       const querySnapshot = await getDocs(q);
       const totalAmountData = {
         income: 0,
