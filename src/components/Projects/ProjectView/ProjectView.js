@@ -19,6 +19,8 @@ import {
   deleteDoc,
   collection,
   getDocs,
+  where,
+  query,
 } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { TiMessages } from "react-icons/ti";
@@ -32,8 +34,14 @@ function ProjectView() {
   const [project, setProject] = useState({});
   const [isEdit, setIsEdit] = useState(false);
   const [bankBooks, setBankBooks] = useState([]);
+  const [totalAmounts, setTotalAmounts] = useState({
+    income: 0,
+    expense: 0,
+    balance: 0,
+  });
   const userDetails = useSelector((state) => state.users);
-
+  const companyId =
+    userDetails.companies[userDetails.selectedCompanyIndex].companyId;
   const handleUpdate = async () => {
     try {
       const projectDoc = doc(db, "projects", id);
@@ -73,6 +81,7 @@ function ProjectView() {
   useEffect(() => {
     fetchData();
     fetchBankBooks();
+    fetchIncomeAndExpense();
   }, [id]);
 
   async function fetchData() {
@@ -114,6 +123,35 @@ function ProjectView() {
     setBankBooks(bankBooksData);
   }
 
+  async function fetchIncomeAndExpense() {
+    try {
+      const expensesRef = collection(db, "companies", companyId, "expenses");
+      const q = query(
+        expensesRef,
+        where("projectRef", "==", doc(db, "projects", id))
+      );
+      const querySnapshot = await getDocs(q);
+      const totalAmountData = {
+        income: 0,
+        expense: 0,
+        balance: 0,
+      };
+      const totalData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        if (data.transactionType === "income") {
+          totalAmountData.income += +data.amount;
+          totalAmountData.balance += +data.amount;
+        } else if (data.transactionType === "expense") {
+          totalAmountData.expense += +data.amount;
+          totalAmountData.balance -= +data.amount;
+        }
+      });
+      setTotalAmounts(totalAmountData);
+    } catch (error) {
+      console.log("Error in fetching total balance:", error);
+    }
+  }
+  console.log("total amounts", totalAmounts);
   const manageProjectItems = [
     {
       name: "Users",
@@ -431,7 +469,7 @@ function ProjectView() {
                   </div>
                   <span className="font-bold ml-5">Income</span>
                 </div>
-                <div>2500</div>
+                <div>{totalAmounts.income}</div>
               </div>
               <div className="">
                 <div className="flex items-center py-2">
@@ -441,13 +479,13 @@ function ProjectView() {
                   </div>
                 </div>
 
-                <div className="text-end">2500</div>
+                <div className="text-end">{totalAmounts.expense}</div>
               </div>
             </div>
           </div>
           <div className="flex justify-between bg-green-500  text-center mt-4 p-2 rounded-b-lg">
             <div>Balance</div>
-            <div>2500</div>
+            <div>{totalAmounts.balance}</div>
           </div>
         </div>
         <div className="p-5 bg-white shadow rounded-lg mt-4">
