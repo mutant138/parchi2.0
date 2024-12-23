@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import CompanyForm from "./CompanyForm";
 
 const LandingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +26,7 @@ const LandingPage = () => {
   const [countdown, setCountdown] = useState(60);
   const [isResendAllowed, setIsResendAllowed] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [isCompanyFound, setIsCompanyFound] = useState(!false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -194,9 +196,10 @@ const LandingPage = () => {
       }
     }
   };
+
   return (
     <div className="text-gray-800 min-h-screen">
-      <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-4 bg-white shadow-md z-10">
+      <header className="fixed top-0 left-0 w-full px-8 py-4 bg-white z-10">
         <div className="text-2xl font-bold text-blue-500">Sunya</div>
       </header>
 
@@ -208,87 +211,64 @@ const LandingPage = () => {
           {/*<div className="flex items-center justify-center text-2xl font-bold my-6">
             Welcome to Sunya
           </div> */}
-          <div className=" ">
-            <div className="flex space-x-3 mb-10 border-2 rounded-lg">
-              <button
-                className={
-                  " text-blue-500 py-2 rounded-md w-full " +
-                  (isLogin && " bg-blue-500 text-white")
-                }
-                onClick={() => setIsLogin(true)}
-              >
-                Login
-              </button>
 
-              <button
-                className={
-                  " text-blue-500 py-2  rounded-md w-full " +
-                  (!isLogin && " bg-blue-500 text-white")
-                }
-                onClick={() => setIsLogin(false)}
-              >
-                Register
-              </button>
-            </div>
-            <div className="h-96 overflow-y-auto">
-              {!isLogin ? (
-                <div>
+          {isCompanyFound ? (
+            <CompanyForm userRef={""} />
+          ) : (
+            <div className=" ">
+              <div className="flex space-x-3 mb-10 border-2 rounded-lg">
+                <button
+                  className={
+                    " text-blue-500 py-2 rounded-md w-full " +
+                    (isLogin && " bg-blue-500 text-white")
+                  }
+                  onClick={() => setIsLogin(true)}
+                >
+                  Login
+                </button>
+
+                <button
+                  className={
+                    " text-blue-500 py-2  rounded-md w-full " +
+                    (!isLogin && " bg-blue-500 text-white")
+                  }
+                  onClick={() => setIsLogin(false)}
+                >
+                  Register
+                </button>
+              </div>
+              <div className="h-96 overflow-y-auto">
+                {!isLogin && (
                   <div>
-                    <h2 className="text-1xl text-grey-500 mb-2">Enter Name</h2>
-                    <div className="mb-4">
-                      <input
-                        type="text"
-                        placeholder="Enter Name"
-                        className="px-4 py-2 border w-full focus:outline-none"
-                        required
-                      />
+                    <div>
+                      <h2 className="text-1xl text-grey-500 mb-2">
+                        Enter UserName
+                      </h2>
+                      <div className="mb-4">
+                        <input
+                          type="text"
+                          placeholder="Enter UserName"
+                          className="px-4 py-2 border w-full focus:outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h2 className="text-1xl text-grey-500 mb-2">
+                        Enter User Email
+                      </h2>
+                      <div className="mb-4">
+                        <input
+                          type="email"
+                          placeholder="Enter User Email"
+                          className="px-4 py-2 border w-full focus:outline-none"
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <h2 className="text-1xl text-grey-500 mb-2">
-                      Enter phone number
-                    </h2>
-                    <div className="flex items-center mb-4">
-                      <span className="px-3 py-2 bg-gray-200 border border-r-0 rounded-l-md text-gray-700">
-                        +91
-                      </span>
-                      <input
-                        type="text"
-                        maxLength="10"
-                        placeholder="Enter your mobile number"
-                        value={phoneNumber}
-                        onChange={handlePhoneNumberChange}
-                        className="px-4 py-2 border w-full focus:outline-none"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <h2 className="text-1xl text-grey-500 mb-2">Enter Email</h2>
-                    <div className="mb-4">
-                      <input
-                        type="email"
-                        placeholder="Enter Email"
-                        className="px-4 py-2 border w-full focus:outline-none"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <h2 className="text-1xl text-grey-500 mb-2">
-                      Enter Password
-                    </h2>
-                    <div className="mb-4">
-                      <input
-                        type="password"
-                        placeholder="Enter Password"
-                        className="px-4 py-2 border w-full focus:outline-none"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
+                )}
                 <div className="">
                   <div className="w-full">
                     <h2 className="text-1xl text-grey-500 mb-2">
@@ -307,195 +287,67 @@ const LandingPage = () => {
                         className="px-4 py-2 border w-full focus:outline-none"
                         required
                       />
-                      {isOtpStage ? (
-                        <>
-                          <button
-                            type="button"
-                            className="px-3 py-2 border border-l-0 rounded-r-md text-gray-700"
-                            onClick={() => setIsOtpStage(false)}
-                          >
-                            Edit
-                          </button>
-                        </>
-                      ) : (
-                        ""
+                      {isOtpStage && (
+                        <button
+                          type="button"
+                          className="px-3 py-2 border border-l-0 rounded-r-md text-gray-700"
+                          onClick={() => setIsOtpStage(false)}
+                        >
+                          Edit
+                        </button>
                       )}
                     </div>
                   </div>
                 </div>
-              )}
-              {isOtpStage && (
-                <div>
-                  <h2 className="text-1xl text-grey-500 mb-2">Enter OTP</h2>
-                  <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="px-4 py-2 border rounded-md w-full mb-4"
-                  />
-                </div>
-              )}
-            </div>
-            {isOtpStage ? (
-              <>
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
-                  onClick={handleOtpSubmit}
-                >
-                  Verify OTP
-                </button>
-
-                <div className="text-sm text-gray-500 mt-3">
-                  {countdown > 0
-                    ? `You can request another OTP in ${countdown} seconds`
-                    : ""}
-                </div>
-                {countdown === 0 && (
-                  <button
-                    className="mt-2 text-blue-500 underline"
-                    onClick={handleResendOtp}
-                  >
-                    Resend OTP
-                  </button>
+                {isOtpStage && (
+                  <div>
+                    <h2 className="text-1xl text-grey-500 mb-2">Enter OTP</h2>
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      className="px-4 py-2 border rounded-md w-full mb-4"
+                    />
+                  </div>
                 )}
-              </>
-            ) : (
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-md w-full mt-4"
-                onClick={handlePhoneNumberSubmit}
-              >
-                Submit
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-      {/* {isModalOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20"
-          onClick={closeModal}
-        >
-          <div
-            className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg h-auto relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-center text-3xl font-bold text-blue-500">
-              Sunya
-            </div>
-            <div className="flex items-center justify-center text-2xl font-bold my-6">
-              Welcome to Sunya
-            </div>
-
-            <h2 className="text-1xl text-grey-500 mb-2">Enter phone number</h2>
-            <div className="flex items-center mb-4">
-              <span className="px-3 py-2 bg-gray-200 border border-r-0 rounded-l-md text-gray-700">
-                +91
-              </span>
-              <input
-                type="text"
-                maxLength="10"
-                placeholder="Enter your mobile number"
-                value={phoneNumber}
-                onChange={handlePhoneNumberChange}
-                className="px-4 py-2 border w-full focus:outline-none"
-                required
-              />
+              </div>
               {isOtpStage ? (
                 <>
                   <button
-                    type="button"
-                    className="px-3 py-2 border border-l-0 rounded-r-md text-gray-700"
-                    onClick={() => setIsOtpStage(false)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
+                    onClick={handleOtpSubmit}
                   >
-                    Edit
+                    Verify OTP
                   </button>
+
+                  <div className="text-sm text-gray-500 mt-3">
+                    {countdown > 0
+                      ? `You can request another OTP in ${countdown} seconds`
+                      : ""}
+                  </div>
+                  {countdown === 0 && (
+                    <button
+                      className="mt-2 text-blue-500 underline"
+                      onClick={handleResendOtp}
+                    >
+                      Resend OTP
+                    </button>
+                  )}
                 </>
               ) : (
-                ""
-              )}
-            </div>
-            {!isOtpStage ? (
-              <>
                 <button
                   className="bg-blue-500 text-white px-4 py-2 rounded-md w-full mt-4"
                   onClick={handlePhoneNumberSubmit}
                 >
                   Submit
                 </button>
-              </>
-            ) : (
-              ""
-            )}
-
-            {isOtpStage ? (
-              <>
-                <h2 className="text-1xl text-grey-500 mb-2">Enter OTP</h2>
-                <input
-                  type="text"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="px-4 py-2 border rounded-md w-full mb-4"
-                />
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
-                  onClick={handleOtpSubmit}
-                >
-                  Verify OTP
-                </button>
-
-                <div className="text-sm text-gray-500 mt-3">
-                  {countdown > 0
-                    ? `You can request another OTP in ${countdown} seconds`
-                    : ""}
-                </div>
-                {countdown === 0 && (
-                  <button
-                    className="mt-2 text-blue-500 underline"
-                    onClick={handleResendOtp}
-                  >
-                    Resend OTP
-                  </button>
-                )}
-              </>
-            ) : (
-              " "
-            )}
-
-            <button
-              onClick={closeModal}
-              className="mt-4 text-blue-500 hover:underline w-full"
-            >
-              Close
-            </button>
-            <div className="flex flex-col items-center justify-center text-1xl text-gray-600 mt-7 mb-5 text-center">
-              <span className="mr-1">
-                By proceeding, you agree to our
-                <Link
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800 ml-1"
-                >
-                  Terms of Use
-                </Link>
-              </span>
-              <span className="ml-1">
-                {" and "}
-                <Link
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800"
-                >
-                  Privacy Policy
-                </Link>
-              </span>
+              )}
             </div>
-          </div>
+          )}
         </div>
-      )} */}
+      </div>
+
       <div id="recaptcha-container"></div>
     </div>
   );
