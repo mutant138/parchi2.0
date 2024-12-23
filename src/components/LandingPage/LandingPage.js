@@ -106,7 +106,7 @@ const LandingPage = () => {
         const userDoc = await getDoc(userDocRef);
         let user = {};
         let companiesData = [];
-        if (!userDoc.exists()) {
+        if (!isLogin) {
           user = {
             uid: authUser.uid,
             displayName: "",
@@ -117,29 +117,10 @@ const LandingPage = () => {
             createdAt: Timestamp.fromDate(new Date()),
           };
           await setDoc(userDocRef, user);
-
-          const companyPayload = {
-            userRef: userDocRef,
-            userType: "Admin",
-            name: "Your Company",
-            address: "",
-            city: "",
-            zip_code: "",
-            image: "",
-          };
-          const companyDocRef = await addDoc(
-            collection(db, "companies"),
-            companyPayload
-          );
-          companiesData.push({
-            companyId: companyDocRef.id,
-            userType: "Admin",
-            name: "Your Company",
-            address: "",
-            city: "",
-            zip_code: "",
-            image: "",
-          });
+          const companiesRef = collection(db, "companies");
+          const q = query(companiesRef, where("userRef", "==", userDocRef));
+          const company = await getDocs(q);
+          console.log(company)
         } else {
           user = userDoc.data();
           const companiesRef = collection(db, "companies");
@@ -153,7 +134,6 @@ const LandingPage = () => {
             };
           });
         }
-
         const payload = {
           userId: user.uid,
           name: user.displayName || "",
