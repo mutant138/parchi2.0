@@ -204,7 +204,7 @@ const LandingPage = () => {
       </header>
 
       <div className="bg-gray-100 flex justify-center items-center h-screen">
-        <div className="border-2 shadow px-10 py-5 rounded-lg  w-full max-w-lg h-auto bg-white  rounded-lg">
+        <div className="border-2 shadow px-10 py-5 w-full max-w-lg h-auto bg-white  rounded-lg">
           <div className="text-center mb-3 text-3xl font-bold py-3 text-blue-500">
             Sunya
           </div>
