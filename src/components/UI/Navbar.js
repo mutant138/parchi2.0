@@ -18,15 +18,22 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
   const [editForm, setEditForm] = useState({ name: "", email: "", phone: "" });
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.users);
-  const companyName =
+  let companiesList = userDetails.companies;
+
+  let companyName =
     userDetails.companies[userDetails.selectedCompanyIndex].name;
-  console.log("selectedCompany", selectedCompany);
-  console.log("companyDetails", companyDetails, isStaff);
+
+  if (isStaff) {
+    companiesList = companyDetails ?? [];
+    companyName = selectedCompany ?? "";
+  }
+
   function onSwitchCompany(index) {
     const payload = { ...userDetails, selectedCompanyIndex: index };
     dispatch(setUserLogin(payload));
     setIsCompanyOpen(false);
   }
+
   function onSwitchDashboard(e) {
     const { value } = e.target;
     const payload = { ...userDetails, selectedDashboard: value };
@@ -35,6 +42,7 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
   }
 
   const navigate = useNavigate();
+
   const handleEditClick = () => {
     setIsEditing(true);
     setEditForm({
@@ -43,6 +51,7 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
       phone: userDetails.phone,
     });
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditForm({ ...editForm, [name]: value });
@@ -73,21 +82,10 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
               onClick={() => setIsCompanyOpen(!isCompanyOpen)}
             >
               <div className="bg-orange-400 text-white font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
-                {isStaff && selectedCompany
-                  ? selectedCompany?.slice(0, 2).toUpperCase() || "YB"
-                  : userDetails?.companies?.[
-                      userDetails.selectedCompanyIndex
-                    ]?.name
-                      ?.slice(0, 2)
-                      .toUpperCase() || "YB"}
+                {companyName?.slice(0, 2).toUpperCase() || "YB"}
               </div>
               <div>
-                <span className="font-bold text-gray-800">
-                  {isStaff && selectedCompany
-                    ? selectedCompany
-                    : userDetails.companies[userDetails.selectedCompanyIndex]
-                        .name}
-                </span>
+                <span className="font-bold text-gray-800">{companyName}</span>
               </div>
               <div className="absolute z-10 left-0 top-10 w-max px-2 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
                 Change Company
@@ -290,48 +288,31 @@ const Navbar = ({ selectedCompany, companyDetails, isStaff }) => {
             style={{ marginTop: "8vh" }}
           >
             <div className="" onClick={(e) => e.stopPropagation()}>
-              {companyDetails.length > 0 ? (
-                <>
-                  {companyDetails.map((company, index) => (
-                    <div
-                      className="hover:bg-blue-100 w-full border-b-2 p-2 flex items-center cursor-pointer"
-                      key={company.id}
-                      //  onClick={() => {
-                      //    navigate("/");
-                      //    onSwitchCompany(index);
-                      //  }}
-                    >
-                      <div className="bg-orange-400 text-white mr-3 font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
-                        {company.name?.slice(0, 2).toUpperCase() || "YB"}
-                      </div>
-                      {company.name}
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <>
-                  {userDetails.companies.map((company, index) => (
-                    <div
-                      className="hover:bg-blue-100 w-full border-b-2 p-2 flex items-center cursor-pointer"
-                      key={company.companyId}
-                      onClick={() => {
+              {companiesList?.length > 0 &&
+                companiesList.map((company, index) => (
+                  <div
+                    className="hover:bg-blue-100 w-full border-b-2 p-2 flex items-center cursor-pointer"
+                    key={company.companyId}
+                    onClick={() => {
+                      if (!isStaff) {
                         navigate("/");
                         onSwitchCompany(index);
-                      }}
-                    >
-                      <div className="bg-orange-400 text-white mr-3 font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
-                        {company.name?.slice(0, 2).toUpperCase() || "YB"}
-                      </div>
-                      {company.name}
+                      }
+                    }}
+                  >
+                    <div className="bg-orange-400 text-white mr-3 font-bold w-10 h-10 flex items-center justify-center rounded-full border border-gray-500">
+                      {company.name?.slice(0, 2).toUpperCase() || "YB"}
                     </div>
-                  ))}
-                </>
+                    {company.name}
+                  </div>
+                ))}
+              {!isStaff && (
+                <div className="hover:bg-blue-100 w-full  p-2 flex items-center">
+                  <span className="text-sm text-gray-600 font-medium tracking-tight">
+                    + Add Another Company
+                  </span>
+                </div>
               )}
-              <div className="hover:bg-blue-100 w-full  p-2 flex items-center">
-                <span className="text-sm text-gray-600 font-medium tracking-tight">
-                  + Add Another Company
-                </span>
-              </div>
             </div>
           </div>
         </div>

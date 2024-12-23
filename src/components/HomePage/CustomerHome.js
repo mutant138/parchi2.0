@@ -8,6 +8,7 @@ import Projects from "../CustomerDashboard/Projects";
 import ProjectView from "../CustomerDashboard/ProjectView";
 import Files from "../CustomerDashboard/Files";
 import Approval from "../CustomerDashboard/Approval";
+import Settings from "../Settings/Settings";
 
 function CustomerHome() {
   return (
@@ -30,6 +31,7 @@ function CustomerHome() {
               path="/projects/:id/approvals"
               element={<Approval />}
             ></Route>
+            <Route path="/user" element={<Settings />}></Route>
           </Routes>
           <Outlet />
         </div>
