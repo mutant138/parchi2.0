@@ -107,19 +107,45 @@ const userSlice = createSlice({
     },
 
     updateCompanyDetails: (state, action) => {
-      const { isCalendarMonth, name, userType, weekOff } = action.payload;
+      const {
+        isCalendarMonth,
+        name,
+        userType,
+        weekOff,
+        phone,
+        address,
+        city,
+        zipCode,
+        panNumber,
+        gst,
+        email,
+      } = action.payload;
       const updatedCompanies = state.companies;
       state.companies[state.selectedCompanyIndex].isCalendarMonth =
         isCalendarMonth;
       state.companies[state.selectedCompanyIndex].name = name;
       state.companies[state.selectedCompanyIndex].userType = userType;
       state.companies[state.selectedCompanyIndex].weekOff = weekOff;
+      state.companies[state.selectedCompanyIndex].phone = phone;
+      state.companies[state.selectedCompanyIndex].address = address;
+      state.companies[state.selectedCompanyIndex].city = city;
+      state.companies[state.selectedCompanyIndex].zipCode = zipCode;
+      state.companies[state.selectedCompanyIndex].panNumber = panNumber;
+      state.companies[state.selectedCompanyIndex].gst = gst;
+      state.companies[state.selectedCompanyIndex].email = email;
       updatedCompanies[state.selectedCompanyIndex] = {
         ...updatedCompanies[state.selectedCompanyIndex],
         isCalendarMonth,
         name,
         userType,
         weekOff,
+        phone,
+        address,
+        city,
+        zipCode,
+        panNumber,
+        gst,
+        email,
       };
       const updatedData = { ...state, companies: updatedCompanies };
       localStorage.setItem("user", JSON.stringify(updatedData));
