@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { db, storage } from "../../firebase";
 import { collection, addDoc, updateDoc, doc, getDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import SettingsView from "./SettingView";
+import { updateCompanyDetails } from "../../store/UserSlice";
 const Settings = () => {
   const userDetails = useSelector((state) => state.users);
+  const dispatch = useDispatch();
 
   const companyId =
     userDetails.companies[userDetails.selectedCompanyIndex].companyId;
@@ -96,8 +98,12 @@ const Settings = () => {
   const handleSave = async () => {
     try {
       const { id, ...payload } = formData;
+      const { companyLogo, altContact, website, userName, userRef, ...rest } =
+        payload;
+      console.log("rest", rest);
       await updateDoc(doc(db, "companies", companyId), payload);
       alert("Details saved successfully! ");
+      dispatch(updateCompanyDetails(rest));
     } catch (e) {
       console.error("Error adding document: ", e);
       alert("Failed to save details.");
@@ -110,7 +116,7 @@ const Settings = () => {
         {" "}
         <SettingsView />
       </div>
-      <div className="p-6 bg-gray-100 w-full  max-h-screen overflow-y-auto">
+      <div className="p-6 bg-gray-100 w-full  max-h-screen overflow-y-auto mt-4">
         <div className="mx-auto bg-white shadow-md rounded-md p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold text-gray-700">
@@ -147,7 +153,7 @@ const Settings = () => {
             </div>
 
             <div className="flex-grow">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-600">
                   User Name:
                 </label>
@@ -159,7 +165,7 @@ const Settings = () => {
                   className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2  hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
                   placeholder="User Name"
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
