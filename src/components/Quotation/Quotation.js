@@ -132,7 +132,7 @@ function Quotation({ companyDetails, isStaff }) {
               </div>
             </div>
             <div className="rounded-lg p-5 bg-red-50 ">
-              <div className="text-lg">UnPaid Amount</div>
+              <div className="text-lg">UnPaid Amount </div>
               <div className="text-3xl text-red-600 font-bold">
                 ₹ {totalAmount - paidAmount}
               </div>
