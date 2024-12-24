@@ -201,13 +201,27 @@ const POS = ({ companyDetails, isStaff }) => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">POS No</th>
-                      <th className="px-5 py-1 text-start">Customer</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        POS No
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Customer
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -220,12 +234,12 @@ const POS = ({ companyDetails, isStaff }) => {
                             navigate(pos.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">{pos.posNo}</td>
+                          <td className="px-5 py-1 font-bold">{pos.posNo}</td>
 
                           <td className="px-5 py-1 text-start">
                             {pos.customerDetails?.name} <br />
-                            <span className="text-gray-500">
-                              {pos.customerDetails.phone}
+                            <span className="text-gray-500 text-sm">
+                              Ph.No {pos.customerDetails.phone}
                             </span>
                           </td>
 
@@ -235,7 +249,7 @@ const POS = ({ companyDetails, isStaff }) => {
                                 pos.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${pos.total.toFixed(
+                          <td className="px-5 py-1 font-bold  text-center">{`₹ ${pos.total.toFixed(
                             2
                           )}`}</td>
                           <td
@@ -247,12 +261,12 @@ const POS = ({ companyDetails, isStaff }) => {
                               onChange={(e) => {
                                 handleStatusChange(pos.id, e.target.value);
                               }}
-                              className={`border p-1 rounded ${
+                              className={`border p-1  rounded-lg font-bold text-xs ${
                                 pos.paymentStatus === "Paid"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 "
                                   : pos.paymentStatus === "Pending"
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-yellow-100 "
+                                  : "bg-red-100 "
                               }`}
                             >
                               <option value="Pending">Pending</option>

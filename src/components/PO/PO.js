@@ -178,13 +178,27 @@ function PO({ companyDetails, isStaff }) {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">PO No</th>
-                      <th className="px-5 py-1 text-start">Vendor</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        PO No
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Vendor
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -197,12 +211,12 @@ function PO({ companyDetails, isStaff }) {
                             navigate(po.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">{po.poNo}</td>
+                          <td className="px-5 py-1 font-bold">{po.poNo}</td>
 
                           <td className="px-5 py-1 text-start">
                             {po.vendorDetails?.name} <br />
                             <span className="text-gray-500">
-                              {po.vendorDetails.phone}
+                              Ph.No {po.vendorDetails.phone}
                             </span>
                           </td>
 
@@ -224,10 +238,10 @@ function PO({ companyDetails, isStaff }) {
                               onChange={(e) => {
                                 onStatusUpdate(e.target.value, po.id);
                               }}
-                              className={`border p-1 rounded ${
+                              className={`border p-1 rounded-lg font-bold text-xs ${
                                 po.orderStatus !== "Pending"
-                                  ? "bg-green-200  text-green-900"
-                                  : "bg-red-200  text-red-900"
+                                  ? "bg-green-200 "
+                                  : "bg-red-200 "
                               }`}
                             >
                               <option value="Pending">Pending</option>

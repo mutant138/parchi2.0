@@ -218,13 +218,27 @@ const CreditNoteList = () => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">Credit Note No</th>
-                      <th className="px-5 py-1 text-start">Customer</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Credit Note No
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Customer
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold  text-center ">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -237,14 +251,14 @@ const CreditNoteList = () => {
                             navigate(creditnote.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">
+                          <td className="px-5 py-1 font-bold">
                             {creditnote.creditNoteNo}
                           </td>
 
                           <td className="px-5 py-1 text-start">
                             {creditnote.customerDetails?.name} <br />
-                            <span className="text-gray-500">
-                              {creditnote.customerDetails.phone}
+                            <span className="text-gray-500 text-sm">
+                              Ph.No {creditnote.customerDetails.phone}
                             </span>
                           </td>
 
@@ -254,7 +268,7 @@ const CreditNoteList = () => {
                                 creditnote.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${creditnote.total.toFixed(
+                          <td className="px-5 py-1 font-bold text-center">{`₹ ${creditnote.total.toFixed(
                             2
                           )}`}</td>
                           <td
@@ -269,12 +283,12 @@ const CreditNoteList = () => {
                                   e.target.value
                                 );
                               }}
-                              className={`border p-1 rounded ${
+                              className={`border p-1 rounded-lg font-bold text-xs ${
                                 creditnote.paymentStatus === "Paid"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 "
                                   : creditnote.paymentStatus === "Pending"
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-yellow-100"
+                                  : "bg-red-100 "
                               }`}
                             >
                               <option value="Pending">Pending</option>

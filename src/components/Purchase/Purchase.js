@@ -174,13 +174,27 @@ const Purchase = ({ companyDetails, isStaff }) => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">Purchase No</th>
-                      <th className="px-5 py-1 text-start">Vendor</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Purchase No
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Vendor
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-center text-gray-600 font-semibold  ">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -193,12 +207,14 @@ const Purchase = ({ companyDetails, isStaff }) => {
                             navigate(purchase.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">{purchase.purchaseNo}</td>
+                          <td className="px-5 py-1 font-bold">
+                            {purchase.purchaseNo}
+                          </td>
 
                           <td className="px-5 py-1 text-start">
                             {purchase.vendorDetails?.name} <br />
-                            <span className="text-gray-500">
-                              {purchase.vendorDetails.phone}
+                            <span className="text-gray-500 text-sm">
+                              Ph.No {purchase.vendorDetails.phone}
                             </span>
                           </td>
 
@@ -208,7 +224,7 @@ const Purchase = ({ companyDetails, isStaff }) => {
                                 purchase.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${purchase.total.toFixed(
+                          <td className="px-5 py-1 font-bold text-center">{`₹ ${purchase.total.toFixed(
                             2
                           )}`}</td>
                           <td
@@ -220,12 +236,12 @@ const Purchase = ({ companyDetails, isStaff }) => {
                               onChange={(e) => {
                                 handleStatusChange(purchase.id, e.target.value);
                               }}
-                              className={`border p-1 rounded ${
+                              className={`border p-1 rounded-lg font-bold text-xs ${
                                 purchase.paymentStatus === "Paid"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 "
                                   : purchase.paymentStatus === "Pending"
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-yellow-100 "
+                                  : "bg-red-100 "
                               }`}
                             >
                               <option value="Pending">Pending</option>
