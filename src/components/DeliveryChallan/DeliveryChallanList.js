@@ -227,7 +227,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
                       <th className="px-5 py-1 text-start">
-                        DeliveryChallan NO
+                        DeliveryChallan No
                       </th>
                       <th className="px-5 py-1 text-start">Customer</th>
                       <th className="px-5 py-1 text-start ">Date</th>

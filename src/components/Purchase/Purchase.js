@@ -74,9 +74,9 @@ const Purchase = ({ companyDetails, isStaff }) => {
 
   const filteredPurchases = purchases.filter((purchase) => {
     const { vendorDetails, purchaseNo, paymentStatus } = purchase;
-    const customerName = vendorDetails?.name || "";
+    const VendorName = vendorDetails?.name || "";
     const matchesSearch =
-      customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      VendorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       purchaseNo?.toString().toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -174,8 +174,8 @@ const Purchase = ({ companyDetails, isStaff }) => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">Purchase NO</th>
-                      <th className="px-5 py-1 text-start">Customer</th>
+                      <th className="px-5 py-1 text-start">Purchase No</th>
+                      <th className="px-5 py-1 text-start">Vendor</th>
                       <th className="px-5 py-1 text-start ">Date</th>
                       <th className="px-5 py-1  ">Amount</th>
                       <th className="px-5 py-1 text-start ">Status</th>

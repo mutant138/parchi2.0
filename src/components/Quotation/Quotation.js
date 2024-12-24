@@ -180,7 +180,7 @@ function Quotation({ companyDetails, isStaff }) {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">Quotation NO</th>
+                      <th className="px-5 py-1 text-start">Quotation No</th>
                       <th className="px-5 py-1 text-start">Customer</th>
                       <th className="px-5 py-1 text-start ">Date</th>
                       <th className="px-5 py-1  ">Amount</th>
