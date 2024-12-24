@@ -30,14 +30,27 @@ const CompanyForm = (userRef) => {
   }
 
   return (
-    <div className="rounded-lg p-8 max-w-lg mx-auto">
-      <h1 className="text-2xl font-semibold mb-6 text-gray-700">Company Details</h1>
+    <div className="shadow-md py-5 w-1/2 h-auto bg-gray-100  rounded-lg bg-white p-5">
+      <div className="flex justify-around items-center">
+        <div className="border-2 w-full h-0 border-green-500"></div>
+        <div className=" rounded-full  p-2 px-4 bg-green-500 text-white">1</div>
+        <div className="border-2 w-full h-0 border-green-500"></div>
+        <div className="border-2  rounded-full p-2 px-4 border-green-500">
+          2
+        </div>
+        <div className="border-2 w-full h-0"></div>
+      </div>
+      <h1 className="text-2xl font-semibold mb-6 text-gray-700 text-center">
+        Company Details
+      </h1>
       <form onSubmit={onSubmit}>
         <div className="mb-4">
-          <label className="block font-medium mb-2">Company Name <span className="text-red-500">*</span></label>
+          <label className="block font-medium mb-2">
+            Company Name <span className="text-red-500">*</span>
+          </label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <FaUser />
+              <FaUser />
             </span>
             <input
               type="text"
@@ -54,7 +67,7 @@ const CompanyForm = (userRef) => {
           <label className="block font-medium mb-2">Address</label>
           <div className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
-            <MdOutlineLocationOn />
+              <MdOutlineLocationOn />
             </span>
             <input
               type="text"
@@ -69,10 +82,12 @@ const CompanyForm = (userRef) => {
         {/* Repeat similar structure for other fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block font-medium mb-2">Phone Number <span className="text-red-500">*</span></label>
+            <label className="block font-medium mb-2">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
-              <MdOutlineLocalPhone />
+                <MdOutlineLocalPhone />
               </span>
               <input
                 type="text"
@@ -88,7 +103,7 @@ const CompanyForm = (userRef) => {
             <label className="block font-medium mb-2">Email</label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
-              <MdEmail />
+                <MdEmail />
               </span>
               <input
                 type="email"

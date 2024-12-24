@@ -117,16 +117,16 @@ const LandingPage = () => {
             phone_number: "+91" + phoneNumber,
             photoURL: "",
             createdAt: Timestamp.fromDate(new Date()),
-            isCompanyProfileDone: false
+            isCompanyProfileDone: false,
           };
           await setDoc(userDocRef, user);
-          setIsCompanyProfileDone(false)
+          setIsCompanyProfileDone(false);
         } else {
           user = userDoc.data();
           console.log("🚀 ~ handleOtpSubmit ~ user", user);
-          if(!user.isCompanyProfileDone){
-           setIsCompanyProfileDone(false)
-           return
+          if (!user.isCompanyProfileDone) {
+            setIsCompanyProfileDone(false);
+            return;
           }
           const companiesRef = collection(db, "companies");
           const q = query(companiesRef, where("userRef", "==", userDocRef));
@@ -150,7 +150,6 @@ const LandingPage = () => {
           token,
           selectedDashboard: "",
         };
-        console.log("🚀 ~ handleOtpSubmit ~ payload", payload);
         dispatch(setUserLogin(payload));
         alert("OTP verified successfully!");
         navigate("/invoice");
@@ -183,19 +182,19 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="text-gray-800 min-h-screen">
+    <div className="h-screen">
       <div className="bg-gray-100 flex justify-center items-center h-screen">
-        <div className="border-2 shadow py-5 w-full max-w-lg h-auto bg-gray-100  rounded-lg">
-          <div className="text-center mb-3 text-3xl font-bold py-3 text-blue-500">
-            Sunya
-          </div>
-          {/*<div className="flex items-center justify-center text-2xl font-bold my-6">
+        {!isCompanyProfileDone ? (
+          <CompanyForm userRef={userDocRef} />
+        ) : (
+          <div className="shadow-md py-5 w-full max-w-lg h-auto bg-gray-100  rounded-lg bg-white p-3">
+            <div className="text-center mb-3 text-3xl font-bold py-3 text-blue-600">
+              Sunya
+            </div>
+            {/*<div className="flex items-center justify-center text-2xl font-bold my-6">
             Welcome to Sunya
           </div> */}
 
-          {!isCompanyProfileDone ? (
-            <CompanyForm userRef={userDocRef} />
-          ) : (
             <div className=" ">
               <div className="flex space-x-3 mb-10 border-2 rounded-lg">
                 <button
@@ -233,7 +232,7 @@ const LandingPage = () => {
                         placeholder="Enter your mobile number"
                         value={phoneNumber}
                         onChange={handlePhoneNumberChange}
-                        className="px-4 py-2 border w-full focus:outline-none"
+                        className="px-4 py-2 border rounded-r-md w-full focus:outline-none"
                         required
                       />
                       {isOtpStage && (
@@ -293,8 +292,8 @@ const LandingPage = () => {
                 </button>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div id="recaptcha-container"></div>

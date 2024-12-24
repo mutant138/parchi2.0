@@ -102,7 +102,7 @@ function Invoice() {
                     <th className="p-4">Amount</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Mode</th>
-                    <th className="p-4">Invoice NO</th>
+                    <th className="p-4">Invoice No</th>
                     <th className="p-4">Date / Updated Time</th>
                     <th className="p-4">Actions</th>
                   </tr>
