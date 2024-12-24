@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import SettingsView from "./SettingView";
 import { MdMailOutline } from "react-icons/md";
 import { FaSquarePhone } from "react-icons/fa6";
-import { CgProfile } from "react-icons/cg";
+import { FaRegUser } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { db, storage } from "../../firebase";
 import { updateDoc, doc, getDoc } from "firebase/firestore";
@@ -157,7 +157,7 @@ const Prefix = () => {
               </label>
 
               <div className="relative">
-                <CgProfile className="absolute w-5 h-5 text-gray-400 top-1/2 left-3 transform -translate-y-1/2" />
+                <FaRegUser className="absolute w-5 h-5 text-gray-400 top-1/2 left-3 transform -translate-y-1/2" />
                 <input
                   type="text"
                   name="displayName"
