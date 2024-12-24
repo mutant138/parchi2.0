@@ -184,7 +184,7 @@ const LandingPage = () => {
   return (
     <div className="h-screen">
       <div className="bg-gray-100 flex justify-center items-center h-screen">
-        {isCompanyProfileDone ? (
+        {!isCompanyProfileDone ? (
           <CompanyForm userRef={userDocRef} />
         ) : (
           <div className="shadow-md py-5 w-full max-w-lg h-auto bg-gray-100  rounded-lg bg-white p-3">

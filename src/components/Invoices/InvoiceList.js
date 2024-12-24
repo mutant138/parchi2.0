@@ -113,26 +113,26 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
           <h1 className="text-2xl font-bold py-3 px-10 ">Invoice Overview</h1>
           <div className="grid grid-cols-4 gap-12  px-10 ">
             <div className="rounded-lg p-5 bg-[hsl(240,100%,98%)] ">
-              <div className="text-lg">Total Invoices Amount</div>
+              <div className="text-lg">Total Amount</div>
               <div className="text-3xl text-indigo-600 font-bold">
                 ₹ {totalAmount}
               </div>
             </div>
             <div className="rounded-lg p-5 bg-green-50 ">
-              <div className="text-lg">Total Paid Invoices</div>
+              <div className="text-lg"> Paid Amount</div>
               <div className="text-3xl text-emerald-600 font-bold">
                 {" "}
                 ₹ {paidAmount}
               </div>
             </div>
             <div className="rounded-lg p-5 bg-orange-50 ">
-              <div className="text-lg">Pending Invoices</div>
+              <div className="text-lg"> Pending Amount</div>
               <div className="text-3xl text-orange-600 font-bold">
                 ₹ {pendingAmount}
               </div>
             </div>
             <div className="rounded-lg p-5 bg-red-50 ">
-              <div className="text-lg">UnPaid Invoices</div>
+              <div className="text-lg"> UnPaid Amount</div>
               <div className="text-3xl text-red-600 font-bold">
                 ₹ {totalAmount - paidAmount}
               </div>
@@ -146,7 +146,7 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
               <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
                 <input
                   type="text"
-                  placeholder="Search by customer name, phone number, invoice number#..."
+                  placeholder="Search by invoice #..."
                   className=" w-full focus:outline-none"
                   value={searchTerm}
                   onChange={handleSearch}
