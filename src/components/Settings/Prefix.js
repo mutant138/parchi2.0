@@ -65,9 +65,21 @@ const Prefix = () => {
 
   const handleSave = async () => {
     try {
-      const data = { prefix: { ...formData } };
+      // Fill empty fields with their corresponding labels on save
+      const updatedFormData = { ...formData };
+      PREFIX_FIELDS.forEach((field) => {
+        if (
+          !updatedFormData[field.name] ||
+          updatedFormData[field.name].trim() === ""
+        ) {
+          updatedFormData[field.name] = field.label; // Default to label only on save
+        }
+      });
+
+      const data = { prefix: updatedFormData };
       await updateDoc(doc(db, "companies", companyId), data);
       alert("Details saved successfully!");
+      setFormData(updatedFormData); // Update state with defaults
     } catch (error) {
       console.error("Error saving details:", error);
       alert("Failed to save details.");
