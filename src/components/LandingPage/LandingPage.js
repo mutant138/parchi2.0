@@ -26,7 +26,7 @@ const LandingPage = () => {
   const [countdown, setCountdown] = useState(60);
   const [isResendAllowed, setIsResendAllowed] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [isCompanyFound, setIsCompanyFound] = useState(!false);
+  const [isCompanyFound, setIsCompanyFound] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
