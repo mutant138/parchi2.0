@@ -70,6 +70,9 @@ import PurchaseViewHome from "../Purchase/PurchaseView/PurchaseViewHome";
 import SetPurchase from "../Purchase/SetPurchase/SetPurchase";
 import Settings from "../Settings/Settings";
 import ProductViewHome from "../Products/ProductView/ProductViewHome";
+import SettingView from "../Settings/SettingView";
+import UserProfile from "../Settings/UserProfile";
+import Prefix from "../Settings/Prefix";
 
 const Home = () => {
   const location = useLocation();
@@ -83,8 +86,14 @@ const Home = () => {
     "/create-po",
     "/services/create-service",
   ];
+  const match = [
+    "user",
+    "/user/user-profile",
+    "/user/company-profile",
+    "/user/prefix",
+  ];
 
-  const noSideBarPagesList = matchPathList.find((path) =>
+  const noSideBarPagesList = match.find((path) =>
     matchPath({ path }, location.pathname)
   );
 
@@ -94,11 +103,11 @@ const Home = () => {
         <Navbar />
       </div>
       <div className="flex" style={{ height: "92vh" }}>
-        {/* {!noSideBarPagesList && ( */}
-        <div>
-          <SideBar />
-        </div>
-        {/* )} */}
+        {!noSideBarPagesList && (
+          <div>
+            <SideBar />
+          </div>
+        )}
         <div style={{ width: "100%", height: "92vh" }} className="bg-gray-100">
           <Routes>
             <Route path="/invoice" element={<InvoiceList />}></Route>
@@ -250,7 +259,10 @@ const Home = () => {
               element={<SetCreditNote />}
             ></Route>
             <Route path="/vendor/po" element={<VendorPO />}></Route>
+            <Route path="/user/user-profile" element={<UserProfile />}></Route>
+            <Route path="/user/company-profile" element={<Settings />}></Route>
             <Route path="/user" element={<Settings />}></Route>
+            <Route path="/user/prefix" element={<Prefix />}></Route>
           </Routes>
           <Outlet />
         </div>
