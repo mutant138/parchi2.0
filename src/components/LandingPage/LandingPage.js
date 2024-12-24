@@ -22,11 +22,12 @@ const LandingPage = () => {
   const [isOtpStage, setIsOtpStage] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [userDocRef, setUserDocRef] = useState(null);
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(60);
   const [isResendAllowed, setIsResendAllowed] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [isCompanyFound, setIsCompanyFound] = useState(!false);
+  const [isCompanyProfileDone, setIsCompanyProfileDone] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -101,12 +102,13 @@ const LandingPage = () => {
         const authResult = await confirmationResult.confirm(otp);
         const authUser = authResult.user;
         const token = await authUser.getIdToken();
-
+        console.log("🚀 ~ handleOtpSubmit ~ token", token);
         let userDocRef = doc(db, "users", authUser.uid);
+        setUserDocRef(userDocRef);
         const userDoc = await getDoc(userDocRef);
         let user = {};
         let companiesData = [];
-        if (!userDoc.exists()) {
+        if (!isLogin) {
           user = {
             uid: authUser.uid,
             displayName: "",
@@ -115,33 +117,17 @@ const LandingPage = () => {
             phone_number: "+91" + phoneNumber,
             photoURL: "",
             createdAt: Timestamp.fromDate(new Date()),
+            isCompanyProfileDone: false
           };
           await setDoc(userDocRef, user);
-
-          const companyPayload = {
-            userRef: userDocRef,
-            userType: "Admin",
-            name: "Your Company",
-            address: "",
-            city: "",
-            zip_code: "",
-            image: "",
-          };
-          const companyDocRef = await addDoc(
-            collection(db, "companies"),
-            companyPayload
-          );
-          companiesData.push({
-            companyId: companyDocRef.id,
-            userType: "Admin",
-            name: "Your Company",
-            address: "",
-            city: "",
-            zip_code: "",
-            image: "",
-          });
+          setIsCompanyProfileDone(false)
         } else {
           user = userDoc.data();
+          console.log("🚀 ~ handleOtpSubmit ~ user", user);
+          if(!user.isCompanyProfileDone){
+           setIsCompanyProfileDone(false)
+           return
+          }
           const companiesRef = collection(db, "companies");
           const q = query(companiesRef, where("userRef", "==", userDocRef));
           const company = await getDocs(q);
@@ -153,7 +139,6 @@ const LandingPage = () => {
             };
           });
         }
-
         const payload = {
           userId: user.uid,
           name: user.displayName || "",
@@ -165,7 +150,7 @@ const LandingPage = () => {
           token,
           selectedDashboard: "",
         };
-
+        console.log("🚀 ~ handleOtpSubmit ~ payload", payload);
         dispatch(setUserLogin(payload));
         alert("OTP verified successfully!");
         navigate("/invoice");
@@ -199,12 +184,8 @@ const LandingPage = () => {
 
   return (
     <div className="text-gray-800 min-h-screen">
-      <header className="fixed top-0 left-0 w-full px-8 py-4 bg-white z-10">
-        <div className="text-2xl font-bold text-blue-500">Sunya</div>
-      </header>
-
       <div className="bg-gray-100 flex justify-center items-center h-screen">
-        <div className="border-2 shadow px-10 py-5 w-full max-w-lg h-auto bg-white  rounded-lg">
+        <div className="border-2 shadow py-5 w-full max-w-lg h-auto bg-gray-100  rounded-lg">
           <div className="text-center mb-3 text-3xl font-bold py-3 text-blue-500">
             Sunya
           </div>
@@ -212,8 +193,8 @@ const LandingPage = () => {
             Welcome to Sunya
           </div> */}
 
-          {isCompanyFound ? (
-            <CompanyForm userRef={""} />
+          {!isCompanyProfileDone ? (
+            <CompanyForm userRef={userDocRef} />
           ) : (
             <div className=" ">
               <div className="flex space-x-3 mb-10 border-2 rounded-lg">
@@ -226,7 +207,6 @@ const LandingPage = () => {
                 >
                   Login
                 </button>
-
                 <button
                   className={
                     " text-blue-500 py-2  rounded-md w-full " +
@@ -238,37 +218,6 @@ const LandingPage = () => {
                 </button>
               </div>
               <div className="h-96 overflow-y-auto">
-                {!isLogin && (
-                  <div>
-                    <div>
-                      <h2 className="text-1xl text-grey-500 mb-2">
-                        Enter UserName
-                      </h2>
-                      <div className="mb-4">
-                        <input
-                          type="text"
-                          placeholder="Enter UserName"
-                          className="px-4 py-2 border w-full focus:outline-none"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <h2 className="text-1xl text-grey-500 mb-2">
-                        Enter User Email
-                      </h2>
-                      <div className="mb-4">
-                        <input
-                          type="email"
-                          placeholder="Enter User Email"
-                          className="px-4 py-2 border w-full focus:outline-none"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
                 <div className="">
                   <div className="w-full">
                     <h2 className="text-1xl text-grey-500 mb-2">

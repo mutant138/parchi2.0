@@ -1,4 +1,7 @@
 import { addDoc, collection } from "firebase/firestore";
+import { FaUser } from "react-icons/fa";
+import { MdOutlineLocationOn, MdOutlineLocalPhone } from "react-icons/md";
+import { MdEmail } from "react-icons/md";
 import React, { useState } from "react";
 import { db } from "../../firebase";
 
@@ -15,133 +18,93 @@ const CompanyForm = (userRef) => {
         ...formData,
         ...userRef,
       });
-      alert("!Successfully Created!");
+      alert("Successfully Created!");
     } catch (error) {
       console.log("🚀 ~ Submit ~ error:", error);
     }
   }
+
   function handleChangeInput(e) {
     const { name, value } = e.target;
     setFormData((val) => ({ ...val, [name]: value }));
   }
+
   return (
-    <div className="">
-      <h1 className="text-2xl font-semibold mb-4">Company Details</h1>
+    <div className="rounded-lg p-8 max-w-lg mx-auto">
+      <h1 className="text-2xl font-semibold mb-6 text-gray-700">Company Details</h1>
       <form onSubmit={onSubmit}>
         <div className="mb-4">
-          <label className="block font-medium mb-1">
-            Logo <span className="text-gray-500">(Optional)</span>:
-          </label>
-          <div className="flex items-center border border-gray-300 rounded-md p-4">
-            <div className="w-16 h-16 border-2 border-dashed border-gray-400 flex justify-center items-center rounded-md">
-              <span className="text-gray-400 text-sm">+</span>
-            </div>
-            <button className="ml-4 text-blue-600 hover:underline">
-              Upload Logo
-            </button>
+          <label className="block font-medium mb-2">Company Name <span className="text-red-500">*</span></label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <FaUser />
+            </span>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter company name"
+              className="w-full border border-gray-300 rounded-md pl-10 py-2 focus:ring focus:ring-blue-300"
+              onChange={handleChangeInput}
+              required
+            />
           </div>
         </div>
 
+        <div className="mb-4">
+          <label className="block font-medium mb-2">Address</label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
+            <MdOutlineLocationOn />
+            </span>
+            <input
+              type="text"
+              name="address"
+              placeholder="Enter address"
+              className="w-full border border-gray-300 rounded-md pl-10 py-2 focus:ring focus:ring-blue-300"
+              onChange={handleChangeInput}
+            />
+          </div>
+        </div>
+
+        {/* Repeat similar structure for other fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block font-medium mb-1">
-              Company Name <span className="text-red-500">*</span>:
-            </label>
-            <input
-              type="text"
-              placeholder="Enter company name"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              required
-              name="name"
-              onChange={handleChangeInput}
-            />
+            <label className="block font-medium mb-2">Phone Number <span className="text-red-500">*</span></label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
+              <MdOutlineLocalPhone />
+              </span>
+              <input
+                type="text"
+                name="phone"
+                placeholder="Enter phone number"
+                className="w-full border border-gray-300 rounded-md pl-10 py-2 focus:ring focus:ring-blue-300"
+                onChange={handleChangeInput}
+                required
+              />
+            </div>
           </div>
-
           <div>
-            <label className="block font-medium mb-1">Address:</label>
-            <input
-              type="text"
-              placeholder="Enter address"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="address"
-              onChange={handleChangeInput}
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">City:</label>
-            <input
-              type="text"
-              placeholder="Enter city"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="city"
-              onChange={handleChangeInput}
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">Pincode:</label>
-            <input
-              type="text"
-              placeholder="Enter pincode"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="zipCode"
-              onChange={handleChangeInput}
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">GST:</label>
-            <input
-              type="text"
-              placeholder="Enter GST number"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="gst"
-              onChange={handleChangeInput}
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">PAN Number:</label>
-            <input
-              type="text"
-              placeholder="Enter PAN number"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="panNumber"
-              onChange={handleChangeInput}
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">Email:</label>
-            <input
-              type="email"
-              placeholder="Enter email address"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="email"
-              onChange={handleChangeInput}
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">
-              Phone Number <span className="text-red-500">*</span>:
-            </label>
-            <input
-              type="text"
-              placeholder="Enter phone number"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-              name="phone"
-              onChange={handleChangeInput}
-              required
-            />
+            <label className="block font-medium mb-2">Email</label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 ">
+              <MdEmail />
+              </span>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter email address"
+                className="w-full border border-gray-300 rounded-md pl-10 py-2 focus:ring focus:ring-blue-300"
+                onChange={handleChangeInput}
+              />
+            </div>
           </div>
         </div>
 
         <div className="mt-6 flex justify-between">
           <button
             type="button"
-            className="text-blue-600  px-4 py-2 rounded-md "
+            className="text-blue-600 px-4 py-2 rounded-md hover:underline"
             onClick={onSubmit}
           >
             Skip for Now
