@@ -66,16 +66,12 @@ const Prefix = () => {
   const handleSave = async () => {
     try {
       const updatedFormData = { ...formData };
-      PREFIX_FIELDS.forEach((field) => {
-        if (
-          !updatedFormData[field.name] ||
-          updatedFormData[field.name].trim() === ""
-        ) {
-          updatedFormData[field.name] = field.label;
-        }
-      });
+      const prefix = PREFIX_FIELDS.reduce((acc, field) => {
+        acc[field.name] = updatedFormData?.[field.name] ?? field.label;
+        return acc;
+      }, {});
 
-      const data = { prefix: updatedFormData };
+      const data = { prefix };
       await updateDoc(doc(db, "companies", companyId), data);
       alert("Details saved successfully!");
       setFormData(updatedFormData);
@@ -108,7 +104,7 @@ const Prefix = () => {
                     type="text"
                     name={field.name}
                     placeholder={field.placeholder}
-                    value={formData[field.name] || field.label}
+                    defaultValue={formData[field.name] || field.label}
                     onChange={handleChange}
                     className="bg-gray-40 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 hover:border-blue-500 hover:shadow-md hover:shadow-blue-300"
                   />
