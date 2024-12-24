@@ -143,7 +143,7 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by invoice #..."
@@ -153,7 +153,7 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Pending">Pending</option>
@@ -164,7 +164,7 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-invoice"
               >
                 + Create Invoice
@@ -192,7 +192,7 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
                       <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
                         Amount
                       </td>
-                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
                         Status
                       </td>
                       <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
@@ -208,41 +208,37 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
                       filteredInvoices.map((invoice) => (
                         <tr
                           key={invoice.id}
-                          className="border-b text-center cursor-pointer text-start"
+                          className="border-b border-gray-200 text-center cursor-pointer  text-start"
                           onClick={(e) => {
                             navigate(invoice.id);
                           }}
                         >
-                          <td className="px-5 py-1 font-bold">
+                          <td className="px-5 py-3 font-bold">
                             {invoice.invoiceNo}
                           </td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {invoice.customerDetails?.name} <br />
                             <span className="text-gray-500 text-sm">
                               Ph.No {invoice.customerDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               invoice.date.seconds * 1000 +
                                 invoice.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1 font-bold  text-center">{`₹ ${invoice.total.toFixed(
+                          <td className="px-5 py-3 font-bold  text-center">{`₹ ${invoice.total.toFixed(
                             2
                           )}`}</td>
                           <td
-                            className="px-5 py-1"
+                            className="px-5 py-3"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={invoice.paymentStatus}
-                              onChange={(e) => {
-                                handleStatusChange(invoice.id, e.target.value);
-                              }}
-                              className={`border p-1 rounded-lg text-xs font-bold ${
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 invoice.paymentStatus === "Paid"
                                   ? "bg-green-100 "
                                   : invoice.paymentStatus === "Pending"
@@ -250,16 +246,33 @@ const InvoiceList = ({ companyDetails, isStaff }) => {
                                   : "bg-red-100"
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="UnPaid">UnPaid</option>
-                            </select>
+                              <select
+                                value={invoice.paymentStatus}
+                                className={
+                                  invoice.paymentStatus === "Paid"
+                                    ? "bg-green-100 "
+                                    : invoice.paymentStatus === "Pending"
+                                    ? "bg-yellow-100 "
+                                    : "bg-red-100"
+                                }
+                                onChange={(e) => {
+                                  handleStatusChange(
+                                    invoice.id,
+                                    e.target.value
+                                  );
+                                }}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="UnPaid">UnPaid</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {invoice.mode || "Online"}
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {invoice?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}

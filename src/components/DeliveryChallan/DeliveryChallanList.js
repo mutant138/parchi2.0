@@ -189,7 +189,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by deliveryChallan ..."
@@ -199,7 +199,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Pending">Pending</option>
@@ -210,7 +210,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-deliveryChallan"
               >
                 + Create Delivery Challan
@@ -238,7 +238,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                       <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
                         Amount
                       </td>
-                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
                         Status
                       </td>
                       <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
@@ -259,36 +259,33 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                             navigate(dcItem.id);
                           }}
                         >
-                          <td className="px-5 py-1 font-bold">
+                          <td className="px-5 py-3 font-bold">
                             {dcItem.deliveryChallanNo}
                           </td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {dcItem.customerDetails?.name} <br />
                             <span className="text-gray-500 text-sm">
                               Ph.No {dcItem.customerDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               dcItem.date.seconds * 1000 +
                                 dcItem.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1 font-bold text-center">{`₹ ${dcItem.total.toFixed(
+                          <td className="px-5 py-3 font-bold text-center">{`₹ ${dcItem.total.toFixed(
                             2
                           )}`}</td>
                           <td
                             className="px-5 py-1"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={dcItem.paymentStatus}
-                              onChange={(e) => {
-                                handleStatusChange(dcItem.id, e.target.value);
-                              }}
-                              className={`border p-1 rounded-lg font-bold text-xs ${
+                            {" "}
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 dcItem.paymentStatus === "Paid"
                                   ? "bg-green-100 "
                                   : dcItem.paymentStatus === "Pending"
@@ -296,16 +293,30 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                                   : "bg-red-100 "
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="UnPaid">UnPaid</option>
-                            </select>
+                              <select
+                                value={dcItem.paymentStatus}
+                                onChange={(e) => {
+                                  handleStatusChange(dcItem.id, e.target.value);
+                                }}
+                                className={` ${
+                                  dcItem.paymentStatus === "Paid"
+                                    ? "bg-green-100 "
+                                    : dcItem.paymentStatus === "Pending"
+                                    ? "bg-yellow-100 "
+                                    : "bg-red-100 "
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="UnPaid">UnPaid</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {dcItem.mode || "Online"}
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {dcItem?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}

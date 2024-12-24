@@ -142,7 +142,7 @@ function PO({ companyDetails, isStaff }) {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by PO #..."
@@ -152,7 +152,7 @@ function PO({ companyDetails, isStaff }) {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Received">Received</option>
@@ -162,7 +162,7 @@ function PO({ companyDetails, isStaff }) {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-po"
               >
                 + Create PO
@@ -190,7 +190,7 @@ function PO({ companyDetails, isStaff }) {
                       <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
                         Amount
                       </td>
-                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
                         Status
                       </td>
                       <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
@@ -211,46 +211,55 @@ function PO({ companyDetails, isStaff }) {
                             navigate(po.id);
                           }}
                         >
-                          <td className="px-5 py-1 font-bold">{po.poNo}</td>
+                          <td className="px-5 py-3 font-bold">{po.poNo}</td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {po.vendorDetails?.name} <br />
                             <span className="text-gray-500">
                               Ph.No {po.vendorDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               po.date.seconds * 1000 +
                                 po.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${po.total.toFixed(
+                          <td className="px-5 py-3  text-center">{`₹ ${po.total.toFixed(
                             2
                           )}`}</td>
                           <td
                             className="px-5 py-1"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={po.orderStatus}
-                              onChange={(e) => {
-                                onStatusUpdate(e.target.value, po.id);
-                              }}
-                              className={`border p-1 rounded-lg font-bold text-xs ${
+                            {" "}
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 po.orderStatus !== "Pending"
                                   ? "bg-green-200 "
                                   : "bg-red-200 "
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Received">Received</option>
-                            </select>
+                              <select
+                                value={po.orderStatus}
+                                onChange={(e) => {
+                                  onStatusUpdate(e.target.value, po.id);
+                                }}
+                                className={` ${
+                                  po.orderStatus !== "Pending"
+                                    ? "bg-green-200 "
+                                    : "bg-red-200 "
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Received">Received</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">{po.mode || "Online"}</td>
+                          <td className="px-5 py-3">{po.mode || "Online"}</td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {po?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}

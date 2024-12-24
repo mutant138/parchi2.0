@@ -152,7 +152,7 @@ const ProFormaProForma = ({ companyDetails, isStaff }) => {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by proForma #..."
@@ -162,7 +162,7 @@ const ProFormaProForma = ({ companyDetails, isStaff }) => {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Pending">Pending</option>
@@ -173,7 +173,7 @@ const ProFormaProForma = ({ companyDetails, isStaff }) => {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-proForma"
               >
                 + Create ProForma
@@ -201,7 +201,7 @@ const ProFormaProForma = ({ companyDetails, isStaff }) => {
                       <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
                         Amount
                       </td>
-                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
                         Status
                       </td>
                       <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
@@ -222,36 +222,33 @@ const ProFormaProForma = ({ companyDetails, isStaff }) => {
                             navigate(proForma.id);
                           }}
                         >
-                          <td className="px-5 py-1 font-bold">
+                          <td className="px-5 py-3 font-bold">
                             {proForma.proFormaNo}
                           </td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {proForma.customerDetails?.name} <br />
                             <span className="text-gray-500 text-sm">
                               Ph.No {proForma.customerDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               proForma.date.seconds * 1000 +
                                 proForma.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1 font-bold text-center">{`₹ ${proForma.total.toFixed(
+                          <td className="px-5 py-3 font-bold text-center">{`₹ ${proForma.total.toFixed(
                             2
                           )}`}</td>
                           <td
                             className="px-5 py-1"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={proForma.paymentStatus}
-                              onChange={(e) => {
-                                handleStatusChange(proForma.id, e.target.value);
-                              }}
-                              className={`border p-1 rounded-lg font-bold text-xs ${
+                            {" "}
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 proForma.paymentStatus === "Paid"
                                   ? "bg-green-100 "
                                   : proForma.paymentStatus === "Pending"
@@ -259,16 +256,33 @@ const ProFormaProForma = ({ companyDetails, isStaff }) => {
                                   : "bg-red-100 "
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="UnPaid">UnPaid</option>
-                            </select>
+                              <select
+                                value={proForma.paymentStatus}
+                                onChange={(e) => {
+                                  handleStatusChange(
+                                    proForma.id,
+                                    e.target.value
+                                  );
+                                }}
+                                className={` ${
+                                  proForma.paymentStatus === "Paid"
+                                    ? "bg-green-100 "
+                                    : proForma.paymentStatus === "Pending"
+                                    ? "bg-yellow-100 "
+                                    : "bg-red-100 "
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="UnPaid">UnPaid</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {proForma.mode || "Online"}
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {proForma?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}
