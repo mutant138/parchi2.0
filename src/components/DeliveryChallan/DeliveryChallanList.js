@@ -189,7 +189,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by deliveryChallan ..."
@@ -199,7 +199,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Pending">Pending</option>
@@ -210,7 +210,7 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-deliveryChallan"
               >
                 + Create Delivery Challan
@@ -226,15 +226,27 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
                         DeliveryChallan No
-                      </th>
-                      <th className="px-5 py-1 text-start">Customer</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Customer
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -247,53 +259,64 @@ const DeliveryChallanList = ({ companyDetails, isStaff }) => {
                             navigate(dcItem.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">
+                          <td className="px-5 py-3 font-bold">
                             {dcItem.deliveryChallanNo}
                           </td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {dcItem.customerDetails?.name} <br />
-                            <span className="text-gray-500">
-                              {dcItem.customerDetails.phone}
+                            <span className="text-gray-500 text-sm">
+                              Ph.No {dcItem.customerDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               dcItem.date.seconds * 1000 +
                                 dcItem.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${dcItem.total.toFixed(
+                          <td className="px-5 py-3 font-bold text-center">{`₹ ${dcItem.total.toFixed(
                             2
                           )}`}</td>
                           <td
                             className="px-5 py-1"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={dcItem.paymentStatus}
-                              onChange={(e) => {
-                                handleStatusChange(dcItem.id, e.target.value);
-                              }}
-                              className={`border p-1 rounded ${
+                            {" "}
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 dcItem.paymentStatus === "Paid"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 "
                                   : dcItem.paymentStatus === "Pending"
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-yellow-100 "
+                                  : "bg-red-100 "
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="UnPaid">UnPaid</option>
-                            </select>
+                              <select
+                                value={dcItem.paymentStatus}
+                                onChange={(e) => {
+                                  handleStatusChange(dcItem.id, e.target.value);
+                                }}
+                                className={` ${
+                                  dcItem.paymentStatus === "Paid"
+                                    ? "bg-green-100 "
+                                    : dcItem.paymentStatus === "Pending"
+                                    ? "bg-yellow-100 "
+                                    : "bg-red-100 "
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="UnPaid">UnPaid</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {dcItem.mode || "Online"}
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {dcItem?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}

@@ -181,7 +181,7 @@ const CreditNoteList = () => {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by Credit Note #..."
@@ -191,7 +191,7 @@ const CreditNoteList = () => {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Pending">Pending</option>
@@ -202,7 +202,7 @@ const CreditNoteList = () => {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-creditnote"
               >
                 + Create Credit Note
@@ -218,13 +218,27 @@ const CreditNoteList = () => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">Credit Note No</th>
-                      <th className="px-5 py-1 text-start">Customer</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Credit Note No
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Customer
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold  text-center ">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -237,56 +251,67 @@ const CreditNoteList = () => {
                             navigate(creditnote.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">
+                          <td className="px-5 py-3 font-bold">
                             {creditnote.creditNoteNo}
                           </td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {creditnote.customerDetails?.name} <br />
-                            <span className="text-gray-500">
-                              {creditnote.customerDetails.phone}
+                            <span className="text-gray-500 text-sm">
+                              Ph.No {creditnote.customerDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               creditnote.date.seconds * 1000 +
                                 creditnote.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${creditnote.total.toFixed(
+                          <td className="px-5 py-3 font-bold text-center">{`₹ ${creditnote.total.toFixed(
                             2
                           )}`}</td>
                           <td
                             className="px-5 py-1"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={creditnote.paymentStatus}
-                              onChange={(e) => {
-                                handleStatusChange(
-                                  creditnote.id,
-                                  e.target.value
-                                );
-                              }}
-                              className={`border p-1 rounded ${
+                            {" "}
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 creditnote.paymentStatus === "Paid"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 "
                                   : creditnote.paymentStatus === "Pending"
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-yellow-100"
+                                  : "bg-red-100 "
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="UnPaid">UnPaid</option>
-                            </select>
+                              <select
+                                value={creditnote.paymentStatus}
+                                onChange={(e) => {
+                                  handleStatusChange(
+                                    creditnote.id,
+                                    e.target.value
+                                  );
+                                }}
+                                className={`${
+                                  creditnote.paymentStatus === "Paid"
+                                    ? "bg-green-100 "
+                                    : creditnote.paymentStatus === "Pending"
+                                    ? "bg-yellow-100"
+                                    : "bg-red-100 "
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="UnPaid">UnPaid</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {creditnote.mode || "Online"}
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {creditnote?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}

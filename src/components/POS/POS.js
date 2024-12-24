@@ -164,7 +164,7 @@ const POS = ({ companyDetails, isStaff }) => {
         <div className="bg-white  py-8 rounded-lg shadow my-6">
           <nav className="flex mb-4 px-5">
             <div className="space-x-4 w-full flex items-center">
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded w-full">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg w-full">
                 <input
                   type="text"
                   placeholder="Search by customer name, phone number, pos number#..."
@@ -174,7 +174,7 @@ const POS = ({ companyDetails, isStaff }) => {
                 />
                 <IoSearch />
               </div>
-              <div className="flex items-center space-x-4 mb-4 border p-2 rounded ">
+              <div className="flex items-center space-x-4 mb-4 border p-2 rounded-lg ">
                 <select onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All"> All Transactions</option>
                   <option value="Pending">Pending</option>
@@ -185,7 +185,7 @@ const POS = ({ companyDetails, isStaff }) => {
             </div>
             <div className="w-full text-end ">
               <Link
-                className="bg-blue-500 text-white py-2 px-2 rounded"
+                className="bg-blue-500 text-white py-2 px-2 rounded-lg"
                 to="create-pos"
               >
                 + Create POS
@@ -201,13 +201,27 @@ const POS = ({ companyDetails, isStaff }) => {
                 <table className="w-full border-collapse text-start">
                   <thead className="sticky top-0 z-10 bg-white">
                     <tr className="border-b">
-                      <th className="px-5 py-1 text-start">POS No</th>
-                      <th className="px-5 py-1 text-start">Customer</th>
-                      <th className="px-5 py-1 text-start ">Date</th>
-                      <th className="px-5 py-1  ">Amount</th>
-                      <th className="px-5 py-1 text-start ">Status</th>
-                      <th className="px-5 py-1 text-start ">Mode</th>
-                      <th className="px-5 py-1 text-start ">Created By</th>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        POS No
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start">
+                        Customer
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Date
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold  text-center">
+                        Amount
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-center ">
+                        Status
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Mode
+                      </td>
+                      <td className="px-5 py-1 text-gray-600 font-semibold text-start ">
+                        Created By
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
@@ -220,49 +234,60 @@ const POS = ({ companyDetails, isStaff }) => {
                             navigate(pos.id);
                           }}
                         >
-                          <td className="px-5 py-1 ">{pos.posNo}</td>
+                          <td className="px-5 py-3 font-bold">{pos.posNo}</td>
 
-                          <td className="px-5 py-1 text-start">
+                          <td className="px-5 py-3 text-start">
                             {pos.customerDetails?.name} <br />
-                            <span className="text-gray-500">
-                              {pos.customerDetails.phone}
+                            <span className="text-gray-500 text-sm">
+                              Ph.No {pos.customerDetails.phone}
                             </span>
                           </td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {new Date(
                               pos.date.seconds * 1000 +
                                 pos.date.nanoseconds / 1000000
                             ).toLocaleString()}
                           </td>
-                          <td className="px-5 py-1  text-center">{`₹ ${pos.total.toFixed(
+                          <td className="px-5 py-3 font-bold  text-center">{`₹ ${pos.total.toFixed(
                             2
                           )}`}</td>
                           <td
                             className="px-5 py-1"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={pos.paymentStatus}
-                              onChange={(e) => {
-                                handleStatusChange(pos.id, e.target.value);
-                              }}
-                              className={`border p-1 rounded ${
+                            {" "}
+                            <div
+                              className={`px-1 text-center py-2 rounded-lg text-xs font-bold ${
                                 pos.paymentStatus === "Paid"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 "
                                   : pos.paymentStatus === "Pending"
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-yellow-100 "
+                                  : "bg-red-100 "
                               }`}
                             >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="UnPaid">UnPaid</option>
-                            </select>
+                              <select
+                                value={pos.paymentStatus}
+                                onChange={(e) => {
+                                  handleStatusChange(pos.id, e.target.value);
+                                }}
+                                className={` ${
+                                  pos.paymentStatus === "Paid"
+                                    ? "bg-green-100 "
+                                    : pos.paymentStatus === "Pending"
+                                    ? "bg-yellow-100 "
+                                    : "bg-red-100 "
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="UnPaid">UnPaid</option>
+                              </select>
+                            </div>
                           </td>
-                          <td className="px-5 py-1">{pos.mode || "Online"}</td>
+                          <td className="px-5 py-3">{pos.mode || "Online"}</td>
 
-                          <td className="px-5 py-1">
+                          <td className="px-5 py-3">
                             {pos?.createdBy?.name == userDetails.name
                               ? "Owner"
                               : userDetails.name}
