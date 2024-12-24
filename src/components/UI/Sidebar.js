@@ -22,52 +22,51 @@ function SideBar({ staff }) {
 
   console.log("viewdashboard", viewDashBoardList);
   const constSideBarDetails = {
+    //
     sales: {
       // image: <LiaMoneyBillWaveSolid size={30} />,
       isExpend: true,
       items: [
         {
-          name: "Expense",
-          path: "/expense",
-        },
-        {
           name: "Invoice",
           path: "/invoice",
         },
-        {
-          name: "Services",
-          path: "/services",
-        },
+
         {
           name: "Quotation",
           path: "/quotation",
-        },
-        {
-          name: "Purchase",
-          path: "/purchase",
         },
         {
           name: "Pro Forma Invoice",
           path: "/pro-forma-invoice",
         },
         {
-          name: "PO",
-          path: "/po",
-        },
-        {
           name: "Delivery Challan",
           path: "/delivery-challan",
+        },
+        {
+          name: "Subscription",
+          path: "/services",
         },
         {
           name: "Credit Note",
           path: "/credit-note",
         },
         {
-          name: "POS",
-          path: "/pos",
+          name: "Purchase",
+          path: "/purchase",
+        },
+        {
+          name: "PO",
+          path: "/po",
+        },
+        {
+          name: "Debit Note",
+          path: "",
         },
       ],
     },
+
     manage: {
       // image: <GrUserManager size={30} />,
       isExpend: true,
@@ -77,17 +76,22 @@ function SideBar({ staff }) {
           path: "/projects",
         },
         {
-          name: "Products",
+          name: "Inventory",
           path: "/products",
         },
         {
-          name: "Services List",
+          name: "Subscription Plans",
           path: "/services-list",
         },
         {
           name: "Staff & Payout",
           path: "/staff-payout",
         },
+      ],
+    },
+    parties: {
+      isExpend: true,
+      items: [
         {
           name: "Customers",
           path: "/customers",
@@ -96,16 +100,9 @@ function SideBar({ staff }) {
           name: "Vendors",
           path: "/vendors",
         },
-        {
-          name: "Documents",
-          path: "",
-        },
-        {
-          name: "Reminder",
-          path: "/reminder",
-        },
       ],
     },
+
     more: {
       // image: <CgMoreVerticalO size={30} />,
       isExpend: true,
@@ -116,10 +113,6 @@ function SideBar({ staff }) {
         },
         {
           name: "Report",
-          path: "",
-        },
-        {
-          name: "Business Card",
           path: "",
         },
       ],
@@ -175,6 +168,10 @@ function SideBar({ staff }) {
                 ...sideBarDetails.more,
                 isExpend: false,
               },
+              parties: {
+                ...sideBarDetails.more,
+                isExpend: false,
+              },
             });
           }}
         >
@@ -182,7 +179,17 @@ function SideBar({ staff }) {
         </div>
       </div>
       <div className="p-1">
-        <div className=" border-b-2">
+        <div className="border-b-2 ">
+          <Link to="" className=" cursor-pointer mb-10">
+            <div className="text-lg font-semibold pl-3">Home</div>
+          </Link>
+        </div>
+        <div className="border-b-2 mt-3">
+          <Link to="/expense" className=" cursor-pointer mb-10">
+            <div className="text-lg font-semibold pl-3">Expense</div>
+          </Link>
+        </div>
+        <div className=" border-b-2 mt-3">
           <div
             className="flex items-center justify-between"
             onClick={() =>
@@ -239,7 +246,11 @@ function SideBar({ staff }) {
               ))}
           </div>
         </div>
-
+        <div className="border-b-2 mt-3">
+          <Link to="/pos" className=" cursor-pointer mb-10">
+            <div className="text-lg font-semibold pl-3">POS</div>
+          </Link>
+        </div>
         <div className="mt-3  border-b-2">
           <div
             className="flex items-center justify-between"
@@ -300,8 +311,81 @@ function SideBar({ staff }) {
               ))}
           </div>
         </div>
-
-        <div className="mt-3  border-b-2 mb-10">
+        <div className="mt-3  border-b-2">
+          <div
+            className="flex items-center justify-between"
+            onClick={() =>
+              setSideBarDetails({
+                ...sideBarDetails,
+                parties: {
+                  ...sideBarDetails.parties,
+                  isExpend: !sideBarDetails.parties.isExpend,
+                },
+              })
+            }
+          >
+            <div className="flex items-center">
+              {/* <div>{sideBarDetails.manage.image}</div> */}
+              <div
+                className="text-lg font-semibold pl-3"
+                hidden={!isSideBarExpend}
+              >
+                Parties
+              </div>
+            </div>
+            <div hidden={!isSideBarExpend}>
+              {sideBarDetails.parties.isExpend ? (
+                <FaAngleUp />
+              ) : (
+                <FaAngleDown />
+              )}
+            </div>
+          </div>
+          <div
+            className={
+              "" +
+              (isSideBarExpend
+                ? ""
+                : "absolute left-full ml-2 mt-2 bg-white rounded-lg shadow-lg")
+            }
+          >
+            {sideBarDetails.parties.isExpend &&
+              sideBarDetails.parties.items.map((item, index) => (
+                <Link
+                  key={index}
+                  to={
+                    (selectedDashboardUser ? "/" + selectedDashboardUser : "") +
+                    item.path
+                  }
+                  className=" cursor-pointer"
+                >
+                  <div
+                    className={
+                      "w-full py-2 px-3 border-t hover:bg-gray-300 hover:rounded-lg  " +
+                      (location.pathname
+                        .split("/")
+                        .includes(item.path.split("/")[1])
+                        ? "bg-gray-300 rounded-lg"
+                        : "")
+                    }
+                  >
+                    {item.name}
+                  </div>
+                </Link>
+              ))}
+          </div>
+        </div>
+        <div className="border-b-2 mt-3">
+          <Link to="" className=" cursor-pointer mb-10">
+            <div className="text-lg font-semibold pl-3">Documents</div>
+          </Link>{" "}
+        </div>
+        <div className="border-b-2 mt-3">
+          <Link to="/reminder" className=" cursor-pointer mb-10">
+            <div className="text-lg font-semibold pl-3">Reminder</div>
+          </Link>
+        </div>
+        <div className="mt-3  border-b-2 ">
           <div
             className="flex items-center justify-between"
             onClick={() =>
@@ -356,6 +440,11 @@ function SideBar({ staff }) {
                 </Link>
               ))}
           </div>
+        </div>
+        <div className="border-b-2 mt-3">
+          <Link to="" className=" cursor-pointer mb-10">
+            <div className="text-lg font-semibold pl-3">Business Card</div>
+          </Link>
         </div>
       </div>
     </div>
